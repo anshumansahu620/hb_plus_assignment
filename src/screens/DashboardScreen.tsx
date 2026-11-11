@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,12 @@ import {
   Image,
   useWindowDimensions,
   Pressable,
-  Modal,
+  Animated,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { Badge } from '../components/Badge';
-import { Button } from '../components/Button';
 import { THEME } from '../constants/theme';
 import { APP_CONFIG } from '../constants/config';
 
@@ -25,21 +25,83 @@ export const DashboardScreen: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
+  // Desktop smooth width & opacity animation
+  const sidebarWidthAnim = useRef(new Animated.Value(240)).current;
+  const labelOpacityAnim = useRef(new Animated.Value(1)).current;
+
+  // Mobile drawer slide & backdrop animation
+  const drawerTranslateX = useRef(new Animated.Value(-280)).current;
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+
   const firstName = user?.fullName
     ? user.fullName.split(' ')[0]
     : user?.email.split('@')[0] || 'Member';
 
-  // Render Sidebar Content (shared between Desktop & Mobile Drawer)
+  // Toggle desktop sidebar with smooth parallel animations
+  const handleToggleCollapse = () => {
+    const nextState = !isCollapsed;
+    setIsCollapsed(nextState);
+
+    Animated.parallel([
+      Animated.timing(sidebarWidthAnim, {
+        toValue: nextState ? 72 : 240,
+        duration: 250,
+        useNativeDriver: false,
+      }),
+      Animated.timing(labelOpacityAnim, {
+        toValue: nextState ? 0 : 1,
+        duration: nextState ? 120 : 250,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+
+  // Open mobile drawer with slide animation
+  const openMobileDrawer = () => {
+    setIsMobileDrawerOpen(true);
+    Animated.parallel([
+      Animated.timing(drawerTranslateX, {
+        toValue: 0,
+        duration: 240,
+        useNativeDriver: false,
+      }),
+      Animated.timing(backdropOpacity, {
+        toValue: 1,
+        duration: 240,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+
+  // Close mobile drawer with slide animation
+  const closeMobileDrawer = () => {
+    Animated.parallel([
+      Animated.timing(drawerTranslateX, {
+        toValue: -280,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+      Animated.timing(backdropOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+    ]).start(() => {
+      setIsMobileDrawerOpen(false);
+    });
+  };
+
+  // Render Sidebar Content
   const renderSidebarContent = (collapsed: boolean, isDrawer = false) => (
     <View style={[styles.sidebarInner, collapsed && styles.sidebarInnerCollapsed]}>
       <View style={styles.sidebarTop}>
-        {/* Brand Row & Collapse Toggle Button */}
+        {/* Brand Row & Toggle Button */}
         <View style={[styles.brandRow, collapsed && styles.brandRowCollapsed]}>
           {!collapsed ? (
-            <View style={styles.brandRowLeft}>
+            <Animated.View style={[styles.brandRowLeft, { opacity: isDrawer ? 1 : labelOpacityAnim }]}>
               <View style={styles.brandDot} />
               <Text style={styles.brandName}>hbplus</Text>
-            </View>
+            </Animated.View>
           ) : (
             <View style={styles.brandLogoIconBadge}>
               <View style={styles.brandDot} />
@@ -47,9 +109,9 @@ export const DashboardScreen: React.FC = () => {
             </View>
           )}
 
-          {/* Toggle Button (Collapse on Desktop / Close on Mobile Drawer) */}
+          {/* Toggle Button */}
           <Pressable
-            onPress={() => isDrawer ? setIsMobileDrawerOpen(false) : setIsCollapsed(!collapsed)}
+            onPress={isDrawer ? closeMobileDrawer : handleToggleCollapse}
             style={({ pressed }) => [styles.collapseToggleBtn, pressed && { opacity: 0.7 }]}
             accessibilityLabel={isDrawer ? "Close drawer" : collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
@@ -61,13 +123,13 @@ export const DashboardScreen: React.FC = () => {
           </Pressable>
         </View>
 
-        {/* Sidebar Menu Items */}
+        {/* Menu Items */}
         <View style={[styles.menuList, collapsed && styles.menuListCollapsed]}>
           {/* Overview */}
           <Pressable
             onPress={() => {
               setActiveTab('overview');
-              if (isDrawer) setIsMobileDrawerOpen(false);
+              if (isDrawer) closeMobileDrawer();
             }}
             style={[
               styles.menuItem,
@@ -82,9 +144,11 @@ export const DashboardScreen: React.FC = () => {
               style={!collapsed ? styles.menuIcon : undefined}
             />
             {!collapsed && (
-              <Text style={[styles.menuItemText, activeTab === 'overview' && styles.menuItemTextActive]}>
-                Overview
-              </Text>
+              <Animated.View style={[styles.labelWrapper, { opacity: isDrawer ? 1 : labelOpacityAnim }]}>
+                <Text style={[styles.menuItemText, activeTab === 'overview' && styles.menuItemTextActive]}>
+                  Overview
+                </Text>
+              </Animated.View>
             )}
           </Pressable>
 
@@ -93,7 +157,7 @@ export const DashboardScreen: React.FC = () => {
             <Pressable
               onPress={() => {
                 navigateTo('admin');
-                if (isDrawer) setIsMobileDrawerOpen(false);
+                if (isDrawer) closeMobileDrawer();
               }}
               style={[
                 styles.menuItem,
@@ -107,10 +171,10 @@ export const DashboardScreen: React.FC = () => {
                 style={!collapsed ? styles.menuIcon : undefined}
               />
               {!collapsed && (
-                <>
+                <Animated.View style={[styles.labelWrapperRow, { opacity: isDrawer ? 1 : labelOpacityAnim }]}>
                   <Text style={styles.menuItemText}>Admin Panel</Text>
                   <Badge label="RBAC" variant="admin" />
-                </>
+                </Animated.View>
               )}
             </Pressable>
           )}
@@ -119,7 +183,7 @@ export const DashboardScreen: React.FC = () => {
           <Pressable
             onPress={() => {
               setActiveTab('resources');
-              if (isDrawer) setIsMobileDrawerOpen(false);
+              if (isDrawer) closeMobileDrawer();
             }}
             style={[
               styles.menuItem,
@@ -134,18 +198,20 @@ export const DashboardScreen: React.FC = () => {
               style={!collapsed ? styles.menuIcon : undefined}
             />
             {!collapsed && (
-              <Text style={[styles.menuItemText, activeTab === 'resources' && styles.menuItemTextActive]}>
-                Resources
-              </Text>
+              <Animated.View style={[styles.labelWrapper, { opacity: isDrawer ? 1 : labelOpacityAnim }]}>
+                <Text style={[styles.menuItemText, activeTab === 'resources' && styles.menuItemTextActive]}>
+                  Resources
+                </Text>
+              </Animated.View>
             )}
           </Pressable>
         </View>
       </View>
 
-      {/* Sidebar User Footer */}
+      {/* User Profile Footer */}
       <View style={[styles.sidebarFooter, collapsed && styles.sidebarFooterCollapsed]}>
         {!collapsed ? (
-          <>
+          <Animated.View style={{ opacity: isDrawer ? 1 : labelOpacityAnim, width: '100%' }}>
             <View style={styles.userProfileRow}>
               {user?.avatarUrl ? (
                 <Image source={{ uri: user.avatarUrl }} style={styles.userAvatar} />
@@ -167,7 +233,7 @@ export const DashboardScreen: React.FC = () => {
               <Ionicons name="log-out-outline" size={14} color={THEME.colors.error} style={{ marginRight: 6 }} />
               <Text style={styles.signOutText}>Sign out</Text>
             </Pressable>
-          </>
+          </Animated.View>
         ) : (
           <View style={styles.userProfileCollapsed}>
             {user?.avatarUrl ? (
@@ -194,31 +260,49 @@ export const DashboardScreen: React.FC = () => {
     <View style={styles.rootWrapper}>
       <View style={[styles.dashboardLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
         
-        {/* DESKTOP SIDEBAR (Collapsible) */}
+        {/* DESKTOP SIDEBAR (Animated Smooth Width Transition) */}
         {isDesktop && (
-          <View style={[styles.sidebar, isCollapsed ? styles.sidebarCollapsed : styles.sidebarExpanded]}>
+          <Animated.View
+            style={[
+              styles.sidebar,
+              { width: sidebarWidthAnim },
+              isCollapsed ? styles.sidebarCollapsedPadding : styles.sidebarExpandedPadding,
+              Platform.OS === 'web' && ({
+                transition: 'width 250ms cubic-bezier(0.4, 0, 0.2, 1), padding 250ms ease',
+              } as any),
+            ]}
+          >
             {renderSidebarContent(isCollapsed, false)}
-          </View>
+          </Animated.View>
         )}
 
-        {/* MOBILE DRAWER MODAL */}
-        {!isDesktop && (
-          <Modal
-            visible={isMobileDrawerOpen}
-            transparent={true}
-            animationType="fade"
-            onRequestClose={() => setIsMobileDrawerOpen(false)}
-          >
-            <View style={styles.modalOverlay}>
+        {/* MOBILE SLIDING DRAWER (Animated smoothly) */}
+        {!isDesktop && isMobileDrawerOpen && (
+          <View style={styles.mobileDrawerWrapper}>
+            <Animated.View
+              style={[
+                styles.modalBackdrop,
+                { opacity: backdropOpacity },
+              ]}
+            >
               <Pressable
-                style={styles.modalBackdrop}
-                onPress={() => setIsMobileDrawerOpen(false)}
+                style={StyleSheet.absoluteFill}
+                onPress={closeMobileDrawer}
               />
-              <View style={styles.modalDrawerContent}>
-                {renderSidebarContent(false, true)}
-              </View>
-            </View>
-          </Modal>
+            </Animated.View>
+
+            <Animated.View
+              style={[
+                styles.modalDrawerContent,
+                { transform: [{ translateX: drawerTranslateX }] },
+                Platform.OS === 'web' && ({
+                  transition: 'transform 240ms cubic-bezier(0.4, 0, 0.2, 1)',
+                } as any),
+              ]}
+            >
+              {renderSidebarContent(false, true)}
+            </Animated.View>
+          </View>
         )}
 
         {/* MAIN DASHBOARD CONTENT AREA */}
@@ -228,13 +312,13 @@ export const DashboardScreen: React.FC = () => {
             <View style={styles.mobileTopBar}>
               <View style={styles.mobileLeftGroup}>
                 <Pressable
-                  onPress={() => setIsMobileDrawerOpen(true)}
+                  onPress={openMobileDrawer}
                   style={({ pressed }) => [styles.mobileMenuButton, pressed && { opacity: 0.6 }]}
                   accessibilityLabel="Open navigation menu"
                 >
                   <Ionicons name="menu-outline" size={24} color={THEME.colors.forestGreen} />
                 </Pressable>
-                <View style={styles.brandRow}>
+                <View style={styles.brandRowSimple}>
                   <View style={styles.brandDot} />
                   <Text style={styles.brandNameDark}>hbplus</Text>
                 </View>
@@ -420,18 +504,17 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
 
-  // Sidebar Styles (Collapsible)
+  // Sidebar Styles (Smooth Transition)
   sidebar: {
     backgroundColor: '#FFFFFF',
     borderRightWidth: 1,
     borderRightColor: THEME.colors.cardBorder,
+    overflow: 'hidden',
   },
-  sidebarExpanded: {
-    width: 240,
+  sidebarExpandedPadding: {
     padding: THEME.spacing.lg,
   },
-  sidebarCollapsed: {
-    width: 72,
+  sidebarCollapsedPadding: {
     paddingVertical: THEME.spacing.lg,
     paddingHorizontal: 8,
     alignItems: 'center',
@@ -439,6 +522,7 @@ const styles = StyleSheet.create({
   sidebarInner: {
     flex: 1,
     justifyContent: 'space-between',
+    width: '100%',
   },
   sidebarInnerCollapsed: {
     alignItems: 'center',
@@ -461,6 +545,10 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.xl,
   },
   brandRowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  brandRowSimple: {
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -530,11 +618,19 @@ const styles = StyleSheet.create({
   menuIcon: {
     marginRight: 10,
   },
+  labelWrapper: {
+    flex: 1,
+  },
+  labelWrapperRow: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   menuItemText: {
     fontSize: 14,
     color: THEME.colors.textSecondary,
     fontWeight: '500',
-    flex: 1,
   },
   menuItemTextActive: {
     color: THEME.colors.forestGreen,
@@ -623,9 +719,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  // Mobile Drawer Modal
-  modalOverlay: {
-    flex: 1,
+  // Mobile Sliding Drawer
+  mobileDrawerWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
     flexDirection: 'row',
   },
   modalBackdrop: {
@@ -642,7 +743,7 @@ const styles = StyleSheet.create({
     height: '100%',
     padding: THEME.spacing.lg,
     ...THEME.shadows.lg,
-    zIndex: 100,
+    zIndex: 1000,
   },
 
   // Main Content Area
