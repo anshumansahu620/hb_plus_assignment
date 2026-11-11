@@ -297,16 +297,15 @@ export const DashboardScreen: React.FC = () => {
                   {/* CARD: GRANT ADMIN ACCESS & PERMISSIONS (Always inside the view) */}
                   <View style={styles.cardContainer}>
                     <View style={styles.cardHeaderRow}>
-                      <View>
-                        <Text style={styles.cardTitle}>Grant Admin Access & Permissions</Text>
+                      <View style={styles.adminCardTitleCol}>
+                        <Text
+                          style={[styles.cardTitle, styles.adminCardTitle, !isDesktop && styles.adminCardTitleMobile]}
+                          numberOfLines={1}
+                          adjustsFontSizeToFit
+                        >
+                          Grant Admin Access & Permissions
+                        </Text>
                       </View>
-                      {user?.role === 'admin' ? (
-                        <Badge label="ADMIN PRIVILEGES" variant="admin" />
-                      ) : (
-                        <Pressable onPress={elevateToAdmin} style={styles.claimAdminPill}>
-                          <Text style={styles.claimAdminPillText}>Elevate to Admin</Text>
-                        </Pressable>
-                      )}
                     </View>
 
                     {quickAdminMsg && (
@@ -414,10 +413,7 @@ export const DashboardScreen: React.FC = () => {
                           Enable direct email sign-in using your @{APP_CONFIG.allowedDomain} account.
                         </Text>
                       </View>
-                      <Badge
-                        label={user?.hasCustomPassword ? 'PASSWORD ACTIVE' : 'GOOGLE SSO ONLY'}
-                        variant={user?.hasCustomPassword ? 'sage' : 'neutral'}
-                      />
+                      
                     </View>
 
                     {pwdMessage && (
@@ -1097,6 +1093,18 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: THEME.colors.textPrimary,
     letterSpacing: -0.3,
+  },
+  adminCardTitleCol: {
+    flex: 1,
+    minWidth: 0,
+    flexShrink: 1,
+  },
+  adminCardTitle: {
+    fontSize: 16,
+    letterSpacing: -0.2,
+  },
+  adminCardTitleMobile: {
+    fontSize: 14,
   },
   cardSubtitle: {
     fontSize: 12,
