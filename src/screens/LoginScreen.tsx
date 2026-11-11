@@ -58,17 +58,18 @@ export const LoginScreen: React.FC = () => {
 
           </View>
 
+
+
           <View style={styles.heroMiddle}>
             <Text style={styles.heroTaglineKicker}>HOP WITH HB</Text>
             <Text style={styles.heroTitle}>Wellness That Understands Your Lifestyle.</Text>
-            <Text style={styles.heroDescription}>
-              Real health goes beyond fitness. It lives at the intersection of body, mind, and gut. Welcome to the official HB+ team portal trusted by{' '}
-              <Text style={styles.heroHighlightText}>1550+ Members</Text>.
-            </Text>
 
-
-
-
+            {isDesktop && (
+              <Text style={styles.heroDescription}>
+                Real health goes beyond fitness. It lives at the intersection of body, mind, and gut. Welcome to the official HB+ team portal trusted by{' '}
+                <Text style={styles.heroHighlightText}>1550+ Members</Text>.
+              </Text>
+            )}
           </View>
 
           <View style={styles.heroFooter}>
