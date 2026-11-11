@@ -119,6 +119,7 @@ sequenceDiagram
 - [x] **Cross-Platform**: Exact same codebase runs seamlessly on Web (Netlify) and Mobile (Expo/Android/iOS).
 - [x] **Official Google Sign-In**: Branded Google button (`assets/google-logo.svg`) with real OAuth 2.0 integration via Supabase.
 - [x] **Email & Password Authentication**: Work email/password option with the exact same domain whitelist validation.
+- [x] **Set Password after Google Login**: Users authenticated via Google OAuth can set/change their own personal workspace password on the Dashboard, enabling direct email sign-in using their `@hbplus.fit` email and new password.
 - [x] **Domain Validation**: Robust algorithm enforcing `@hbplus.fit` whitelist.
 - [x] **Exact Error Messaging**: Strictly returns `"Access restricted. Please login using your official domain email."` on any non-whitelisted domain (e.g. `@gmail.com`).
 - [x] **Official Hop with HB Branding**: Colors, typography, and logo (`assets/hbplus-logo.png`) extracted directly from `hbplus.fit` (`example.html`) and Figma prototype.
@@ -266,6 +267,7 @@ netlify deploy --prod --dir=dist
 | Test Scenario | Action | Expected Result |
 | :--- | :--- | :--- |
 | **Allowed Domain** | Sign in with `@hbplus.fit` | ✅ Access granted. Redirects to `/dashboard` with verified badge. |
+| **Set Password after Google Login** | Log in with Google → enter new password on Dashboard → Sign out → log in with email & custom password | ✅ Custom password saved to Supabase & local storage. Direct email login succeeds with new password. |
 | **Restricted Domain** | Sign in with `@gmail.com` | ❌ Access blocked. Session revoked. Shows: *"Access restricted. Please login using your official domain email."* |
 | **Direct URL Tampering** | Open `/#dashboard` while logged out | ❌ Intercepted by route guard. Redirects back to `/#login`. |
 | **Admin Route Protection** | Navigate to `/#admin` as standard user | ❌ Blocked by RBAC. Shows unauthorized message and returns to dashboard. |

@@ -10,6 +10,7 @@ export interface UserProfile {
   isDomainVerified: boolean;
   lastLoginAt: string;
   provider: string;
+  hasCustomPassword?: boolean;
 }
 
 export interface DomainValidationResult {
@@ -29,6 +30,7 @@ export interface AuthState {
 export interface AuthContextType extends AuthState {
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password?: string) => Promise<boolean>;
+  setPassword: (newPassword: string) => Promise<{ success: boolean; message?: string }>;
   signOut: () => Promise<void>;
   clearError: () => void;
   simulateLogin: (email: string, role?: UserRole) => Promise<boolean>;

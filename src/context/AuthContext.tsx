@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import { Platform } from 'react-native';
 import { AuthContextType, AuthState, UserProfile, UserRole, AppRoute } from '../types/auth';
 import { validateEmailDomain } from '../utils/domainValidator';
-import { supabase, startGoogleOAuth, endSession, signInWithSupabaseEmail } from '../services/supabase';
+import { supabase, startGoogleOAuth, endSession, signInWithSupabaseEmail, setAccountPassword } from '../services/supabase';
 import { syncUserProfile, determineRoleForEmail, logAuthEvent } from '../services/db';
 import { appStorage } from '../utils/storage';
 import { ALLOWED_DOMAIN } from '../constants/config';
@@ -62,6 +62,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Handle successful login
   const handleSuccessfulAuth = useCallback(async (profile: UserProfile) => {
+    // Check if custom password has been set for this account
+    const normalized = profile.email.toLowerCase().trim();
+    const hasCustomPwd = !!(await appStorage.getItem(`hbplus_pwd_${normalized}`));
+    profile.hasCustomPassword = hasCustomPwd;
+
     const synced = await syncUserProfile(profile);
     await appStorage.setItem(CURRENT_USER_KEY, JSON.stringify(synced));
     await logAuthEvent(synced.email, 'ALLOWED', synced.domain, 'User authenticated successfully');
@@ -276,7 +281,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return false;
       }
 
-      // 2. Attempt Supabase Auth
+      const normalized = validation.email.toLowerCase().trim();
+      const savedPassword = await appStorage.getItem(`hbplus_pwd_${normalized}`);
+
+      // 2. If user previously set their custom password after Google Login, verify it
+      if (savedPassword) {
+        if (password !== savedPassword) {
+          // Attempt Supabase in case changed in cloud
+          let supabaseOk = false;
+          try {
+            const data = await signInWithSupabaseEmail(validation.email, password);
+            if (data?.user) supabaseOk = true;
+          } catch {}
+
+          if (!supabaseOk) {
+            setAuthState(prev => ({
+              ...prev,
+              isLoading: false,
+              error: 'Incorrect password. Please enter the password you set for your account.',
+            }));
+            await logAuthEvent(validation.email, 'RESTRICTED', validation.domain, 'Failed email login: incorrect password');
+            return false;
+          }
+        }
+      }
+
+      // 3. Attempt Supabase Auth
       try {
         const data = await signInWithSupabaseEmail(validation.email, password);
         const userObj = data?.user;
@@ -285,30 +315,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           id: userObj?.id || `usr_${Date.now()}`,
           email: validation.email,
           fullName: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-          avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=0F382C&color=fff`,
+          avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=1A1A1A&color=F5F2E9`,
           role: determineRoleForEmail(validation.email),
           domain: validation.domain,
           isDomainVerified: true,
           lastLoginAt: new Date().toISOString(),
           provider: 'email',
+          hasCustomPassword: !!savedPassword,
         };
 
         await handleSuccessfulAuth(profile);
         return true;
       } catch (authError: any) {
-        // Fallback to domain-verified profile if offline or Supabase credentials need verification
+        // Fallback to domain-verified profile
         console.warn('Supabase email auth notice:', authError?.message);
 
         const profile: UserProfile = {
           id: `usr_email_${Date.now()}`,
           email: validation.email,
           fullName: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-          avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=0F382C&color=fff`,
+          avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=1A1A1A&color=F5F2E9`,
           role: determineRoleForEmail(validation.email),
           domain: validation.domain,
           isDomainVerified: true,
           lastLoginAt: new Date().toISOString(),
           provider: 'email',
+          hasCustomPassword: !!savedPassword,
         };
 
         await handleSuccessfulAuth(profile);
@@ -321,6 +353,56 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         error: err.message || 'Unable to sign in with email.',
       }));
       return false;
+    }
+  };
+
+  // Set / Update Workspace Password (Callable after Google OAuth login)
+  const setPassword = async (newPassword: string): Promise<{ success: boolean; message?: string }> => {
+    if (!authState.user) {
+      return { success: false, message: 'You must be signed in to set your password.' };
+    }
+    if (!newPassword || newPassword.length < 6) {
+      return { success: false, message: 'Password must be at least 6 characters long.' };
+    }
+
+    try {
+      const normalized = authState.user.email.toLowerCase().trim();
+
+      // 1. Update in Supabase Auth if session active
+      try {
+        await setAccountPassword(newPassword);
+      } catch (err: any) {
+        console.warn('Supabase updateUser notice:', err.message);
+      }
+
+      // 2. Persist custom password for direct email sign-in
+      await appStorage.setItem(`hbplus_pwd_${normalized}`, newPassword);
+
+      // 3. Update current user state
+      const updatedUser: UserProfile = {
+        ...authState.user,
+        hasCustomPassword: true,
+      };
+
+      setAuthState(prev => ({ ...prev, user: updatedUser }));
+      await appStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedUser));
+      await syncUserProfile(updatedUser);
+      await logAuthEvent(
+        updatedUser.email,
+        'ALLOWED',
+        updatedUser.domain,
+        'User set custom workspace password for email login'
+      );
+
+      return {
+        success: true,
+        message: 'Password saved successfully! You can now log in using your work email and this password.',
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err.message || 'Failed to update password.',
+      };
     }
   };
 
@@ -385,6 +467,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         ...authState,
         signInWithGoogle,
         signInWithEmail,
+        setPassword,
         signOut,
         clearError,
         simulateLogin,

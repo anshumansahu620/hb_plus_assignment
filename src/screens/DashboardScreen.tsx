@@ -7,6 +7,8 @@ import {
   Image,
   useWindowDimensions,
   Pressable,
+  TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
@@ -17,11 +19,52 @@ import { APP_CONFIG } from '../constants/config';
 const hbplusLogo = require('../../assets/hbplus-logo.png');
 
 export const DashboardScreen: React.FC = () => {
-  const { user, signOut, navigateTo } = useAuth();
+  const { user, signOut, navigateTo, setPassword } = useAuth();
   const { width } = useWindowDimensions();
   const isDesktop = width >= THEME.breakpoints.tablet;
 
   const [activeTab, setActiveTab] = useState<'overview' | 'resources'>('overview');
+
+  // Custom Password Setting State
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
+  const [pwdLoading, setPwdLoading] = useState(false);
+  const [pwdMessage, setPwdMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  const handleSavePassword = async () => {
+    setPwdMessage(null);
+    if (!newPassword) {
+      setPwdMessage({ text: 'Please enter a password.', type: 'error' });
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPwdMessage({ text: 'Password must be at least 6 characters long.', type: 'error' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPwdMessage({ text: 'Passwords do not match. Please re-enter.', type: 'error' });
+      return;
+    }
+
+    setPwdLoading(true);
+    const result = await setPassword(newPassword);
+    setPwdLoading(false);
+
+    if (result.success) {
+      setPwdMessage({
+        text: result.message || 'Password saved successfully! You can now log in using your work email.',
+        type: 'success',
+      });
+      setNewPassword('');
+      setConfirmPassword('');
+    } else {
+      setPwdMessage({
+        text: result.message || 'Failed to update password.',
+        type: 'error',
+      });
+    }
+  };
 
   const firstName = user?.fullName
     ? user.fullName.split(' ')[0]
@@ -162,21 +205,14 @@ export const DashboardScreen: React.FC = () => {
               {/* HB+ LUXURY HERO CARD (From example.html) */}
               <View style={styles.forestHeroBanner}>
                 <View style={styles.forestHeroLeft}>
-                  <View style={styles.heroPill}>
-                    <View style={styles.heroPillDot} />
-                    <Text style={styles.heroPillText}>HOP WITH HB • OFFICIAL PORTAL</Text>
-                  </View>
+
                   <Text style={styles.forestHeroTitle}>Wellness That Understands Your Lifestyle.</Text>
                   <Text style={styles.forestHeroSubtitle}>
-                    Real health goes beyond fitness. It lives at the intersection of body, mind, and gut. One team, securely connected under @{APP_CONFIG.allowedDomain}.
+                    Real health goes beyond fitness. It lives at the intersection of body, mind, and gut.
                   </Text>
                 </View>
 
-                <View style={styles.forestHeroRight}>
-                  <View style={styles.lockBadgeCircle}>
-                    <Ionicons name="shield-checkmark-outline" size={22} color={THEME.colors.terracotta} />
-                  </View>
-                </View>
+
               </View>
 
               {/* Admin Announcement Callout (If user is Admin) */}
@@ -237,6 +273,96 @@ export const DashboardScreen: React.FC = () => {
                       {user?.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : 'Just now'}
                     </Text>
                   </View>
+                </View>
+              </View>
+
+              {/* CARD: SET WORKSPACE PASSWORD (Direct Email Login after Google OAuth) */}
+              <View style={styles.cardContainer}>
+                <View style={styles.cardHeaderRow}>
+                  <View>
+                    <Text style={styles.cardTitle}>Set Workspace Password</Text>
+                    <Text style={styles.cardSubtitle}>
+                      Enable direct email sign-in using your @{APP_CONFIG.allowedDomain} account.
+                    </Text>
+                  </View>
+                  <Badge
+                    label={user?.hasCustomPassword ? 'PASSWORD ACTIVE' : 'GOOGLE SSO ONLY'}
+                    variant={user?.hasCustomPassword ? 'sage' : 'neutral'}
+                  />
+                </View>
+
+                {pwdMessage && (
+                  <View style={[styles.pwdAlertBox, pwdMessage.type === 'success' ? styles.pwdAlertSuccess : styles.pwdAlertError]}>
+                    <Ionicons
+                      name={pwdMessage.type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'}
+                      size={16}
+                      color={pwdMessage.type === 'success' ? THEME.colors.textPrimary : THEME.colors.error}
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text style={[styles.pwdAlertText, pwdMessage.type === 'success' ? styles.pwdAlertTextSuccess : styles.pwdAlertTextError]}>
+                      {pwdMessage.text}
+                    </Text>
+                  </View>
+                )}
+
+                <View style={[styles.pwdFormGrid, !isDesktop && styles.pwdFormGridMobile]}>
+                  <View style={styles.pwdFieldCol}>
+                    <Text style={styles.pwdInputLabel}>New Password</Text>
+                    <View style={styles.pwdInputWrapper}>
+                      <Ionicons name="key-outline" size={16} color={THEME.colors.textMuted} style={styles.pwdInputIcon} />
+                      <TextInput
+                        style={styles.pwdTextInput}
+                        secureTextEntry={!showPwd}
+                        placeholder="At least 6 characters"
+                        placeholderTextColor={THEME.colors.textMuted}
+                        value={newPassword}
+                        onChangeText={setNewPassword}
+                      />
+                    </View>
+                  </View>
+
+                  <View style={styles.pwdFieldCol}>
+                    <Text style={styles.pwdInputLabel}>Confirm Password</Text>
+                    <View style={styles.pwdInputWrapper}>
+                      <Ionicons name="lock-closed-outline" size={16} color={THEME.colors.textMuted} style={styles.pwdInputIcon} />
+                      <TextInput
+                        style={styles.pwdTextInput}
+                        secureTextEntry={!showPwd}
+                        placeholder="Re-enter password"
+                        placeholderTextColor={THEME.colors.textMuted}
+                        value={confirmPassword}
+                        onChangeText={setConfirmPassword}
+                      />
+                    </View>
+                  </View>
+                </View>
+
+                <View style={styles.pwdActionRow}>
+                  <Pressable
+                    onPress={() => setShowPwd(!showPwd)}
+                    style={styles.showPwdToggle}
+                  >
+                    <Ionicons name={showPwd ? 'eye-off-outline' : 'eye-outline'} size={15} color={THEME.colors.textSecondary} style={{ marginRight: 6 }} />
+                    <Text style={styles.showPwdText}>{showPwd ? 'Hide' : 'Show'} Password</Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={handleSavePassword}
+                    disabled={pwdLoading}
+                    style={({ pressed }) => [
+                      styles.savePwdBtn,
+                      pressed && { opacity: 0.85 },
+                      pwdLoading && { opacity: 0.6 },
+                    ]}
+                  >
+                    {pwdLoading ? (
+                      <ActivityIndicator size="small" color="#FFFFFF" />
+                    ) : (
+                      <Text style={styles.savePwdBtnText}>
+                        {user?.hasCustomPassword ? 'Update Password' : 'Save Workspace Password'}
+                      </Text>
+                    )}
+                  </Pressable>
                 </View>
               </View>
 
@@ -705,6 +831,108 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: THEME.colors.textPrimary,
     letterSpacing: -0.3,
+  },
+  cardSubtitle: {
+    fontSize: 12,
+    color: THEME.colors.textSecondary,
+    marginTop: 2,
+  },
+  pwdAlertBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: THEME.borderRadius.md,
+    marginBottom: 14,
+  },
+  pwdAlertSuccess: {
+    backgroundColor: '#FAF8F5',
+    borderColor: THEME.colors.cardBorder,
+    borderWidth: 1,
+  },
+  pwdAlertError: {
+    backgroundColor: THEME.colors.errorBg,
+    borderColor: THEME.colors.errorBorder,
+    borderWidth: 1,
+  },
+  pwdAlertText: {
+    fontSize: 12,
+    flex: 1,
+  },
+  pwdAlertTextSuccess: {
+    color: THEME.colors.textPrimary,
+    fontWeight: '600',
+  },
+  pwdAlertTextError: {
+    color: THEME.colors.errorText,
+    fontWeight: '600',
+  },
+  pwdFormGrid: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 14,
+  },
+  pwdFormGridMobile: {
+    flexDirection: 'column',
+  },
+  pwdFieldCol: {
+    flex: 1,
+    gap: 5,
+  },
+  pwdInputLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: THEME.colors.textPrimary,
+  },
+  pwdInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FAF8F5',
+    borderWidth: 1.5,
+    borderColor: THEME.colors.cardBorder,
+    borderRadius: THEME.borderRadius.md,
+    paddingHorizontal: 12,
+    height: 42,
+  },
+  pwdInputIcon: {
+    marginRight: 8,
+  },
+  pwdTextInput: {
+    flex: 1,
+    fontSize: 13,
+    color: THEME.colors.textPrimary,
+    outlineWidth: 0,
+    height: '100%',
+  },
+  pwdActionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 4,
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  showPwdToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+  },
+  showPwdText: {
+    fontSize: 12,
+    color: THEME.colors.textSecondary,
+    fontWeight: '500',
+  },
+  savePwdBtn: {
+    backgroundColor: THEME.colors.terracotta,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: THEME.borderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  savePwdBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
   },
   accountTable: {
     borderTopWidth: 1,

@@ -76,6 +76,21 @@ export async function signInWithSupabaseEmail(email: string, password: string) {
 }
 
 /**
+ * Updates or sets the password for the currently authenticated user in Supabase Auth
+ */
+export async function setAccountPassword(newPassword: string) {
+  const { data, error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+/**
  * Signs out the current user session from Supabase
  */
 export async function endSession() {

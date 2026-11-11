@@ -55,9 +55,7 @@ export const LoginScreen: React.FC = () => {
                 <Text style={styles.brandSubtitleText}>Hop with HB</Text>
               </View>
             </View>
-            <View style={styles.officialPill}>
-              <Text style={styles.officialPillText}>Corporate SSO</Text>
-            </View>
+
           </View>
 
           <View style={styles.heroMiddle}>
@@ -68,18 +66,9 @@ export const LoginScreen: React.FC = () => {
               <Text style={styles.heroHighlightText}>1550+ Members</Text>.
             </Text>
 
-            {/* Official Workspace Badge Card */}
-            <View style={styles.domainHighlightCard}>
-              <View style={styles.domainCardTop}>
-                <Text style={styles.domainCardDomain}>@{ALLOWED_DOMAIN}</Text>
-                <View style={styles.domainCardBadge}>
-                  <Text style={styles.domainCardBadgeText}>Official Workspace</Text>
-                </View>
-              </View>
-              <Text style={styles.domainCardDesc}>
-                Access is strictly restricted to verified corporate team members.
-              </Text>
-            </View>
+
+
+
           </View>
 
           <View style={styles.heroFooter}>
@@ -102,7 +91,7 @@ export const LoginScreen: React.FC = () => {
           <View style={styles.authContentContainer}>
             {/* Header */}
             <View style={styles.authHeader}>
-              <Text style={styles.kickerText}>SIGN IN TO YOUR ACCOUNT</Text>
+
               <Text style={styles.authTitle}>Your workspace awaits.</Text>
               <Text style={styles.authSubtitle}>
                 Sign in with your official @{ALLOWED_DOMAIN} account to continue.
