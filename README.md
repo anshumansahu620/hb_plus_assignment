@@ -199,6 +199,20 @@ export const validateEmailDomain = (email: string): boolean => {
 | user@fakehbplus.fit | Fail | Prefix domain spoofing rejected |
 | user@HBPLUS.FIT | Pass | Case-insensitive matching accepted |
 
+### Ready-to-Use Login Credentials (Admin, Super User & Member)
+
+The application provides a switchable login form supporting both Google OAuth and direct Work Email authentication. The following pre-configured credentials can be used immediately for testing:
+
+| Account Type | Mode | Email Address | Password | Access Rights & Features |
+| :--- | :--- | :--- | :--- | :--- |
+| Super User | Google OAuth | sjugal884@gmail.com | Select Google Account | Domain bypass, Admin Panel, Audit Trail |
+| Super User | Work Email | sjugal884@gmail.com | admin123 | Domain bypass, Admin Panel, Audit Trail |
+| Administrator | Work Email | admin@hbplus.fit | admin123 | Administrator, RBAC delegation, Audit Logs |
+| Administrator | Work Email | rahul@hbplus.fit | admin123 | Administrator, RBAC delegation, Audit Logs |
+| Administrator | Work Email | security@hbplus.fit | admin123 | Administrator, RBAC delegation, Audit Logs |
+| Team Member | Work Email | employee@hbplus.fit | user123 | Standard Member, Overview, Resource Library |
+| Blocked Domain | Google / Email | candidate@gmail.com | Any | Triggers "Access restricted" security banner |
+
 ---
 
 ## 6. Installation & Local Development
@@ -306,6 +320,13 @@ Super Users receive:
 2. Full Administrator privileges (role: 'admin') with access to the Admin Control Center, role assignment forms, and security audit logs.
 3. Unrestricted access to both Overview Dashboard and Resource Library.
 4. All other external email accounts continue to be strictly blocked, preserving the security validation requirement.
+
+### Super User Login Credentials
+
+| Method | Email Address | Password / Action | Resulting Role |
+| :--- | :--- | :--- | :--- |
+| Google OAuth (SSO) | sjugal884@gmail.com | Click "Continue with Google" | Super User (Admin) |
+| Work Email Sign-In | sjugal884@gmail.com | admin123 | Super User (Admin) |
 
 ### How to Configure or Become a Super User
 
