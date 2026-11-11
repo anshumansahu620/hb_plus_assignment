@@ -8,6 +8,7 @@ import {
   Image,
   Pressable,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
@@ -55,7 +56,7 @@ export const AdminScreen: React.FC = () => {
     return (
       <View style={styles.unauthorizedRoot}>
         <View style={styles.unauthorizedCard}>
-          <Text style={styles.unauthorizedIcon}>🚫</Text>
+          <Ionicons name="lock-closed-outline" size={44} color={THEME.colors.textMuted} style={{ marginBottom: 12 }} />
           <Text style={styles.unauthorizedTitle}>Administrator Access Required</Text>
           <Text style={styles.unauthorizedText}>
             This control center is restricted to @{APP_CONFIG.allowedDomain} administrators.

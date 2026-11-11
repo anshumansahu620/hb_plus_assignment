@@ -130,7 +130,7 @@ export const LoginScreen: React.FC = () => {
               <View style={styles.testButtonsGrid}>
                 {/* 1. Allowed User */}
                 <Button
-                  label="🟢 Allow: user@hbplus.fit"
+                  label="Allow: user@hbplus.fit (Team Member)"
                   variant="outline"
                   onPress={() => simulateLogin(`alex.trainer@${ALLOWED_DOMAIN}`, 'user')}
                   isLoading={isLoading}
@@ -140,7 +140,7 @@ export const LoginScreen: React.FC = () => {
 
                 {/* 2. Allowed Admin */}
                 <Button
-                  label="🛡️ Allow: admin@hbplus.fit (Admin Role)"
+                  label="Allow: admin@hbplus.fit (Admin Role)"
                   variant="outline"
                   onPress={() => simulateLogin(`admin@${ALLOWED_DOMAIN}`, 'admin')}
                   isLoading={isLoading}
@@ -150,7 +150,7 @@ export const LoginScreen: React.FC = () => {
 
                 {/* 3. Blocked Gmail */}
                 <Button
-                  label="🔴 Block: example@gmail.com"
+                  label="Block: example@gmail.com (Restricted)"
                   variant="outline"
                   onPress={() => simulateLogin('example@gmail.com')}
                   isLoading={isLoading}

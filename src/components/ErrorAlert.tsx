@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { THEME } from '../constants/theme';
 
 interface ErrorAlertProps {
@@ -19,7 +20,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
     <View style={styles.container}>
       <View style={styles.iconColumn}>
         <View style={styles.iconCircle}>
-          <Text style={styles.iconText}>⚠️</Text>
+          <Ionicons name="alert-circle-outline" size={17} color={THEME.colors.errorText} />
         </View>
       </View>
       

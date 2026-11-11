@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
   Pressable,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
@@ -45,7 +46,12 @@ export const DashboardScreen: React.FC = () => {
                   onPress={() => setActiveTab('overview')}
                   style={[styles.menuItem, activeTab === 'overview' && styles.menuItemActive]}
                 >
-                  <Text style={styles.menuIcon}>📊</Text>
+                  <Ionicons
+                    name="grid-outline"
+                    size={17}
+                    color={activeTab === 'overview' ? THEME.colors.forestGreen : THEME.colors.textSecondary}
+                    style={styles.menuIcon}
+                  />
                   <Text style={[styles.menuItemText, activeTab === 'overview' && styles.menuItemTextActive]}>
                     Overview
                   </Text>
@@ -56,7 +62,12 @@ export const DashboardScreen: React.FC = () => {
                     onPress={() => navigateTo('admin')}
                     style={styles.menuItem}
                   >
-                    <Text style={styles.menuIcon}>🛡️</Text>
+                    <Ionicons
+                      name="shield-checkmark-outline"
+                      size={17}
+                      color={THEME.colors.textSecondary}
+                      style={styles.menuIcon}
+                    />
                     <Text style={styles.menuItemText}>Admin Panel</Text>
                     <Badge label="RBAC" variant="admin" />
                   </Pressable>
@@ -66,7 +77,12 @@ export const DashboardScreen: React.FC = () => {
                   onPress={() => setActiveTab('resources')}
                   style={[styles.menuItem, activeTab === 'resources' && styles.menuItemActive]}
                 >
-                  <Text style={styles.menuIcon}>📁</Text>
+                  <Ionicons
+                    name="folder-outline"
+                    size={17}
+                    color={activeTab === 'resources' ? THEME.colors.forestGreen : THEME.colors.textSecondary}
+                    style={styles.menuIcon}
+                  />
                   <Text style={[styles.menuItemText, activeTab === 'resources' && styles.menuItemTextActive]}>
                     Resources
                   </Text>
@@ -151,7 +167,7 @@ export const DashboardScreen: React.FC = () => {
 
                 <View style={styles.forestHeroRight}>
                   <View style={styles.lockBadgeCircle}>
-                    <Text style={styles.lockBadgeIcon}>🔒</Text>
+                    <Ionicons name="shield-checkmark-outline" size={24} color="#D1FAE5" />
                   </View>
                 </View>
               </View>
@@ -163,7 +179,9 @@ export const DashboardScreen: React.FC = () => {
                   style={({ pressed }) => [styles.adminNotice, pressed && { opacity: 0.85 }]}
                 >
                   <View style={styles.adminNoticeContent}>
-                    <Text style={styles.adminNoticeIcon}>🛡️</Text>
+                    <View style={styles.adminIconBox}>
+                      <Ionicons name="shield-outline" size={20} color="#6D28D9" />
+                    </View>
                     <View style={{ flex: 1 }}>
                       <Text style={styles.adminNoticeTitle}>Administrator Controls Active</Text>
                       <Text style={styles.adminNoticeBody}>
@@ -226,7 +244,7 @@ export const DashboardScreen: React.FC = () => {
                     style={styles.moduleCard}
                   >
                     <View style={styles.moduleIconWrapper}>
-                      <Text style={styles.moduleIcon}>👥</Text>
+                      <Ionicons name="people-outline" size={18} color={THEME.colors.forestGreen} />
                     </View>
                     <Text style={styles.moduleTitle}>Team Directory</Text>
                     <Text style={styles.moduleDesc}>
@@ -240,7 +258,7 @@ export const DashboardScreen: React.FC = () => {
                     style={styles.moduleCard}
                   >
                     <View style={[styles.moduleIconWrapper, { backgroundColor: '#F0FDF4' }]}>
-                      <Text style={styles.moduleIcon}>🔒</Text>
+                      <Ionicons name="lock-closed-outline" size={18} color="#059669" />
                     </View>
                     <Text style={styles.moduleTitle}>Domain Security</Text>
                     <Text style={styles.moduleDesc}>
@@ -254,7 +272,7 @@ export const DashboardScreen: React.FC = () => {
                     style={styles.moduleCard}
                   >
                     <View style={[styles.moduleIconWrapper, { backgroundColor: '#FEF2F2' }]}>
-                      <Text style={styles.moduleIcon}>🚪</Text>
+                      <Ionicons name="log-out-outline" size={18} color={THEME.colors.error} />
                     </View>
                     <Text style={styles.moduleTitle}>Terminate Session</Text>
                     <Text style={styles.moduleDesc}>
@@ -335,7 +353,6 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.sageBg,
   },
   menuIcon: {
-    fontSize: 16,
     marginRight: 10,
   },
   menuItemText: {
@@ -540,8 +557,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  adminNoticeIcon: {
-    fontSize: 24,
+  adminIconBox: {
     marginRight: 12,
   },
   adminNoticeTitle: {
