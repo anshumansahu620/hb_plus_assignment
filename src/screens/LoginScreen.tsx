@@ -62,7 +62,9 @@ export const LoginScreen: React.FC = () => {
 
           <View style={styles.heroMiddle}>
             <Text style={styles.heroTaglineKicker}>HOP WITH HB</Text>
-            <Text style={styles.heroTitle}>Wellness That Understands Your Lifestyle.</Text>
+            <Text style={[styles.heroTitle, !isDesktop && styles.heroTitleMobile]}>
+              Wellness That Understands Your Lifestyle.
+            </Text>
 
             {isDesktop && (
               <Text style={styles.heroDescription}>
@@ -91,13 +93,13 @@ export const LoginScreen: React.FC = () => {
 
           <View style={styles.authContentContainer}>
             {/* Header */}
-            <View style={styles.authHeader}>
+            {isDesktop && <View style={styles.authHeader}>
 
               <Text style={styles.authTitle}>Your workspace awaits.</Text>
               <Text style={styles.authSubtitle}>
                 Sign in with your official @{ALLOWED_DOMAIN} account to continue.
               </Text>
-            </View>
+            </View>}
 
             {/* Error banner (Displays when non-domain email like @gmail.com is attempted) */}
             {error && (
@@ -307,6 +309,11 @@ const styles = StyleSheet.create({
     color: THEME.colors.onyx,
     lineHeight: 42,
     letterSpacing: -0.5,
+  },
+  heroTitleMobile: {
+    fontSize: 22,
+    lineHeight: 28,
+    letterSpacing: -0.3,
   },
   heroDescription: {
     fontFamily: THEME.typography.fontFamily.sans,
