@@ -176,7 +176,7 @@ export const DashboardScreen: React.FC = () => {
                     style={styles.menuItem}
                   >
                     <Ionicons
-                      name="shield-checkmark-outline"
+                      name="lock-closed-outline"
                       size={17}
                       color={THEME.colors.textSecondary}
                       style={styles.menuIcon}
@@ -343,7 +343,7 @@ export const DashboardScreen: React.FC = () => {
                             isQuickGranting && { opacity: 0.6 },
                           ]}
                         >
-                          <Ionicons name="shield-checkmark" size={15} color="#FFFFFF" style={{ marginRight: 6 }} />
+                          <Ionicons name="lock-closed-outline" size={15} color="#FFFFFF" style={{ marginRight: 6 }} />
                           <Text style={styles.quickGrantBtnText}>
                             {isQuickGranting ? 'Granting...' : 'Grant Admin Access'}
                           </Text>

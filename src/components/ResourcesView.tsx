@@ -119,7 +119,7 @@ const RESOURCES_DATA: ResourceItem[] = [
     format: 'PDF',
     size: '850 KB',
     updatedAt: 'Active Security Standard',
-    iconName: 'shield-checkmark-outline',
+    iconName: 'lock-closed-outline',
     featured: true,
   },
   {
@@ -374,7 +374,7 @@ export const ResourcesView: React.FC = () => {
       {/* Compliance & Verification Hub Banner */}
       <View style={styles.complianceCard}>
         <View style={styles.complianceContent}>
-          <Ionicons name="shield-checkmark" size={24} color={THEME.colors.terracotta} style={{ marginRight: 12 }} />
+          <Ionicons name="lock-closed" size={24} color={THEME.colors.terracotta} style={{ marginRight: 12 }} />
           <View style={{ flex: 1 }}>
             <Text style={styles.complianceTitle}>Official Corporate Knowledge Repository</Text>
             <Text style={styles.complianceDesc}>

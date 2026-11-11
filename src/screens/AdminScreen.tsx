@@ -204,7 +204,7 @@ export const AdminScreen: React.FC = () => {
                   isGranting && { opacity: 0.6 },
                 ]}
               >
-                <Ionicons name="shield-checkmark-outline" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+                <Ionicons name="lock-closed-outline" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
                 <Text style={styles.grantBtnText}>
                   {isGranting ? 'Granting...' : 'Grant Admin Access'}
                 </Text>
@@ -217,7 +217,7 @@ export const AdminScreen: React.FC = () => {
               <View style={styles.adminPillsWrap}>
                 {activeAdmins.map(admin => (
                   <View key={admin.id} style={styles.adminPill}>
-                    <Ionicons name="shield" size={12} color={THEME.colors.terracotta} style={{ marginRight: 5 }} />
+                    <Ionicons name="lock-closed" size={12} color={THEME.colors.terracotta} style={{ marginRight: 5 }} />
                     <Text style={styles.adminPillText}>{admin.email}</Text>
                   </View>
                 ))}
@@ -271,7 +271,7 @@ export const AdminScreen: React.FC = () => {
                         ]}
                       >
                         <Ionicons
-                          name={item.role === 'admin' ? 'close-circle-outline' : 'shield-checkmark-outline'}
+                          name={item.role === 'admin' ? 'close-circle-outline' : 'lock-closed-outline'}
                           size={14}
                           color={item.role === 'admin' ? '#991B1B' : '#047857'}
                           style={{ marginRight: 4 }}
