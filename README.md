@@ -146,7 +146,7 @@ hb_assignment/
 - Evaluator Sandbox: Provides quick one-click evaluator credentials to easily test allowed domain access, admin privileges, and blocked domain scenarios.
 
 ### 4.2 Dashboard Screen (src/screens/DashboardScreen.tsx)
-- Fixed Sidebar Navigation: On desktop viewports (880px and wider), a permanent 250px uncollapsible sidebar provides fast navigation between Overview, Resources, and Admin views.
+- Top Navigation Bar & Collapsible Drawer: Replaces rigid sidebars with a responsive top header and a collapsible hamburger drawer menu. Accessible on all screen sizes, expanding to display Workspace Navigation (Overview, Resource Library, Admin Control Center) and user session controls, while allowing the main content area to utilize full screen width.
 - Hero Welcome Banner: Displays the active workspace greeting, personalized with the user name and the official Hop with HB lifestyle statement.
 - Admin Access Management: An embedded management card allowing verified team members to assign administrator privileges to any colleague under @hbplus.fit. Includes title auto-scaling and responsive container boundaries.
 - Account Overview Table: Displays authenticated email, domain status, assigned role, and last login timestamp.
@@ -290,3 +290,69 @@ All styles are governed by design tokens located in src/constants/theme.ts:
   - Brand Display: Gilroy, sans-serif
   - Interface Body: DM Sans, sans-serif
 - Iconography: Clean vector icons from @expo/vector-icons/Ionicons utilizing lock symbols (lock-closed-outline, lock-closed) for security context.
+
+---
+
+## 9. Super User & Evaluator Configuration
+
+### What is a Super User?
+In default production mode, access is exclusively restricted to email accounts ending in @hbplus.fit. Any third-party domain (such as personal @gmail.com accounts) is strictly rejected with the required security alert:
+> "Access restricted. Please login using your official domain email."
+
+To allow evaluators, recruiters, or system administrators to test the live Google OAuth single sign-on flow using their personal Google accounts without needing an @hbplus.fit Google Workspace mailbox, the portal includes a Super User Bypass and Admin Registry.
+
+Super Users receive:
+1. Complete exemption from the @hbplus.fit domain restriction during Google OAuth and email sign-in.
+2. Full Administrator privileges (role: 'admin') with access to the Admin Control Center, role assignment forms, and security audit logs.
+3. Unrestricted access to both Overview Dashboard and Resource Library.
+4. All other external email accounts continue to be strictly blocked, preserving the security validation requirement.
+
+### How to Configure or Become a Super User
+
+#### Method 1: Whitelist in Code Configuration (Recommended)
+
+1. Open src/constants/config.ts:
+```typescript
+// Add your Google email address to the Super User array
+export const SUPER_USER_EMAILS = [
+  'sjugal884@gmail.com',
+  'your-email@gmail.com',
+];
+
+// Add the same email to ADMIN_EMAILS for role authorization
+export const ADMIN_EMAILS = [
+  `admin@${ALLOWED_DOMAIN}`,
+  `security@${ALLOWED_DOMAIN}`,
+  `rahul@${ALLOWED_DOMAIN}`,
+  `user@${ALLOWED_DOMAIN}`,
+  `alex.trainer@${ALLOWED_DOMAIN}`,
+  `sarah.fitness@${ALLOWED_DOMAIN}`,
+  'sjugal884@gmail.com',
+  'your-email@gmail.com',
+];
+```
+
+2. How the code processes this:
+   - src/utils/domainValidator.ts checks SUPER_USER_EMAILS. If matched, validateEmailDomain() returns isValid: true.
+   - src/services/db.ts checks determineRoleForEmail(). If matched, the user is assigned role: 'admin'.
+
+3. Apply changes:
+   - For local development: Changes hot-reload automatically if running "npm run web:3000".
+   - For production web build: Run "npm run build:web" to compile the updated configuration into the dist/ directory.
+
+#### Method 2: Runtime In-App Delegation
+
+Any signed-in Administrator can elevate other team members directly within the application:
+1. Open the Overview Dashboard and locate the "Grant Admin Access" card (or navigate to Admin Control Center via the hamburger menu).
+2. Enter the target email address in the input field.
+3. Click "Grant Admin Access".
+4. The permission is saved immediately to local storage and synchronized with the Supabase database.
+
+#### Method 3: Environment Variable Domain Switching
+
+If you want to permit all Google accounts under a specific domain during testing without modifying code arrays:
+1. Edit the .env file in the root directory:
+```env
+EXPO_PUBLIC_ALLOWED_DOMAIN=gmail.com
+```
+2. Restart the development server ("npm run web:3000"). All @gmail.com accounts will now pass standard domain validation.
