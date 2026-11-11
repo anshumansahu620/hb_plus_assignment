@@ -56,3 +56,4 @@ export async function endSession() {
     console.warn('Supabase signOut notice:', error.message);
   }
 }
+

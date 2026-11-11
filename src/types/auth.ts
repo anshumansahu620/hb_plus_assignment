@@ -36,3 +36,4 @@ export interface AuthContextType extends AuthState {
 }
 
 export type AppRoute = 'login' | 'dashboard' | 'admin' | 'profile';
+

@@ -63,3 +63,4 @@ console.log(t4);
 if (t4.isValid) throw new Error('Test 4 failed!');
 
 console.log('\n✅ ALL DOMAIN RESTRICTION TESTS PASSED PERFECTLY!');
+

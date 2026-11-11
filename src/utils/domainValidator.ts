@@ -64,3 +64,4 @@ export function extractDomain(email: string): string {
 export function isAllowedDomain(email: string): boolean {
   return validateEmailDomain(email).isValid;
 }
+

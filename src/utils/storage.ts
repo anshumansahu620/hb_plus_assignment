@@ -43,3 +43,4 @@ class CrossPlatformStorage {
 }
 
 export const appStorage = new CrossPlatformStorage();
+

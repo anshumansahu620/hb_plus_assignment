@@ -52,3 +52,4 @@ describe('Domain Validation Security Engine', () => {
     expect(extractDomain('test@example.com')).toBe('example.com');
   });
 });
+

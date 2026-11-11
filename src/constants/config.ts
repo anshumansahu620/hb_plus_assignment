@@ -33,3 +33,4 @@ export const APP_CONFIG = {
   supportEmail: `it-support@${ALLOWED_DOMAIN}`,
   version: '1.0.0',
 };
+

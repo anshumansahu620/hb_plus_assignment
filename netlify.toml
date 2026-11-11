@@ -6,6 +6,7 @@
   NODE_VERSION = "22"
   EXPO_PUBLIC_ALLOWED_DOMAIN = "hbplus.fit"
   EXPO_PUBLIC_SUPABASE_URL = "https://uwklwnsrgbzkhpqcbqqj.supabase.co"
+  EXPO_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_I4PLL0x02a4-L1FzLrlFQQ_5XBNtQEJ"
 
 # SPA Fallback redirects for routing
 [[redirects]]
@@ -26,3 +27,4 @@
   for = "/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
