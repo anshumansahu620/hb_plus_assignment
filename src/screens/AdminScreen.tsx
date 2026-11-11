@@ -9,8 +9,6 @@ import {
   Pressable,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { Navbar } from '../components/Navbar';
-import { Card } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { THEME } from '../constants/theme';
@@ -24,9 +22,9 @@ import {
 import { UserProfile, UserRole } from '../types/auth';
 
 export const AdminScreen: React.FC = () => {
-  const { user, navigateTo } = useAuth();
+  const { user, navigateTo, signOut } = useAuth();
   const { width } = useWindowDimensions();
-  const isMobile = width < THEME.breakpoints.tablet;
+  const isDesktop = width >= THEME.breakpoints.tablet;
 
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
@@ -53,16 +51,14 @@ export const AdminScreen: React.FC = () => {
     setIsUpdating(null);
   };
 
-  // Route security guard: regular user cannot access Admin panel
   if (user?.role !== 'admin') {
     return (
-      <View style={styles.screenWrapper}>
-        <Navbar />
-        <View style={styles.unauthorizedContainer}>
+      <View style={styles.unauthorizedRoot}>
+        <View style={styles.unauthorizedCard}>
           <Text style={styles.unauthorizedIcon}>🚫</Text>
           <Text style={styles.unauthorizedTitle}>Administrator Access Required</Text>
           <Text style={styles.unauthorizedText}>
-            This page is restricted to administrators of @{APP_CONFIG.allowedDomain}.
+            This control center is restricted to @{APP_CONFIG.allowedDomain} administrators.
           </Text>
           <Button
             label="Return to Dashboard"
@@ -75,77 +71,83 @@ export const AdminScreen: React.FC = () => {
   }
 
   return (
-    <View style={styles.screenWrapper}>
-      <Navbar />
+    <View style={styles.rootWrapper}>
+      {/* Top Header */}
+      <View style={styles.adminHeader}>
+        <View style={styles.headerBrandRow}>
+          <View style={styles.brandDot} />
+          <Text style={styles.brandName}>hbplus</Text>
+          <View style={{ width: 12 }} />
+          <Badge label="ADMIN CONTROL CENTER" variant="admin" />
+        </View>
+
+        <View style={styles.headerActions}>
+          <Button
+            label="← Back to Dashboard"
+            variant="outline"
+            onPress={() => navigateTo('dashboard')}
+            style={styles.backBtn}
+          />
+        </View>
+      </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={[styles.mainContainer, isMobile ? styles.containerMobile : styles.containerDesktop]}>
+        <View style={styles.innerContainer}>
           
-          {/* Header */}
-          <View style={styles.adminHeader}>
-            <View>
-              <View style={styles.badgeWrapper}>
-                <Badge label="RBAC Control Center" variant="admin" />
-              </View>
-              <Text style={styles.pageTitle}>Admin & Domain Management</Text>
-              <Text style={styles.pageSubtitle}>
-                Manage authorized team accounts, roles, and real-time security audit trails.
-              </Text>
-            </View>
-            <Button
-              label="← Back to Dashboard"
-              variant="outline"
-              onPress={() => navigateTo('dashboard')}
-            />
+          <View style={styles.pageTitleBlock}>
+            <Text style={styles.pageTitle}>User Directory & Domain Auditing</Text>
+            <Text style={styles.pageSubtitle}>
+              Manage corporate identities, role privileges, and inspect real-time domain security logs.
+            </Text>
           </View>
 
-          {/* User Directory Table / Card */}
-          <Card
-            title="Registered Team Directory"
-            subtitle={`Users verified under @${APP_CONFIG.allowedDomain} with stored database profiles`}
-            style={styles.sectionCard}
-          >
+          {/* User Directory Table Card */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View>
+                <Text style={styles.cardTitle}>Verified Team Members</Text>
+                <Text style={styles.cardSubtitle}>Accounts authorized under @{APP_CONFIG.allowedDomain}</Text>
+              </View>
+              <Badge label={`${profiles.length} Active`} variant="sage" />
+            </View>
+
             <View style={styles.userList}>
               {profiles.map((item) => (
-                <View key={item.id} style={styles.userItem}>
-                  <View style={styles.userItemLeft}>
+                <View key={item.id} style={styles.userRow}>
+                  <View style={styles.userRowLeft}>
                     {item.avatarUrl ? (
-                      <Image source={{ uri: item.avatarUrl }} style={styles.avatar} />
+                      <Image source={{ uri: item.avatarUrl }} style={styles.userAvatar} />
                     ) : (
                       <View style={styles.avatarFallback}>
-                        <Text style={styles.avatarText}>
-                          {(item.fullName || item.email)[0].toUpperCase()}
-                        </Text>
+                        <Text style={styles.avatarInitial}>{(item.fullName || item.email)[0].toUpperCase()}</Text>
                       </View>
                     )}
-                    <View style={styles.userItemMeta}>
-                      <Text style={styles.userItemName}>
-                        {item.fullName || item.email.split('@')[0]}
-                      </Text>
-                      <Text style={styles.userItemEmail}>{item.email}</Text>
-                      <Text style={styles.userItemLogin}>
-                        Last active: {new Date(item.lastLoginAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <View style={styles.userMeta}>
+                      <Text style={styles.userName}>{item.fullName || item.email.split('@')[0]}</Text>
+                      <Text style={styles.userEmail}>{item.email}</Text>
+                      <Text style={styles.userLoginTime}>
+                        Active: {new Date(item.lastLoginAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </Text>
                     </View>
                   </View>
 
-                  <View style={styles.userItemRight}>
+                  <View style={styles.userRowRight}>
                     <Badge
                       label={item.role.toUpperCase()}
-                      variant={item.role === 'admin' ? 'admin' : 'neutral'}
+                      variant={item.role === 'admin' ? 'admin' : 'sage'}
                     />
                     {item.id !== user.id && (
                       <Pressable
                         onPress={() => handleRoleToggle(item)}
                         disabled={isUpdating === item.id}
                         style={({ pressed }) => [
-                          styles.roleToggleButton,
+                          styles.roleToggleBtn,
                           pressed && { opacity: 0.7 },
                         ]}
                       >
                         <Text style={styles.roleToggleText}>
                           {isUpdating === item.id
-                            ? 'Saving...'
+                            ? 'Updating...'
                             : item.role === 'admin'
                             ? 'Demote to User'
                             : 'Promote to Admin'}
@@ -156,21 +158,25 @@ export const AdminScreen: React.FC = () => {
                 </View>
               ))}
             </View>
-          </Card>
+          </View>
 
-          {/* Real-Time Security Audit Logs */}
-          <Card
-            title="Security Audit & Domain Interceptions"
-            subtitle="Logs of permitted @hbplus.fit logins and blocked non-domain attempts"
-            style={styles.sectionCard}
-          >
+          {/* Security Audit Trail Card */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View>
+                <Text style={styles.cardTitle}>Security Audit & Domain Interceptions</Text>
+                <Text style={styles.cardSubtitle}>Real-time log of permitted @hbplus.fit logins and blocked attempts</Text>
+              </View>
+              <Badge label="Live Audit" variant="darkGreen" />
+            </View>
+
             <View style={styles.logsList}>
               {logs.map((log) => (
-                <View key={log.id} style={styles.logItem}>
-                  <View style={styles.logLeft}>
+                <View key={log.id} style={styles.logRow}>
+                  <View style={styles.logRowLeft}>
                     <View
                       style={[
-                        styles.logStatusDot,
+                        styles.logDot,
                         {
                           backgroundColor:
                             log.status === 'ALLOWED'
@@ -180,7 +186,7 @@ export const AdminScreen: React.FC = () => {
                       ]}
                     />
                     <View style={styles.logMeta}>
-                      <View style={styles.logHeaderRow}>
+                      <View style={styles.logHeader}>
                         <Text style={styles.logEmail}>{log.email}</Text>
                         <Badge
                           label={log.status}
@@ -201,7 +207,7 @@ export const AdminScreen: React.FC = () => {
                 </View>
               ))}
             </View>
-          </Card>
+          </View>
 
         </View>
       </ScrollView>
@@ -210,113 +216,160 @@ export const AdminScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  screenWrapper: {
+  rootWrapper: {
     flex: 1,
     backgroundColor: THEME.colors.background,
   },
-  scrollContent: {
-    paddingVertical: THEME.spacing.lg,
-    paddingHorizontal: THEME.spacing.md,
-    alignItems: 'center',
-  },
-  mainContainer: {
-    width: '100%',
-  },
-  containerDesktop: {
-    maxWidth: 1100,
-  },
-  containerMobile: {
-    maxWidth: '100%',
-  },
   adminHeader: {
+    height: 64,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.colors.cardBorder,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: THEME.spacing.lg,
-    flexWrap: 'wrap',
-    gap: 12,
+    paddingHorizontal: THEME.spacing.xl,
+    ...THEME.shadows.sm,
   },
-  badgeWrapper: {
-    marginBottom: 6,
+  headerBrandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  brandDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: THEME.colors.forestGreenHighlight,
+    marginRight: 8,
+  },
+  brandName: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: THEME.colors.forestGreen,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backBtn: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  scrollContent: {
+    padding: THEME.spacing.xl,
+    alignItems: 'center',
+  },
+  innerContainer: {
+    maxWidth: 960,
+    width: '100%',
+  },
+  pageTitleBlock: {
+    marginBottom: THEME.spacing.lg,
   },
   pageTitle: {
     fontSize: THEME.typography.fontSize.xxl,
-    fontWeight: THEME.typography.fontWeight.bold,
+    fontWeight: '800',
     color: THEME.colors.textPrimary,
+    letterSpacing: -0.5,
   },
   pageSubtitle: {
-    fontSize: THEME.typography.fontSize.sm,
+    fontSize: 14,
     color: THEME.colors.textSecondary,
-    marginTop: 2,
+    marginTop: 4,
   },
-  sectionCard: {
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: THEME.borderRadius.lg,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    padding: THEME.spacing.lg,
     marginBottom: THEME.spacing.lg,
+    ...THEME.shadows.sm,
   },
-  userList: {
-    gap: 12,
-  },
-  userItem: {
+  cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    marginBottom: THEME.spacing.md,
+    paddingBottom: THEME.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.colors.divider,
+  },
+  cardTitle: {
+    fontSize: THEME.typography.fontSize.base,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+  },
+  cardSubtitle: {
+    fontSize: 12,
+    color: THEME.colors.textMuted,
+    marginTop: 2,
+  },
+  userList: {
+    gap: 10,
+  },
+  userRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: THEME.colors.divider,
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 8,
   },
-  userItemLeft: {
+  userRowLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  userAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     marginRight: 12,
   },
   avatarFallback: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: THEME.colors.primary,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: THEME.colors.forestGreen,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
-  avatarText: {
+  avatarInitial: {
     color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 16,
+    fontWeight: '700',
+    fontSize: 15,
   },
-  userItemMeta: {},
-  userItemName: {
-    fontSize: THEME.typography.fontSize.base,
-    fontWeight: THEME.typography.fontWeight.semibold,
+  userMeta: {},
+  userName: {
+    fontSize: 14,
+    fontWeight: '700',
     color: THEME.colors.textPrimary,
   },
-  userItemEmail: {
-    fontSize: THEME.typography.fontSize.xs,
+  userEmail: {
+    fontSize: 12,
     color: THEME.colors.textSecondary,
     marginTop: 1,
   },
-  userItemLogin: {
+  userLoginTime: {
     fontSize: 11,
     color: THEME.colors.textMuted,
-    marginTop: 2,
+    marginTop: 1,
   },
-  userItemRight: {
+  userRowRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
-  roleToggleButton: {
+  roleToggleBtn: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: '#F1F5F9',
     borderRadius: THEME.borderRadius.sm,
+    backgroundColor: '#F3F4F6',
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#E5E7EB',
   },
   roleToggleText: {
     fontSize: 12,
@@ -326,41 +379,41 @@ const styles = StyleSheet.create({
   logsList: {
     gap: 10,
   },
-  logItem: {
+  logRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: THEME.colors.divider,
   },
-  logLeft: {
+  logRowLeft: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     flex: 1,
   },
-  logStatusDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+  logDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     marginTop: 6,
     marginRight: 10,
   },
   logMeta: {
     flex: 1,
   },
-  logHeaderRow: {
+  logHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
   logEmail: {
-    fontSize: THEME.typography.fontSize.sm,
-    fontWeight: THEME.typography.fontWeight.semibold,
+    fontSize: 13,
+    fontWeight: '700',
     color: THEME.colors.textPrimary,
   },
   logDetails: {
-    fontSize: THEME.typography.fontSize.xs,
+    fontSize: 12,
     color: THEME.colors.textSecondary,
     marginTop: 2,
   },
@@ -369,26 +422,34 @@ const styles = StyleSheet.create({
     color: THEME.colors.textMuted,
     marginLeft: 8,
   },
-  unauthorizedContainer: {
+  unauthorizedRoot: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
+    backgroundColor: THEME.colors.background,
+  },
+  unauthorizedCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 32,
+    borderRadius: THEME.borderRadius.xl,
+    alignItems: 'center',
+    maxWidth: 400,
+    ...THEME.shadows.md,
   },
   unauthorizedIcon: {
     fontSize: 48,
     marginBottom: 12,
   },
   unauthorizedTitle: {
-    fontSize: THEME.typography.fontSize.xl,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '800',
     color: THEME.colors.textPrimary,
   },
   unauthorizedText: {
-    fontSize: THEME.typography.fontSize.sm,
+    fontSize: 13,
     color: THEME.colors.textSecondary,
-    marginTop: 6,
     textAlign: 'center',
+    marginTop: 6,
   },
 });
-

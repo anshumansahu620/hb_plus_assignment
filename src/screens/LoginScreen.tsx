@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   useWindowDimensions,
-  Platform,
+  Pressable,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { GoogleSignInButton } from '../components/GoogleSignInButton';
@@ -18,123 +18,155 @@ import { APP_CONFIG, ALLOWED_DOMAIN } from '../constants/config';
 export const LoginScreen: React.FC = () => {
   const { signInWithGoogle, simulateLogin, error, clearError, isLoading } = useAuth();
   const { width } = useWindowDimensions();
-  const isMobile = width < THEME.breakpoints.tablet;
+  const isDesktop = width >= THEME.breakpoints.tablet;
 
   return (
     <ScrollView
-      contentContainerStyle={styles.scrollContent}
+      contentContainerStyle={styles.scrollRoot}
       keyboardShouldPersistTaps="handled"
     >
-      <View style={[styles.container, isMobile ? styles.containerMobile : styles.containerDesktop]}>
+      <View style={[styles.mainLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
         
-        {/* Main Authentication Card */}
-        <View style={styles.authCard}>
-          {/* Header Branding */}
-          <View style={styles.brandHeader}>
-            <View style={styles.logoBadge}>
-              <Text style={styles.logoText}>HB+</Text>
+        {/* LEFT / TOP HERO PANEL (Forest Green from Figma) */}
+        <View style={[styles.heroPanel, isDesktop ? styles.heroPanelDesktop : styles.heroPanelMobile]}>
+          <View style={styles.heroTop}>
+            <View style={styles.brandRow}>
+              <View style={styles.brandDot} />
+              <Text style={styles.brandName}>hbplus</Text>
             </View>
-            <Text style={styles.brandTitle}>{APP_CONFIG.name}</Text>
-            <Text style={styles.brandSubtitle}>
-              Sign in to access your company dashboard and resources
+            <View style={styles.workspacePill}>
+              <Text style={styles.workspacePillText}>Workspace Security</Text>
+            </View>
+          </View>
+
+          <View style={styles.heroMiddle}>
+            <Text style={styles.heroTitle}>Good work.{'\n'}Stronger together.</Text>
+            <Text style={styles.heroDescription}>
+              Your team, your tools, your workday. All in one secure place.
             </Text>
           </View>
 
-          {/* Security Domain Requirement Pill */}
-          <View style={styles.domainRequirementBanner}>
-            <Text style={styles.domainRequirementIcon}>🔒</Text>
-            <View style={styles.domainRequirementTextCol}>
-              <Text style={styles.domainRequirementTitle}>Domain Whitelist Active</Text>
-              <Text style={styles.domainRequirementBody}>
-                Only verified accounts ending in{' '}
-                <Text style={styles.domainHighlight}>@{ALLOWED_DOMAIN}</Text> are authorized.
+          {/* Bottom Card inside Hero from Figma */}
+          <View style={styles.heroCard}>
+            <View style={styles.heroCardTop}>
+              <Text style={styles.heroCardDomain}>{ALLOWED_DOMAIN}</Text>
+              <View style={styles.verifiedTag}>
+                <Text style={styles.verifiedTagText}>✓ Official workspace</Text>
+              </View>
+            </View>
+            <Text style={styles.heroCardNotice}>
+              Restricted exclusively to authorized organizational members.
+            </Text>
+          </View>
+
+          <View style={styles.heroFooter}>
+            <Text style={styles.heroFooterText}>Built for teams that move fast.</Text>
+          </View>
+        </View>
+
+        {/* RIGHT / BOTTOM AUTH PANEL (Clean Sage from Figma) */}
+        <View style={[styles.authPanel, isDesktop ? styles.authPanelDesktop : styles.authPanelMobile]}>
+          {/* Top Support link */}
+          <View style={styles.authTopBar}>
+            <Pressable
+              onPress={() => alert(`IT Support: ${APP_CONFIG.supportEmail}`)}
+              style={({ pressed }) => [styles.supportLink, pressed && { opacity: 0.6 }]}
+            >
+              <Text style={styles.supportLinkText}>Need help? Contact support</Text>
+            </Pressable>
+          </View>
+
+          <View style={styles.authContentContainer}>
+            {/* Kicker & Headline from Figma */}
+            <View style={styles.authHeader}>
+              <Text style={styles.kickerText}>WELCOME BACK</Text>
+              <Text style={styles.authTitle}>Your workspace awaits.</Text>
+              <Text style={styles.authSubtitle}>
+                Sign in with your official Google account to continue to your dashboard.
               </Text>
             </View>
-          </View>
 
-          {/* Error Banner (Displays when rejected) */}
-          {error && (
-            <ErrorAlert
-              message={error}
-              onDismiss={clearError}
-              title="Authentication Blocked"
-            />
-          )}
+            {/* Error banner (Displays when non-domain email like @gmail.com is attempted) */}
+            {error && (
+              <View style={styles.errorContainer}>
+                <ErrorAlert
+                  message={error}
+                  onDismiss={clearError}
+                  title="Access Restricted"
+                />
+              </View>
+            )}
 
-          {/* Google Sign-In Button */}
-          <View style={styles.actionSection}>
-            <GoogleSignInButton
-              onPress={signInWithGoogle}
-              isLoading={isLoading}
-              label="Sign in with Google"
-            />
-            <Text style={styles.oauthHint}>
-              Connects via Google OAuth 2.0. Unofficial domains will be rejected automatically.
-            </Text>
-          </View>
-
-          {/* Divider */}
-          <View style={styles.dividerRow}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>EVALUATOR TEST SUITE</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Demo Sandbox for Evaluators */}
-          <View style={styles.demoCard}>
-            <Text style={styles.demoHeaderTitle}>Instant Scenario Testing</Text>
-            <Text style={styles.demoHeaderSubtitle}>
-              Test both acceptance and rejection flows without third-party account requirements:
-            </Text>
-
-            <View style={styles.demoButtonsGrid}>
-              {/* Allowed Scenario (User) */}
-              <Button
-                label="🟢 Allow: user@hbplus.fit"
-                onPress={() => simulateLogin(`user@${ALLOWED_DOMAIN}`, 'user')}
-                variant="outline"
+            {/* Google OAuth Action Button */}
+            <View style={styles.buttonWrapper}>
+              <GoogleSignInButton
+                onPress={signInWithGoogle}
                 isLoading={isLoading}
-                style={styles.demoBtnSuccess}
-                textStyle={styles.demoBtnTextSuccess}
-              />
-
-              {/* Allowed Scenario (Admin) */}
-              <Button
-                label="🛡️ Allow: admin@hbplus.fit (Admin Role)"
-                onPress={() => simulateLogin(`admin@${ALLOWED_DOMAIN}`, 'admin')}
-                variant="outline"
-                isLoading={isLoading}
-                style={styles.demoBtnAdmin}
-                textStyle={styles.demoBtnTextAdmin}
-              />
-
-              {/* Blocked Scenario (Gmail) */}
-              <Button
-                label="🔴 Block: example@gmail.com"
-                onPress={() => simulateLogin('example@gmail.com')}
-                variant="outline"
-                isLoading={isLoading}
-                style={styles.demoBtnDanger}
-                textStyle={styles.demoBtnTextDanger}
-              />
-
-              {/* Blocked Scenario (Other Domain) */}
-              <Button
-                label="🔴 Block: personal@yahoo.com"
-                onPress={() => simulateLogin('personal@yahoo.com')}
-                variant="outline"
-                isLoading={isLoading}
-                style={styles.demoBtnDanger}
-                textStyle={styles.demoBtnTextDanger}
+                label="Continue with Google"
               />
             </View>
-          </View>
 
-          {/* Footer note */}
-          <View style={styles.footerNote}>
-            <Text style={styles.footerText}>
-              Cross-platform React Native for Web & Mobile • Protected Route Guard Active
-            </Text>
+            {/* Exclusive to @hbplus.fit Notice Card from Figma */}
+            <View style={styles.domainNoticeCard}>
+              <View style={styles.domainNoticeHeader}>
+                <View style={styles.greenDot} />
+                <Text style={styles.domainNoticeTitle}>
+                  Exclusive to @{ALLOWED_DOMAIN}
+                </Text>
+              </View>
+              <Text style={styles.domainNoticeBody}>
+                Please sign in with your official @{ALLOWED_DOMAIN} email address. External accounts will be automatically blocked.
+              </Text>
+            </View>
+
+            {/* Evaluator & Recruiter Sandbox Suite */}
+            <View style={styles.evaluatorSection}>
+              <View style={styles.evaluatorDividerRow}>
+                <View style={styles.evaluatorLine} />
+                <Text style={styles.evaluatorLabel}>EVALUATOR TEST SCENARIOS</Text>
+                <View style={styles.evaluatorLine} />
+              </View>
+
+              <View style={styles.testButtonsGrid}>
+                {/* 1. Allowed User */}
+                <Button
+                  label="🟢 Allow: user@hbplus.fit"
+                  variant="outline"
+                  onPress={() => simulateLogin(`alex.trainer@${ALLOWED_DOMAIN}`, 'user')}
+                  isLoading={isLoading}
+                  style={styles.testBtnSuccess}
+                  textStyle={styles.testBtnTextSuccess}
+                />
+
+                {/* 2. Allowed Admin */}
+                <Button
+                  label="🛡️ Allow: admin@hbplus.fit (Admin Role)"
+                  variant="outline"
+                  onPress={() => simulateLogin(`admin@${ALLOWED_DOMAIN}`, 'admin')}
+                  isLoading={isLoading}
+                  style={styles.testBtnAdmin}
+                  textStyle={styles.testBtnTextAdmin}
+                />
+
+                {/* 3. Blocked Gmail */}
+                <Button
+                  label="🔴 Block: example@gmail.com"
+                  variant="outline"
+                  onPress={() => simulateLogin('example@gmail.com')}
+                  isLoading={isLoading}
+                  style={styles.testBtnDanger}
+                  textStyle={styles.testBtnTextDanger}
+                />
+              </View>
+            </View>
+
+            {/* Terms and Privacy Footer */}
+            <View style={styles.termsFooter}>
+              <Text style={styles.termsText}>
+                Privacy Policy  •  Terms of Service  •  Protected Route Guard Active
+              </Text>
+            </View>
+
           </View>
         </View>
 
@@ -144,187 +176,289 @@ export const LoginScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  scrollContent: {
+  scrollRoot: {
     flexGrow: 1,
+    backgroundColor: THEME.colors.background,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: THEME.colors.background,
-    paddingVertical: THEME.spacing.xl,
-    paddingHorizontal: THEME.spacing.md,
+    padding: THEME.spacing.md,
   },
-  container: {
+  mainLayout: {
     width: '100%',
-    alignItems: 'center',
-  },
-  containerDesktop: {
-    maxWidth: 520,
-  },
-  containerMobile: {
-    maxWidth: '100%',
-  },
-  authCard: {
-    width: '100%',
-    backgroundColor: THEME.colors.card,
-    borderRadius: THEME.borderRadius.xl,
-    borderWidth: 1,
-    borderColor: THEME.colors.cardBorder,
-    padding: THEME.spacing.xl,
+    backgroundColor: THEME.colors.surface,
+    borderRadius: THEME.borderRadius.xxl,
+    overflow: 'hidden',
     ...THEME.shadows.lg,
   },
-  brandHeader: {
+  layoutDesktop: {
+    maxWidth: 1040,
+    minHeight: 640,
+    flexDirection: 'row',
+  },
+  layoutMobile: {
+    maxWidth: 480,
+    flexDirection: 'column',
+  },
+  
+  // Hero Panel Styles (Figma Forest Green)
+  heroPanel: {
+    backgroundColor: THEME.colors.forestGreen,
+    padding: THEME.spacing.xl,
+    justifyContent: 'space-between',
+  },
+  heroPanelDesktop: {
+    width: '46%',
+  },
+  heroPanelMobile: {
+    width: '100%',
+    paddingVertical: THEME.spacing.lg,
+  },
+  heroTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: THEME.spacing.xl,
+  },
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  brandDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: THEME.colors.forestGreenHighlight,
+    marginRight: 8,
+  },
+  brandName: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: -0.5,
+  },
+  workspacePill: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: THEME.borderRadius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  workspacePillText: {
+    color: '#D1FAE5',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  heroMiddle: {
+    marginVertical: THEME.spacing.lg,
+  },
+  heroTitle: {
+    fontSize: THEME.typography.fontSize.hero,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    lineHeight: 44,
+    letterSpacing: -0.8,
+  },
+  heroDescription: {
+    fontSize: THEME.typography.fontSize.base,
+    color: THEME.colors.textLightMuted,
+    marginTop: 14,
+    lineHeight: 22,
+    maxWidth: 340,
+  },
+  heroCard: {
+    backgroundColor: THEME.colors.forestGreenCard,
+    borderRadius: THEME.borderRadius.lg,
+    padding: THEME.spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    marginTop: THEME.spacing.md,
+  },
+  heroCardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  heroCardDomain: {
+    fontSize: THEME.typography.fontSize.base,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  verifiedTag: {
+    backgroundColor: '#064E3B',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: THEME.borderRadius.full,
+  },
+  verifiedTagText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#6EE7B7',
+  },
+  heroCardNotice: {
+    fontSize: 12,
+    color: THEME.colors.textLightMuted,
+    lineHeight: 16,
+  },
+  heroFooter: {
+    marginTop: THEME.spacing.lg,
+  },
+  heroFooterText: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.45)',
+  },
+
+  // Auth Panel Styles (Clean Sage Right side from Figma)
+  authPanel: {
+    backgroundColor: '#FFFFFF',
+    padding: THEME.spacing.xl,
+    justifyContent: 'space-between',
+  },
+  authPanelDesktop: {
+    width: '54%',
+  },
+  authPanelMobile: {
+    width: '100%',
+    padding: THEME.spacing.lg,
+  },
+  authTopBar: {
+    alignItems: 'flex-end',
+    marginBottom: THEME.spacing.md,
+  },
+  supportLink: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  supportLinkText: {
+    fontSize: 12,
+    color: THEME.colors.textMuted,
+    fontWeight: '500',
+  },
+  authContentContainer: {
+    maxWidth: 400,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  authHeader: {
     marginBottom: THEME.spacing.lg,
   },
-  logoBadge: {
-    width: 56,
-    height: 56,
-    borderRadius: THEME.borderRadius.lg,
-    backgroundColor: THEME.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: THEME.spacing.md,
-    ...THEME.shadows.md,
+  kickerText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: THEME.colors.forestGreen,
+    letterSpacing: 1,
+    marginBottom: 6,
   },
-  logoText: {
-    color: '#FFFFFF',
-    fontWeight: '900',
-    fontSize: 22,
-    letterSpacing: 0.5,
-  },
-  brandTitle: {
+  authTitle: {
     fontSize: THEME.typography.fontSize.xxl,
-    fontWeight: THEME.typography.fontWeight.bold,
+    fontWeight: '800',
     color: THEME.colors.textPrimary,
-    textAlign: 'center',
+    letterSpacing: -0.5,
   },
-  brandSubtitle: {
+  authSubtitle: {
     fontSize: THEME.typography.fontSize.sm,
     color: THEME.colors.textSecondary,
-    textAlign: 'center',
     marginTop: 6,
     lineHeight: 20,
   },
-  domainRequirementBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: THEME.colors.primaryLight,
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-    borderRadius: THEME.borderRadius.md,
-    padding: THEME.spacing.md,
-    marginBottom: THEME.spacing.lg,
-  },
-  domainRequirementIcon: {
-    fontSize: 20,
-    marginRight: THEME.spacing.sm,
-  },
-  domainRequirementTextCol: {
-    flex: 1,
-  },
-  domainRequirementTitle: {
-    fontSize: THEME.typography.fontSize.xs,
-    fontWeight: THEME.typography.fontWeight.bold,
-    color: THEME.colors.primary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  domainRequirementBody: {
-    fontSize: THEME.typography.fontSize.sm,
-    color: '#1E40AF',
-    marginTop: 2,
-  },
-  domainHighlight: {
-    fontWeight: 'bold',
-    color: THEME.colors.primary,
-  },
-  actionSection: {
-    width: '100%',
-    alignItems: 'center',
-    marginVertical: THEME.spacing.sm,
-  },
-  oauthHint: {
-    fontSize: THEME.typography.fontSize.xs,
-    color: THEME.colors.textMuted,
-    textAlign: 'center',
-    marginTop: 10,
-    lineHeight: 18,
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: THEME.spacing.lg,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: THEME.colors.cardBorder,
-  },
-  dividerText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: THEME.colors.textMuted,
-    paddingHorizontal: 10,
-    letterSpacing: 0.8,
-  },
-  demoCard: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: THEME.borderRadius.md,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    padding: THEME.spacing.md,
-  },
-  demoHeaderTitle: {
-    fontSize: THEME.typography.fontSize.sm,
-    fontWeight: THEME.typography.fontWeight.bold,
-    color: THEME.colors.textPrimary,
-  },
-  demoHeaderSubtitle: {
-    fontSize: THEME.typography.fontSize.xs,
-    color: THEME.colors.textSecondary,
-    marginTop: 2,
+  errorContainer: {
     marginBottom: THEME.spacing.md,
   },
-  demoButtonsGrid: {
+  buttonWrapper: {
+    width: '100%',
+    marginBottom: THEME.spacing.md,
+  },
+  domainNoticeCard: {
+    backgroundColor: '#F2F7F2',
+    borderWidth: 1,
+    borderColor: '#D7E7D6',
+    borderRadius: THEME.borderRadius.md,
+    padding: 12,
+    marginBottom: THEME.spacing.lg,
+  },
+  domainNoticeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  greenDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#10B981',
+    marginRight: 6,
+  },
+  domainNoticeTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#154436',
+  },
+  domainNoticeBody: {
+    fontSize: 12,
+    color: '#3C5C4E',
+    lineHeight: 17,
+  },
+  evaluatorSection: {
+    marginBottom: THEME.spacing.md,
+  },
+  evaluatorDividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  evaluatorLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: THEME.colors.divider,
+  },
+  evaluatorLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: THEME.colors.textMuted,
+    paddingHorizontal: 8,
+    letterSpacing: 0.6,
+  },
+  testButtonsGrid: {
     gap: 8,
   },
-  demoBtnSuccess: {
-    borderColor: THEME.colors.successBorder,
-    backgroundColor: THEME.colors.successBg,
-    paddingVertical: 10,
+  testBtnSuccess: {
+    borderColor: '#A7F3D0',
+    backgroundColor: '#ECFDF5',
+    paddingVertical: 9,
   },
-  demoBtnTextSuccess: {
+  testBtnTextSuccess: {
     color: '#065F46',
-    fontSize: THEME.typography.fontSize.xs,
+    fontSize: 12,
     fontWeight: '600',
   },
-  demoBtnAdmin: {
-    borderColor: '#E9D5FF',
-    backgroundColor: '#FAF5FF',
-    paddingVertical: 10,
+  testBtnAdmin: {
+    borderColor: '#DDD6FE',
+    backgroundColor: '#F5F3FF',
+    paddingVertical: 9,
   },
-  demoBtnTextAdmin: {
-    color: '#6B21A8',
-    fontSize: THEME.typography.fontSize.xs,
+  testBtnTextAdmin: {
+    color: '#6D28D9',
+    fontSize: 12,
     fontWeight: '600',
   },
-  demoBtnDanger: {
-    borderColor: THEME.colors.errorBorder,
-    backgroundColor: THEME.colors.errorBg,
-    paddingVertical: 10,
+  testBtnDanger: {
+    borderColor: '#FECACA',
+    backgroundColor: '#FEF2F2',
+    paddingVertical: 9,
   },
-  demoBtnTextDanger: {
-    color: THEME.colors.errorText,
-    fontSize: THEME.typography.fontSize.xs,
+  testBtnTextDanger: {
+    color: '#B91C1C',
+    fontSize: 12,
     fontWeight: '600',
   },
-  footerNote: {
-    marginTop: THEME.spacing.lg,
+  termsFooter: {
     alignItems: 'center',
+    marginTop: THEME.spacing.md,
   },
-  footerText: {
+  termsText: {
     fontSize: 11,
     color: THEME.colors.textMuted,
     textAlign: 'center',
   },
 });
-

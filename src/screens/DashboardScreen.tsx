@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,6 @@ import {
   Pressable,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { Navbar } from '../components/Navbar';
-import { Card } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { THEME } from '../constants/theme';
@@ -19,462 +17,659 @@ import { APP_CONFIG } from '../constants/config';
 export const DashboardScreen: React.FC = () => {
   const { user, signOut, navigateTo } = useAuth();
   const { width } = useWindowDimensions();
-  const isMobile = width < THEME.breakpoints.tablet;
+  const isDesktop = width >= THEME.breakpoints.tablet;
+
+  const [activeTab, setActiveTab] = useState<'overview' | 'resources'>('overview');
+
+  const firstName = user?.fullName
+    ? user.fullName.split(' ')[0]
+    : user?.email.split('@')[0] || 'Member';
 
   return (
-    <View style={styles.screenWrapper}>
-      <Navbar />
+    <View style={styles.rootWrapper}>
+      <View style={[styles.dashboardLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
+        
+        {/* SIDEBAR (Desktop only - matches Figma middle screen) */}
+        {isDesktop && (
+          <View style={styles.sidebar}>
+            <View style={styles.sidebarTop}>
+              {/* Brand Logo */}
+              <View style={styles.brandRow}>
+                <View style={styles.brandDot} />
+                <Text style={styles.brandName}>hbplus</Text>
+              </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={[styles.mainContainer, isMobile ? styles.containerMobile : styles.containerDesktop]}>
-          
-          {/* Welcome Hero Banner */}
-          <View style={styles.heroBanner}>
-            <View style={styles.heroLeft}>
-              <View style={styles.heroUserRow}>
+              {/* Sidebar Menu Items */}
+              <View style={styles.menuList}>
+                <Pressable
+                  onPress={() => setActiveTab('overview')}
+                  style={[styles.menuItem, activeTab === 'overview' && styles.menuItemActive]}
+                >
+                  <Text style={styles.menuIcon}>📊</Text>
+                  <Text style={[styles.menuItemText, activeTab === 'overview' && styles.menuItemTextActive]}>
+                    Overview
+                  </Text>
+                </Pressable>
+
+                {user?.role === 'admin' && (
+                  <Pressable
+                    onPress={() => navigateTo('admin')}
+                    style={styles.menuItem}
+                  >
+                    <Text style={styles.menuIcon}>🛡️</Text>
+                    <Text style={styles.menuItemText}>Admin Panel</Text>
+                    <Badge label="RBAC" variant="admin" />
+                  </Pressable>
+                )}
+
+                <Pressable
+                  onPress={() => setActiveTab('resources')}
+                  style={[styles.menuItem, activeTab === 'resources' && styles.menuItemActive]}
+                >
+                  <Text style={styles.menuIcon}>📁</Text>
+                  <Text style={[styles.menuItemText, activeTab === 'resources' && styles.menuItemTextActive]}>
+                    Resources
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+
+            {/* Sidebar User Footer */}
+            <View style={styles.sidebarFooter}>
+              <View style={styles.userProfileRow}>
                 {user?.avatarUrl ? (
-                  <Image source={{ uri: user.avatarUrl }} style={styles.heroAvatar} />
+                  <Image source={{ uri: user.avatarUrl }} style={styles.userAvatar} />
                 ) : (
-                  <View style={styles.heroAvatarFallback}>
-                    <Text style={styles.heroAvatarText}>
-                      {(user?.fullName || user?.email || 'U')[0].toUpperCase()}
-                    </Text>
+                  <View style={styles.avatarFallback}>
+                    <Text style={styles.avatarInitial}>{firstName[0].toUpperCase()}</Text>
                   </View>
                 )}
-                <View style={styles.heroUserMeta}>
-                  <View style={styles.badgeRow}>
-                    <Badge
-                      label={`@${user?.domain || APP_CONFIG.allowedDomain} Verified`}
-                      variant="success"
-                      icon={<Text style={styles.badgeCheck}>✓</Text>}
-                    />
-                    <View style={{ width: 8 }} />
-                    <Badge
-                      label={user?.role === 'admin' ? 'Administrator' : 'Team Member'}
-                      variant={user?.role === 'admin' ? 'admin' : 'primary'}
-                    />
-                  </View>
-                  <Text style={styles.heroWelcomeTitle}>
-                    Welcome back, {user?.fullName || user?.email.split('@')[0]}!
-                  </Text>
-                  <Text style={styles.heroWelcomeEmail}>{user?.email}</Text>
+                <View style={styles.userMetaCol}>
+                  <Text style={styles.userName} numberOfLines={1}>{user?.fullName || firstName}</Text>
+                  <Text style={styles.userRoleText}>{user?.role === 'admin' ? 'Administrator' : 'Team Member'}</Text>
                 </View>
               </View>
-            </View>
 
-            <View style={styles.heroRight}>
-              <Text style={styles.sessionTimestamp}>
-                Authenticated via Google OAuth 2.0
-              </Text>
-              <Text style={styles.sessionDate}>
-                {user?.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : 'Just now'}
-              </Text>
+              <Pressable
+                onPress={signOut}
+                style={({ pressed }) => [styles.signOutLink, pressed && { opacity: 0.6 }]}
+              >
+                <Text style={styles.signOutText}>Sign out</Text>
+              </Pressable>
             </View>
           </View>
+        )}
 
-          {/* Admin Announcement Banner (if user has Admin role) */}
-          {user?.role === 'admin' && (
-            <Pressable
-              onPress={() => navigateTo('admin')}
-              style={({ pressed }) => [styles.adminCallout, pressed && { opacity: 0.85 }]}
-            >
-              <View style={styles.adminCalloutContent}>
-                <Text style={styles.adminCalloutIcon}>🛡️</Text>
-                <View style={styles.adminCalloutTextCol}>
-                  <Text style={styles.adminCalloutTitle}>Administrator Privileges Detected</Text>
-                  <Text style={styles.adminCalloutSubtitle}>
-                    You have elevated access. Click here to open the User Management & Security Audit Panel.
-                  </Text>
-                </View>
+        {/* MAIN DASHBOARD CONTENT AREA */}
+        <View style={styles.contentArea}>
+          {/* Top Mobile Bar if mobile */}
+          {!isDesktop && (
+            <View style={styles.mobileTopBar}>
+              <View style={styles.brandRow}>
+                <View style={styles.brandDot} />
+                <Text style={styles.brandNameDark}>hbplus</Text>
               </View>
-              <View style={styles.adminCalloutArrow}>
-                <Text style={styles.adminArrowText}>Manage →</Text>
-              </View>
-            </Pressable>
+              <Pressable onPress={signOut} style={styles.mobileSignOut}>
+                <Text style={styles.mobileSignOutText}>Sign out</Text>
+              </Pressable>
+            </View>
           )}
 
-          {/* Metric Cards Row */}
-          <View style={[styles.statsGrid, isMobile && styles.statsGridMobile]}>
-            <Card style={styles.statCard}>
-              <View style={styles.statIconBadge}>
-                <Text style={styles.statIcon}>🔒</Text>
-              </View>
-              <Text style={styles.statLabel}>Domain Policy</Text>
-              <Text style={styles.statValue}>@{APP_CONFIG.allowedDomain}</Text>
-              <Text style={styles.statSubtext}>100% Enforced</Text>
-            </Card>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <View style={styles.innerContainer}>
+              
+              {/* Header Greeting */}
+              <View style={styles.greetingHeader}>
+                <View>
+                  <Text style={styles.greetingTitle}>Welcome back, {firstName}.</Text>
+                  <Text style={styles.greetingSubtitle}>
+                    Here is what's happening with your workspace today.
+                  </Text>
+                </View>
 
-            <Card style={styles.statCard}>
-              <View style={[styles.statIconBadge, { backgroundColor: '#ECFDF5' }]}>
-                <Text style={styles.statIcon}>✅</Text>
+                {isDesktop && (
+                  <Badge
+                    label={`@${APP_CONFIG.allowedDomain} Verified`}
+                    variant="success"
+                    icon={<Text style={styles.badgeCheck}>✓</Text>}
+                  />
+                )}
               </View>
-              <Text style={styles.statLabel}>Account Status</Text>
-              <Text style={styles.statValue}>Verified</Text>
-              <Text style={styles.statSubtext}>Official Corporate Email</Text>
-            </Card>
 
-            <Card style={styles.statCard}>
-              <View style={[styles.statIconBadge, { backgroundColor: '#EFF6FF' }]}>
-                <Text style={styles.statIcon}>🔑</Text>
-              </View>
-              <Text style={styles.statLabel}>Auth Protocol</Text>
-              <Text style={styles.statValue}>OAuth 2.0</Text>
-              <Text style={styles.statSubtext}>Supabase JWT Session</Text>
-            </Card>
+              {/* FOREST GREEN HERO BANNER (Matches Figma Screen 2 & 4) */}
+              <View style={styles.forestHeroBanner}>
+                <View style={styles.forestHeroLeft}>
+                  <View style={styles.heroPill}>
+                    <View style={styles.heroPillDot} />
+                    <Text style={styles.heroPillText}>DOMAIN VERIFIED</Text>
+                  </View>
+                  <Text style={styles.forestHeroTitle}>One team. Connected securely.</Text>
+                  <Text style={styles.forestHeroSubtitle}>
+                    Your session is authenticated and protected under @{APP_CONFIG.allowedDomain}.
+                  </Text>
+                </View>
 
-            <Card style={styles.statCard}>
-              <View style={[styles.statIconBadge, { backgroundColor: '#FAF5FF' }]}>
-                <Text style={styles.statIcon}>👤</Text>
-              </View>
-              <Text style={styles.statLabel}>Assigned Role</Text>
-              <Text style={styles.statValue}>{user?.role.toUpperCase()}</Text>
-              <Text style={styles.statSubtext}>RBAC Active</Text>
-            </Card>
-          </View>
-
-          {/* Security & Overview Section */}
-          <View style={[styles.contentColumns, isMobile && styles.contentColumnsMobile]}>
-            {/* Left Column: Security Information */}
-            <Card
-              title="Security & Verification Details"
-              subtitle="Identity and domain validation metadata"
-              style={styles.detailsCard}
-            >
-              <View style={styles.infoRow}>
-                <Text style={styles.infoKey}>User Email:</Text>
-                <Text style={styles.infoVal}>{user?.email}</Text>
-              </View>
-              <View style={styles.infoRow}>
-                <Text style={styles.infoKey}>Email Domain:</Text>
-                <View style={styles.infoValWithBadge}>
-                  <Text style={styles.infoVal}>{user?.domain}</Text>
-                  <Text style={styles.matchBadge}>✓ Allowed</Text>
+                <View style={styles.forestHeroRight}>
+                  <View style={styles.lockBadgeCircle}>
+                    <Text style={styles.lockBadgeIcon}>🔒</Text>
+                  </View>
                 </View>
               </View>
-              <View style={styles.infoRow}>
-                <Text style={styles.infoKey}>OAuth Provider:</Text>
-                <Text style={styles.infoVal}>Google (accounts.google.com)</Text>
-              </View>
-              <View style={styles.infoRow}>
-                <Text style={styles.infoKey}>User ID:</Text>
-                <Text style={[styles.infoVal, styles.monoText]}>{user?.id}</Text>
-              </View>
-              <View style={styles.infoRow}>
-                <Text style={styles.infoKey}>Route Protection:</Text>
-                <Text style={styles.infoVal}>Active (Guarded against unauthorized access)</Text>
-              </View>
-            </Card>
 
-            {/* Right Column: Portal Guidelines */}
-            <Card
-              title="HB+ Domain Protection Rules"
-              subtitle="How unauthorized domain restriction works"
-              style={styles.detailsCard}
-            >
-              <View style={styles.ruleItem}>
-                <Text style={styles.ruleBullet}>1.</Text>
-                <Text style={styles.ruleText}>
-                  Any login attempt from <Text style={{ fontWeight: 'bold' }}>@gmail.com</Text> or other non-official domains is intercepted immediately upon Google OAuth callback.
-                </Text>
+              {/* Admin Announcement Callout (If user is Admin) */}
+              {user?.role === 'admin' && (
+                <Pressable
+                  onPress={() => navigateTo('admin')}
+                  style={({ pressed }) => [styles.adminNotice, pressed && { opacity: 0.85 }]}
+                >
+                  <View style={styles.adminNoticeContent}>
+                    <Text style={styles.adminNoticeIcon}>🛡️</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.adminNoticeTitle}>Administrator Controls Active</Text>
+                      <Text style={styles.adminNoticeBody}>
+                        You have permission to manage team accounts, toggle roles, and review security audit logs.
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.adminNoticeBtn}>
+                    <Text style={styles.adminNoticeBtnText}>Open Panel →</Text>
+                  </View>
+                </Pressable>
+              )}
+
+              {/* CARD: YOUR ACCOUNT (From Figma Screen 2 & 4) */}
+              <View style={styles.cardContainer}>
+                <View style={styles.cardHeaderRow}>
+                  <Text style={styles.cardTitle}>Your account</Text>
+                  <Badge label="ACTIVE" variant="sage" />
+                </View>
+
+                <View style={styles.accountTable}>
+                  <View style={styles.tableRow}>
+                    <Text style={styles.tableLabel}>Email address</Text>
+                    <Text style={styles.tableValueBold}>{user?.email}</Text>
+                  </View>
+
+                  <View style={styles.tableRow}>
+                    <Text style={styles.tableLabel}>Domain status</Text>
+                    <View style={styles.domainValueRow}>
+                      <Text style={styles.tableValue}>{user?.domain}</Text>
+                      <Badge label="Allowed Domain" variant="success" />
+                    </View>
+                  </View>
+
+                  <View style={styles.tableRow}>
+                    <Text style={styles.tableLabel}>Assigned role</Text>
+                    <Badge
+                      label={user?.role === 'admin' ? 'Administrator' : 'Team Member'}
+                      variant={user?.role === 'admin' ? 'admin' : 'sage'}
+                    />
+                  </View>
+
+                  <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
+                    <Text style={styles.tableLabel}>Last sign-in</Text>
+                    <Text style={styles.tableValue}>
+                      {user?.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : 'Just now'}
+                    </Text>
+                  </View>
+                </View>
               </View>
 
-              <View style={styles.ruleItem}>
-                <Text style={styles.ruleBullet}>2.</Text>
-                <Text style={styles.ruleText}>
-                  The system automatically revokes the session token, logs an unauthorized attempt, and redirects to login with:
-                  {'\n'}
-                  <Text style={styles.ruleQuote}>
-                    "Access restricted. Please login using your official domain email."
-                  </Text>
-                </Text>
+              {/* BOTTOM GRID: WORKPLACE MODULES (From Figma Screen 2) */}
+              <View style={styles.modulesSection}>
+                <Text style={styles.sectionHeader}>Workspace quick access</Text>
+
+                <View style={[styles.modulesGrid, !isDesktop && styles.modulesGridMobile]}>
+                  {/* Module 1: Team Directory */}
+                  <Pressable
+                    onPress={() => user?.role === 'admin' ? navigateTo('admin') : alert('Directory contains authorized @hbplus.fit members.')}
+                    style={styles.moduleCard}
+                  >
+                    <View style={styles.moduleIconWrapper}>
+                      <Text style={styles.moduleIcon}>👥</Text>
+                    </View>
+                    <Text style={styles.moduleTitle}>Team Directory</Text>
+                    <Text style={styles.moduleDesc}>
+                      View members and administrators verified on @{APP_CONFIG.allowedDomain}.
+                    </Text>
+                  </Pressable>
+
+                  {/* Module 2: Security Policy */}
+                  <Pressable
+                    onPress={() => alert(`Policy: Access restricted exclusively to @${APP_CONFIG.allowedDomain}. Non-official emails are rejected immediately.`)}
+                    style={styles.moduleCard}
+                  >
+                    <View style={[styles.moduleIconWrapper, { backgroundColor: '#F0FDF4' }]}>
+                      <Text style={styles.moduleIcon}>🔒</Text>
+                    </View>
+                    <Text style={styles.moduleTitle}>Domain Security</Text>
+                    <Text style={styles.moduleDesc}>
+                      Strict Google OAuth domain validation active with automated session revocation.
+                    </Text>
+                  </Pressable>
+
+                  {/* Module 3: Session State */}
+                  <Pressable
+                    onPress={signOut}
+                    style={styles.moduleCard}
+                  >
+                    <View style={[styles.moduleIconWrapper, { backgroundColor: '#FEF2F2' }]}>
+                      <Text style={styles.moduleIcon}>🚪</Text>
+                    </View>
+                    <Text style={styles.moduleTitle}>Terminate Session</Text>
+                    <Text style={styles.moduleDesc}>
+                      Securely sign out and clear active authentication tokens.
+                    </Text>
+                  </Pressable>
+                </View>
               </View>
 
-              <View style={styles.ruleItem}>
-                <Text style={styles.ruleBullet}>3.</Text>
-                <Text style={styles.ruleText}>
-                  Direct URL navigation to <Text style={{ fontFamily: 'monospace' }}>/dashboard</Text> without an active domain-verified session is blocked by the route guard.
-                </Text>
-              </View>
-
-              <View style={styles.actionRow}>
-                <Button
-                  label="Sign Out Session"
-                  variant="outline"
-                  onPress={signOut}
-                  style={{ alignSelf: 'flex-start', marginTop: 12 }}
-                />
-              </View>
-            </Card>
-          </View>
-
+            </View>
+          </ScrollView>
         </View>
-      </ScrollView>
+
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  screenWrapper: {
+  rootWrapper: {
     flex: 1,
     backgroundColor: THEME.colors.background,
   },
-  scrollContent: {
-    paddingVertical: THEME.spacing.lg,
-    paddingHorizontal: THEME.spacing.md,
+  dashboardLayout: {
+    flex: 1,
+  },
+  layoutDesktop: {
+    flexDirection: 'row',
+  },
+  layoutMobile: {
+    flexDirection: 'column',
+  },
+
+  // Sidebar Styles (Figma Screen 2)
+  sidebar: {
+    width: 250,
+    backgroundColor: '#FFFFFF',
+    borderRightWidth: 1,
+    borderRightColor: THEME.colors.cardBorder,
+    padding: THEME.spacing.lg,
+    justifyContent: 'space-between',
+  },
+  sidebarTop: {},
+  brandRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: THEME.spacing.xl,
   },
-  mainContainer: {
-    width: '100%',
+  brandDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: THEME.colors.forestGreenHighlight,
+    marginRight: 8,
   },
-  containerDesktop: {
-    maxWidth: 1100,
+  brandName: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: THEME.colors.forestGreen,
+    letterSpacing: -0.5,
   },
-  containerMobile: {
-    maxWidth: '100%',
+  brandNameDark: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: THEME.colors.forestGreen,
   },
-  heroBanner: {
-    backgroundColor: THEME.colors.card,
-    borderRadius: THEME.borderRadius.xl,
-    padding: THEME.spacing.xl,
-    borderWidth: 1,
-    borderColor: THEME.colors.cardBorder,
+  menuList: {
+    gap: 6,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: THEME.borderRadius.md,
+  },
+  menuItemActive: {
+    backgroundColor: THEME.colors.sageBg,
+  },
+  menuIcon: {
+    fontSize: 16,
+    marginRight: 10,
+  },
+  menuItemText: {
+    fontSize: 14,
+    color: THEME.colors.textSecondary,
+    fontWeight: '500',
+    flex: 1,
+  },
+  menuItemTextActive: {
+    color: THEME.colors.forestGreen,
+    fontWeight: '700',
+  },
+  sidebarFooter: {
+    borderTopWidth: 1,
+    borderTopColor: THEME.colors.divider,
+    paddingTop: THEME.spacing.md,
+  },
+  userProfileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  userAvatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    marginRight: 10,
+  },
+  avatarFallback: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: THEME.colors.forestGreen,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  avatarInitial: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  userMetaCol: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+  },
+  userRoleText: {
+    fontSize: 11,
+    color: THEME.colors.textMuted,
+  },
+  signOutLink: {
+    paddingVertical: 4,
+  },
+  signOutText: {
+    fontSize: 12,
+    color: THEME.colors.error,
+    fontWeight: '600',
+  },
+
+  // Main Content Area
+  contentArea: {
+    flex: 1,
+  },
+  mobileTopBar: {
+    height: 60,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.colors.cardBorder,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 16,
-    marginBottom: THEME.spacing.lg,
-    ...THEME.shadows.md,
+    paddingHorizontal: THEME.spacing.md,
   },
-  heroLeft: {
-    flex: 1,
-    minWidth: 280,
+  mobileSignOut: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: THEME.borderRadius.sm,
+    backgroundColor: '#FEF2F2',
   },
-  heroUserRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  heroAvatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 2,
-    borderColor: THEME.colors.primary,
-    marginRight: THEME.spacing.md,
-  },
-  heroAvatarFallback: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: THEME.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: THEME.spacing.md,
-  },
-  heroAvatarText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  heroUserMeta: {
-    flex: 1,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  badgeCheck: {
-    fontSize: 10,
-    color: THEME.colors.success,
-    fontWeight: 'bold',
-  },
-  heroWelcomeTitle: {
-    fontSize: THEME.typography.fontSize.xl,
-    fontWeight: THEME.typography.fontWeight.bold,
-    color: THEME.colors.textPrimary,
-  },
-  heroWelcomeEmail: {
-    fontSize: THEME.typography.fontSize.sm,
-    color: THEME.colors.textSecondary,
-    marginTop: 2,
-  },
-  heroRight: {
-    alignItems: 'flex-start',
-    backgroundColor: '#F8FAFC',
-    padding: THEME.spacing.md,
-    borderRadius: THEME.borderRadius.md,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-  },
-  sessionTimestamp: {
-    fontSize: 11,
+  mobileSignOutText: {
+    fontSize: 12,
     fontWeight: '600',
-    color: THEME.colors.primary,
-    textTransform: 'uppercase',
+    color: THEME.colors.error,
   },
-  sessionDate: {
-    fontSize: THEME.typography.fontSize.xs,
+  scrollContent: {
+    padding: THEME.spacing.xl,
+    alignItems: 'center',
+  },
+  innerContainer: {
+    maxWidth: 960,
+    width: '100%',
+  },
+  greetingHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: THEME.spacing.lg,
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  greetingTitle: {
+    fontSize: THEME.typography.fontSize.xxl,
+    fontWeight: '800',
+    color: THEME.colors.textPrimary,
+    letterSpacing: -0.5,
+  },
+  greetingSubtitle: {
+    fontSize: THEME.typography.fontSize.sm,
     color: THEME.colors.textSecondary,
     marginTop: 4,
   },
-  adminCallout: {
+  badgeCheck: {
+    color: '#059669',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+
+  // Forest Hero Banner (Figma Screen 2)
+  forestHeroBanner: {
+    backgroundColor: THEME.colors.forestGreen,
+    borderRadius: THEME.borderRadius.xl,
+    padding: THEME.spacing.xl,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: THEME.spacing.lg,
+    ...THEME.shadows.md,
+  },
+  forestHeroLeft: {
+    flex: 1,
+  },
+  heroPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: THEME.borderRadius.full,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+  },
+  heroPillDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: THEME.colors.forestGreenHighlight,
+    marginRight: 6,
+  },
+  heroPillText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#D1FAE5',
+    letterSpacing: 0.5,
+  },
+  forestHeroTitle: {
+    fontSize: THEME.typography.fontSize.xl,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: -0.5,
+  },
+  forestHeroSubtitle: {
+    fontSize: THEME.typography.fontSize.sm,
+    color: THEME.colors.textLightMuted,
+    marginTop: 6,
+    lineHeight: 20,
+    maxWidth: 520,
+  },
+  forestHeroRight: {
+    marginLeft: THEME.spacing.md,
+  },
+  lockBadgeCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lockBadgeIcon: {
+    fontSize: 22,
+  },
+
+  // Admin Announcement
+  adminNotice: {
     backgroundColor: '#FAF5FF',
-    borderColor: '#D8B4FE',
+    borderColor: '#DDD6FE',
     borderWidth: 1.5,
     borderRadius: THEME.borderRadius.lg,
     padding: THEME.spacing.md,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: THEME.spacing.lg,
     ...THEME.shadows.sm,
   },
-  adminCalloutContent: {
+  adminNoticeContent: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  adminCalloutIcon: {
-    fontSize: 28,
-    marginRight: THEME.spacing.md,
+  adminNoticeIcon: {
+    fontSize: 24,
+    marginRight: 12,
   },
-  adminCalloutTextCol: {
-    flex: 1,
+  adminNoticeTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#6D28D9',
   },
-  adminCalloutTitle: {
-    fontSize: THEME.typography.fontSize.base,
-    fontWeight: THEME.typography.fontWeight.bold,
-    color: '#6B21A8',
-  },
-  adminCalloutSubtitle: {
-    fontSize: THEME.typography.fontSize.xs,
-    color: '#7E22CE',
+  adminNoticeBody: {
+    fontSize: 12,
+    color: '#7C3AED',
     marginTop: 2,
   },
-  adminCalloutArrow: {
-    marginLeft: THEME.spacing.md,
-    backgroundColor: '#8B5CF6',
+  adminNoticeBtn: {
+    backgroundColor: '#7C3AED',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: THEME.borderRadius.md,
+    marginLeft: 12,
   },
-  adminArrowText: {
+  adminNoticeBtnText: {
     color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 13,
+    fontWeight: '700',
+    fontSize: 12,
   },
-  statsGrid: {
-    flexDirection: 'row',
-    gap: 16,
+
+  // Account Card
+  cardContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: THEME.borderRadius.lg,
+    borderColor: THEME.colors.cardBorder,
+    borderWidth: 1,
+    padding: THEME.spacing.lg,
     marginBottom: THEME.spacing.lg,
+    ...THEME.shadows.sm,
   },
-  statsGridMobile: {
-    flexDirection: 'column',
-  },
-  statCard: {
-    flex: 1,
-    minWidth: 160,
-  },
-  statIconBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    backgroundColor: '#FEF3C7',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  statIcon: {
-    fontSize: 18,
-  },
-  statLabel: {
-    fontSize: THEME.typography.fontSize.xs,
-    color: THEME.colors.textMuted,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-  },
-  statValue: {
-    fontSize: THEME.typography.fontSize.lg,
-    fontWeight: THEME.typography.fontWeight.bold,
-    color: THEME.colors.textPrimary,
-    marginTop: 2,
-  },
-  statSubtext: {
-    fontSize: 11,
-    color: THEME.colors.textSecondary,
-    marginTop: 2,
-  },
-  contentColumns: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  contentColumnsMobile: {
-    flexDirection: 'column',
-  },
-  detailsCard: {
-    flex: 1,
-  },
-  infoRow: {
+  cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+    marginBottom: THEME.spacing.md,
+  },
+  cardTitle: {
+    fontSize: THEME.typography.fontSize.base,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+  },
+  accountTable: {
+    borderTopWidth: 1,
+    borderTopColor: THEME.colors.divider,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: THEME.colors.divider,
   },
-  infoKey: {
-    fontSize: THEME.typography.fontSize.sm,
+  tableLabel: {
+    fontSize: 13,
     color: THEME.colors.textSecondary,
     fontWeight: '500',
   },
-  infoVal: {
-    fontSize: THEME.typography.fontSize.sm,
+  tableValue: {
+    fontSize: 13,
     color: THEME.colors.textPrimary,
-    fontWeight: '600',
+    fontWeight: '500',
   },
-  infoValWithBadge: {
+  tableValueBold: {
+    fontSize: 13,
+    color: THEME.colors.textPrimary,
+    fontWeight: '700',
+  },
+  domainValueRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
-  matchBadge: {
-    fontSize: 11,
-    color: THEME.colors.success,
-    backgroundColor: THEME.colors.successBg,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    fontWeight: 'bold',
+
+  // Modules Section
+  modulesSection: {
+    marginTop: THEME.spacing.sm,
   },
-  monoText: {
-    fontFamily: 'monospace',
-    fontSize: 12,
-  },
-  ruleItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+  sectionHeader: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: THEME.colors.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
     marginBottom: 12,
   },
-  ruleBullet: {
-    width: 20,
-    fontSize: THEME.typography.fontSize.sm,
-    fontWeight: 'bold',
-    color: THEME.colors.primary,
+  modulesGrid: {
+    flexDirection: 'row',
+    gap: 16,
   },
-  ruleText: {
+  modulesGridMobile: {
+    flexDirection: 'column',
+  },
+  moduleCard: {
     flex: 1,
-    fontSize: THEME.typography.fontSize.sm,
+    backgroundColor: '#FFFFFF',
+    borderRadius: THEME.borderRadius.lg,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    padding: THEME.spacing.md,
+    ...THEME.shadows.sm,
+  },
+  moduleIconWrapper: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: THEME.colors.sageBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  moduleIcon: {
+    fontSize: 18,
+  },
+  moduleTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+  },
+  moduleDesc: {
+    fontSize: 12,
     color: THEME.colors.textSecondary,
-    lineHeight: 20,
-  },
-  ruleQuote: {
-    color: THEME.colors.errorText,
-    fontWeight: '600',
-    fontStyle: 'italic',
-  },
-  actionRow: {
-    marginTop: 8,
+    marginTop: 4,
+    lineHeight: 17,
   },
 });
-

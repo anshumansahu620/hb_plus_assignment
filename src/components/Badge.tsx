@@ -4,22 +4,29 @@ import { THEME } from '../constants/theme';
 
 interface BadgeProps {
   label: string;
-  variant?: 'success' | 'danger' | 'primary' | 'neutral' | 'admin';
+  variant?: 'sage' | 'success' | 'danger' | 'admin' | 'darkGreen' | 'neutral' | 'primary';
   icon?: React.ReactNode;
 }
 
 export const Badge: React.FC<BadgeProps> = ({
   label,
-  variant = 'neutral',
+  variant = 'sage',
   icon,
 }) => {
   const getBadgeStyle = () => {
     switch (variant) {
+      case 'primary':
+      case 'sage':
+        return {
+          bg: THEME.colors.sageBg,
+          text: THEME.colors.sageText,
+          border: THEME.colors.sageBorder,
+        };
       case 'success':
         return {
-          bg: THEME.colors.successBg,
-          text: THEME.colors.success,
-          border: THEME.colors.successBorder,
+          bg: '#ECFDF5',
+          text: '#047857',
+          border: '#A7F3D0',
         };
       case 'danger':
         return {
@@ -27,23 +34,23 @@ export const Badge: React.FC<BadgeProps> = ({
           text: THEME.colors.errorText,
           border: THEME.colors.errorBorder,
         };
-      case 'primary':
-        return {
-          bg: THEME.colors.primaryLight,
-          text: THEME.colors.primary,
-          border: '#BFDBFE',
-        };
       case 'admin':
         return {
-          bg: '#FAF5FF',
-          text: '#7E22CE',
-          border: '#E9D5FF',
+          bg: '#F5F3FF',
+          text: '#6D28D9',
+          border: '#DDD6FE',
+        };
+      case 'darkGreen':
+        return {
+          bg: 'rgba(255, 255, 255, 0.12)',
+          text: '#D1FAE5',
+          border: 'rgba(255, 255, 255, 0.2)',
         };
       default:
         return {
-          bg: '#F1F5F9',
-          text: THEME.colors.textSecondary,
-          border: THEME.colors.cardBorder,
+          bg: '#F3F4F6',
+          text: '#374151',
+          border: '#E5E7EB',
         };
     }
   };
@@ -63,19 +70,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 3.5,
     borderRadius: THEME.borderRadius.full,
     borderWidth: 1,
     alignSelf: 'flex-start',
   },
   iconContainer: {
-    marginRight: 5,
+    marginRight: 4,
   },
   badgeText: {
-    fontSize: THEME.typography.fontSize.xs,
-    fontWeight: THEME.typography.fontWeight.semibold,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
 });
-

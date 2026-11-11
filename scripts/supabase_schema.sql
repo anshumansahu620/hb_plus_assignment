@@ -46,3 +46,4 @@ VALUES
   ('usr_member_seed_1', 'sarah.fitness@hbplus.fit', 'Sarah Jenkins', 'user', 'hbplus.fit', NOW()),
   ('usr_member_seed_2', 'alex.trainer@hbplus.fit', 'Alex Rivera', 'user', 'hbplus.fit', NOW())
 ON CONFLICT (email) DO NOTHING;
+

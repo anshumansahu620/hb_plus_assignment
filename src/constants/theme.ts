@@ -1,39 +1,57 @@
+/**
+ * Design Tokens matching the official Figma Prototype:
+ * Forest Green (#0F382C) & Modern Sage (#F4F6F3) palette.
+ */
 export const THEME = {
   colors: {
-    primary: '#1E3A8A',       // Deep Royal Blue
-    primaryHover: '#1D4ED8',  // Indigo accent
-    primaryLight: '#EFF6FF',  // Soft blue tint
-    accent: '#0D9488',        // Teal
+    // Forest Green Theme from Figma
+    forestGreenDark: '#0A261E',
+    forestGreen: '#0F382C',        // Primary hero banner & left side
+    forestGreenCard: '#154436',    // Inner dark card on hero
+    forestGreenLight: '#1E5343',
+    forestGreenHighlight: '#34D399',// Bright mint accent
     
-    // Status colors
-    success: '#10B981',       // Emerald (Allowed / Verified)
-    successBg: '#ECFDF5',
-    successBorder: '#A7F3D0',
-    
-    error: '#EF4444',         // Ruby Red (Access Restricted)
-    errorBg: '#FEF2F2',
-    errorBorder: '#FECACA',
-    errorText: '#B91C1C',
-    
-    warning: '#F59E0B',
-    warningBg: '#FFFBEB',
+    // Core brand aliases
+    primary: '#0F382C',
+    primaryHover: '#154436',
+    primaryLight: '#E9EFE7',
+    border: '#E3E8E1',
     
     // Backgrounds & Neutrals
-    background: '#F8FAFC',    // Slate 50
+    background: '#F4F6F3',         // Soft Sage/Cream background
+    surface: '#FFFFFF',
+    surfaceSubtle: '#F9FAF8',
     card: '#FFFFFF',
-    cardBorder: '#E2E8F0',    // Slate 200
+    cardBorder: '#E3E8E1',         // Clean subtle sage border
+    divider: '#EBEFE9',
     
-    textPrimary: '#0F172A',   // Slate 900
-    textSecondary: '#475569', // Slate 600
-    textMuted: '#94A3B8',     // Slate 400
+    // Text colors
+    textPrimary: '#141E18',        // Deep forest-slate for high contrast
+    textSecondary: '#4B5850',      // Muted sage-slate
+    textMuted: '#8A978E',          // Light slate
+    textLight: '#F3F6F2',          // Inverted text for dark green panels
+    textLightMuted: '#95B8AB',     // Muted text for dark green panels
     
-    border: '#E2E8F0',
-    divider: '#F1F5F9',
+    // Sage Badges & Accents
+    sageBg: '#E9EFE7',
+    sageBorder: '#CDDBD8',
+    sageText: '#154436',
     
-    // Google Button styling
+    // Status colors
+    success: '#10B981',
+    successBg: '#ECFDF5',
+    successBorder: '#A7F3D0',
+    successText: '#065F46',
+    
+    error: '#DC2626',
+    errorBg: '#FEF2F2',
+    errorBorder: '#FECACA',
+    errorText: '#991B1B',
+    
+    // Google Button
     googleBtnBg: '#FFFFFF',
-    googleBtnBorder: '#DADCE0',
-    googleBtnText: '#3C4043',
+    googleBtnBorder: '#D8DFD7',
+    googleBtnText: '#202124',
   },
   
   spacing: {
@@ -48,57 +66,58 @@ export const THEME = {
   borderRadius: {
     sm: 6,
     md: 10,
-    lg: 16,
-    xl: 24,
+    lg: 14,
+    xl: 20,
+    xxl: 28,
     full: 9999,
   },
   
   typography: {
     fontSize: {
       xs: 12,
-      sm: 14,
-      base: 16,
+      sm: 13,
+      base: 15,
       lg: 18,
-      xl: 20,
-      xxl: 24,
-      hero: 32,
+      xl: 22,
+      xxl: 28,
+      hero: 38,
     },
     fontWeight: {
       regular: '400' as const,
       medium: '500' as const,
       semibold: '600' as const,
       bold: '700' as const,
+      extrabold: '800' as const,
     },
   },
   
   shadows: {
     sm: {
-      shadowColor: '#0F172A',
+      shadowColor: '#0A261E',
       shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
-      shadowRadius: 2,
+      shadowOpacity: 0.04,
+      shadowRadius: 3,
       elevation: 2,
     },
     md: {
-      shadowColor: '#0F172A',
+      shadowColor: '#0A261E',
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.08,
-      shadowRadius: 8,
+      shadowOpacity: 0.06,
+      shadowRadius: 10,
       elevation: 4,
     },
     lg: {
-      shadowColor: '#0F172A',
-      shadowOffset: { width: 0, height: 10 },
-      shadowOpacity: 0.12,
-      shadowRadius: 20,
+      shadowColor: '#0A261E',
+      shadowOffset: { width: 0, height: 12 },
+      shadowOpacity: 0.09,
+      shadowRadius: 24,
       elevation: 8,
     },
   },
   
   breakpoints: {
-    mobile: 480,
-    tablet: 768,
-    desktop: 1024,
+    mobile: 600,
+    tablet: 880,
+    desktop: 1100,
   },
 };
-
