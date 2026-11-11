@@ -28,6 +28,7 @@ export interface AuthState {
 
 export interface AuthContextType extends AuthState {
   signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string, password?: string) => Promise<boolean>;
   signOut: () => Promise<void>;
   clearError: () => void;
   simulateLogin: (email: string, role?: UserRole) => Promise<boolean>;

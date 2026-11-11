@@ -48,6 +48,34 @@ export async function startGoogleOAuth(redirectTo?: string) {
 }
 
 /**
+ * Signs in using Email and Password via Supabase Auth
+ */
+export async function signInWithSupabaseEmail(email: string, password: string) {
+  // First attempt standard sign in
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    // If user does not exist yet, attempt automatic sign up for the corporate domain
+    if (error.message.toLowerCase().includes('invalid login credentials') || error.message.toLowerCase().includes('user not found')) {
+      const signUpResult = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      if (signUpResult.error) {
+        throw signUpResult.error;
+      }
+      return signUpResult.data;
+    }
+    throw error;
+  }
+
+  return data;
+}
+
+/**
  * Signs out the current user session from Supabase
  */
 export async function endSession() {

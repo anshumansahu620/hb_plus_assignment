@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,19 +6,31 @@ import {
   ScrollView,
   useWindowDimensions,
   Pressable,
+  TextInput,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { GoogleSignInButton } from '../components/GoogleSignInButton';
 import { ErrorAlert } from '../components/ErrorAlert';
-import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { THEME } from '../constants/theme';
 import { APP_CONFIG, ALLOWED_DOMAIN } from '../constants/config';
 
 export const LoginScreen: React.FC = () => {
-  const { signInWithGoogle, simulateLogin, error, clearError, isLoading } = useAuth();
+  const { signInWithGoogle, signInWithEmail, simulateLogin, error, clearError, isLoading } = useAuth();
   const { width } = useWindowDimensions();
   const isDesktop = width >= THEME.breakpoints.tablet;
+
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleEmailSubmit = async () => {
+    if (!emailInput.trim()) {
+      return;
+    }
+    await signInWithEmail(emailInput.trim(), passwordInput.trim() || undefined);
+  };
 
   return (
     <ScrollView
@@ -26,7 +38,7 @@ export const LoginScreen: React.FC = () => {
       keyboardShouldPersistTaps="handled"
     >
       <View style={[styles.mainLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
-
+        
         {/* LEFT / TOP HERO PANEL (Forest Green from Figma) */}
         <View style={[styles.heroPanel, isDesktop ? styles.heroPanelDesktop : styles.heroPanelMobile]}>
           <View style={styles.heroTop}>
@@ -34,7 +46,6 @@ export const LoginScreen: React.FC = () => {
               <View style={styles.brandDot} />
               <Text style={styles.brandName}>hbplus</Text>
             </View>
-
           </View>
 
           <View style={styles.heroMiddle}>
@@ -43,8 +54,6 @@ export const LoginScreen: React.FC = () => {
               Your team, your tools, your workday. All in one secure place.
             </Text>
           </View>
-
-
 
           <View style={styles.heroFooter}>
             <Text style={styles.heroFooterText}>Built for teams that move fast.</Text>
@@ -69,7 +78,7 @@ export const LoginScreen: React.FC = () => {
               <Text style={styles.kickerText}>WELCOME BACK</Text>
               <Text style={styles.authTitle}>Your workspace awaits.</Text>
               <Text style={styles.authSubtitle}>
-                Sign in with your official Google account to continue to your dashboard.
+                Sign in with your official @{ALLOWED_DOMAIN} account to continue.
               </Text>
             </View>
 
@@ -93,8 +102,73 @@ export const LoginScreen: React.FC = () => {
               />
             </View>
 
-            {/* Exclusive to @hbplus.fit Notice Card from Figma */}
+            {/* Divider: OR CONTINUE WITH EMAIL */}
+            <View style={styles.orDividerRow}>
+              <View style={styles.orLine} />
+              <Text style={styles.orText}>OR CONTINUE WITH EMAIL</Text>
+              <View style={styles.orLine} />
+            </View>
 
+            {/* EMAIL AUTHENTICATION FORM */}
+            <View style={styles.emailFormContainer}>
+              {/* Work Email Input */}
+              <View style={styles.inputFieldGroup}>
+                <Text style={styles.inputLabel}>Work Email</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons name="mail-outline" size={17} color={THEME.colors.textMuted} style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder={`e.g. name@${ALLOWED_DOMAIN}`}
+                    placeholderTextColor={THEME.colors.textMuted}
+                    value={emailInput}
+                    onChangeText={(txt) => {
+                      setEmailInput(txt);
+                      if (error) clearError();
+                    }}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    keyboardType="email-address"
+                  />
+                </View>
+              </View>
+
+              {/* Password Input */}
+              <View style={styles.inputFieldGroup}>
+                <Text style={styles.inputLabel}>Password</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons name="lock-closed-outline" size={17} color={THEME.colors.textMuted} style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="Enter password"
+                    placeholderTextColor={THEME.colors.textMuted}
+                    value={passwordInput}
+                    onChangeText={setPasswordInput}
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                  />
+                  <Pressable
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={styles.eyeBtn}
+                    accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+                  >
+                    <Ionicons
+                      name={showPassword ? "eye-off-outline" : "eye-outline"}
+                      size={18}
+                      color={THEME.colors.textMuted}
+                    />
+                  </Pressable>
+                </View>
+              </View>
+
+              {/* Email Sign In Button */}
+              <Button
+                label="Sign In with Work Email"
+                onPress={handleEmailSubmit}
+                isLoading={isLoading}
+                style={styles.emailSubmitButton}
+                textStyle={styles.emailSubmitButtonText}
+              />
+            </View>
 
             {/* Evaluator & Recruiter Sandbox Suite */}
             <View style={styles.evaluatorSection}>
@@ -213,19 +287,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     letterSpacing: -0.5,
   },
-  workspacePill: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: THEME.borderRadius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  workspacePillText: {
-    color: '#D1FAE5',
-    fontSize: 11,
-    fontWeight: '600',
-  },
   heroMiddle: {
     marginVertical: THEME.spacing.lg,
   },
@@ -242,41 +303,6 @@ const styles = StyleSheet.create({
     marginTop: 14,
     lineHeight: 22,
     maxWidth: 340,
-  },
-  heroCard: {
-    backgroundColor: THEME.colors.forestGreenCard,
-    borderRadius: THEME.borderRadius.lg,
-    padding: THEME.spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
-    marginTop: THEME.spacing.md,
-  },
-  heroCardTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  heroCardDomain: {
-    fontSize: THEME.typography.fontSize.base,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  verifiedTag: {
-    backgroundColor: '#064E3B',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: THEME.borderRadius.full,
-  },
-  verifiedTagText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#6EE7B7',
-  },
-  heroCardNotice: {
-    fontSize: 12,
-    color: THEME.colors.textLightMuted,
-    lineHeight: 16,
   },
   heroFooter: {
     marginTop: THEME.spacing.lg,
@@ -344,40 +370,78 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     width: '100%',
-    marginBottom: THEME.spacing.md,
   },
-  domainNoticeCard: {
-    backgroundColor: '#F2F7F2',
-    borderWidth: 1,
-    borderColor: '#D7E7D6',
-    borderRadius: THEME.borderRadius.md,
-    padding: 12,
-    marginBottom: THEME.spacing.lg,
-  },
-  domainNoticeHeader: {
+
+  // Divider: OR CONTINUE WITH EMAIL
+  orDividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginVertical: THEME.spacing.md,
   },
-  greenDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#10B981',
-    marginRight: 6,
+  orLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: THEME.colors.cardBorder,
   },
-  domainNoticeTitle: {
-    fontSize: 12,
+  orText: {
+    fontSize: 10,
     fontWeight: '700',
-    color: '#154436',
+    color: THEME.colors.textMuted,
+    paddingHorizontal: 10,
+    letterSpacing: 0.6,
   },
-  domainNoticeBody: {
+
+  // Email Auth Form
+  emailFormContainer: {
+    gap: 12,
+    marginBottom: THEME.spacing.md,
+  },
+  inputFieldGroup: {
+    gap: 5,
+  },
+  inputLabel: {
     fontSize: 12,
-    color: '#3C5C4E',
-    lineHeight: 17,
+    fontWeight: '600',
+    color: THEME.colors.textPrimary,
   },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAF8',
+    borderColor: THEME.colors.cardBorder,
+    borderWidth: 1.5,
+    borderRadius: THEME.borderRadius.md,
+    paddingHorizontal: 12,
+    height: 44,
+  },
+  inputIcon: {
+    marginRight: 8,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 14,
+    color: THEME.colors.textPrimary,
+    outlineWidth: 0,
+    height: '100%',
+  },
+  eyeBtn: {
+    padding: 6,
+  },
+  emailSubmitButton: {
+    backgroundColor: THEME.colors.forestGreen,
+    paddingVertical: 12,
+    marginTop: 4,
+  },
+  emailSubmitButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+
+  // Evaluator Section
   evaluatorSection: {
     marginBottom: THEME.spacing.md,
+    marginTop: THEME.spacing.sm,
   },
   evaluatorDividerRow: {
     flexDirection: 'row',
