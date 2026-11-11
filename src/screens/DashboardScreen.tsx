@@ -270,7 +270,9 @@ export const DashboardScreen: React.FC = () => {
                   {/* Header Greeting */}
                   <View style={styles.greetingHeader}>
                     <View>
-                      <Text style={styles.greetingTitle}>Welcome back, {firstName}.</Text>
+                      <Text style={[styles.greetingTitle, !isDesktop && styles.greetingTitleMobile]}>
+                        Welcome back, {firstName}.
+                      </Text>
                       <Text style={styles.greetingSubtitle}>
                         Here is what's happening with your workspace today.
                       </Text>
@@ -298,7 +300,7 @@ export const DashboardScreen: React.FC = () => {
                   <View style={styles.cardContainer}>
                     <View style={styles.cardHeaderRow}>
                       <View>
-                        <Text style={styles.cardTitle}>Grant Admin Access & Permissions</Text>
+                        <Text style={styles.cardTitle}>Grant Admin Access</Text>
                       </View>
 
                     </View>
@@ -363,7 +365,7 @@ export const DashboardScreen: React.FC = () => {
                       <View style={styles.tableRow}>
                         <Text style={styles.tableLabel}>Domain status</Text>
                         <View style={styles.domainValueRow}>
-                          <Text style={styles.tableValue}>{user?.domain}</Text>
+
                           <Badge label="Allowed Domain" variant="success" />
                         </View>
                       </View>
@@ -380,7 +382,7 @@ export const DashboardScreen: React.FC = () => {
                         <Text style={styles.tableLabel}>Admin privileges</Text>
                         <View style={styles.domainValueRow}>
                           <Text style={styles.tableValue}>
-                            {user?.role === 'admin' ? 'Full Access (Can Grant & Revoke Roles)' : 'Standard Access'}
+                            {user?.role === 'admin' ? 'Full Access' : 'Standard Access'}
                           </Text>
                           {user?.role !== 'admin' && (
                             <Pressable onPress={elevateToAdmin} style={styles.claimAdminPill}>
@@ -491,870 +493,875 @@ export const DashboardScreen: React.FC = () => {
                     </View>
                   </View>
 
-                          {/* BOTTOM GRID: WORKPLACE MODULES (From Figma Screen 2) */}
-                          <View style={styles.modulesSection}>
-                            <Text style={styles.sectionHeader}>Workspace quick access</Text>
+                  {/* BOTTOM GRID: WORKPLACE MODULES (From Figma Screen 2) */}
+                  <View style={styles.modulesSection}>
+                    <Text style={styles.sectionHeader}>Workspace quick access</Text>
 
-                            <View style={[styles.modulesGrid, !isDesktop && styles.modulesGridMobile]}>
-                              {/* Module 1: Team Directory */}
-                              <Pressable
-                                onPress={() => user?.role === 'admin' ? navigateTo('admin') : alert('Directory contains authorized @hbplus.fit members.')}
-                                style={styles.moduleCard}
-                              >
-                                <View style={styles.moduleIconWrapper}>
-                                  <Ionicons name="people-outline" size={18} color={THEME.colors.onyx} />
-                                </View>
-                                <Text style={styles.moduleTitle}>Team Directory</Text>
-                                <Text style={styles.moduleDesc}>
-                                  View members and administrators verified on @{APP_CONFIG.allowedDomain}.
-                                </Text>
-                              </Pressable>
+                    <View style={[styles.modulesGrid, !isDesktop && styles.modulesGridMobile]}>
+                      {/* Module 1: Team Directory */}
+                      <Pressable
+                        onPress={() => user?.role === 'admin' ? navigateTo('admin') : alert('Directory contains authorized @hbplus.fit members.')}
+                        style={styles.moduleCard}
+                      >
+                        <View style={styles.moduleIconWrapper}>
+                          <Ionicons name="people-outline" size={18} color={THEME.colors.onyx} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Team Directory</Text>
+                        <Text style={styles.moduleDesc}>
+                          View members and administrators verified on @{APP_CONFIG.allowedDomain}.
+                        </Text>
+                      </Pressable>
 
-                              {/* Module 2: Resource Library */}
-                              <Pressable
-                                onPress={() => {
-                                  setActiveTab('resources');
-                                  navigateTo('resources');
-                                }}
-                                style={styles.moduleCard}
-                              >
-                                <View style={styles.moduleIconWrapper}>
-                                  <Ionicons name="folder-outline" size={18} color={THEME.colors.terracotta} />
-                                </View>
-                                <Text style={styles.moduleTitle}>Resource Library</Text>
-                                <Text style={styles.moduleDesc}>
-                                  Access 14 official clinical protocols, brand kits, and security compliance handbooks.
-                                </Text>
-                              </Pressable>
+                      {/* Module 2: Resource Library */}
+                      <Pressable
+                        onPress={() => {
+                          setActiveTab('resources');
+                          navigateTo('resources');
+                        }}
+                        style={styles.moduleCard}
+                      >
+                        <View style={styles.moduleIconWrapper}>
+                          <Ionicons name="folder-outline" size={18} color={THEME.colors.terracotta} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Resource Library</Text>
+                        <Text style={styles.moduleDesc}>
+                          Access 14 official clinical protocols, brand kits, and security compliance handbooks.
+                        </Text>
+                      </Pressable>
 
-                              {/* Module 3: Session State */}
-                              <Pressable
-                                onPress={signOut}
-                                style={styles.moduleCard}
-                              >
-                                <View style={[styles.moduleIconWrapper, { backgroundColor: '#FEF2F2' }]}>
-                                  <Ionicons name="log-out-outline" size={18} color={THEME.colors.error} />
-                                </View>
-                                <Text style={styles.moduleTitle}>Terminate Session</Text>
-                                <Text style={styles.moduleDesc}>
-                                  Securely sign out and clear active authentication tokens.
-                                </Text>
-                              </Pressable>
-                            </View>
-                          </View>
-
-                          {/* SECTION: OUR PATHWAYS (Direct from example.html) */}
-                          <View style={styles.pathwaysSection}>
-                            <View style={styles.pathwayHeaderRow}>
-                              <View>
-                                <Text style={styles.pathwaySubheader}>THE HOLY TRIANGLE OF HEALTH</Text>
-                                <Text style={styles.sectionHeader}>Our Pathways</Text>
-                              </View>
-                              <Text style={styles.pathwayKicker}>Integrative Wellness</Text>
-                            </View>
-
-                            <View style={[styles.pathwaysGrid, !isDesktop && styles.modulesGridMobile]}>
-                              {/* Pathway 1 */}
-                              <View style={styles.pathwayCard}>
-                                <View style={styles.pathwayIconBox}>
-                                  <Ionicons name="barbell-outline" size={18} color={THEME.colors.terracotta} />
-                                </View>
-                                <Text style={styles.moduleTitle}>Pain Management</Text>
-                                <Text style={styles.moduleDesc}>
-                                  Targeted physical therapy, postural correction, and chronic joint relief.
-                                </Text>
-                              </View>
-
-                              {/* Pathway 2 */}
-                              <View style={styles.pathwayCard}>
-                                <View style={styles.pathwayIconBox}>
-                                  <Ionicons name="restaurant-outline" size={18} color={THEME.colors.terracotta} />
-                                </View>
-                                <Text style={styles.moduleTitle}>Weight Management</Text>
-                                <Text style={styles.moduleDesc}>
-                                  Metabolic testing, sustainable nutrition, and body recomposition.
-                                </Text>
-                              </View>
-
-                              {/* Pathway 3 */}
-                              <View style={styles.pathwayCard}>
-                                <View style={styles.pathwayIconBox}>
-                                  <Ionicons name="heart-outline" size={18} color={THEME.colors.terracotta} />
-                                </View>
-                                <Text style={styles.moduleTitle}>Pre & Post Natal</Text>
-                                <Text style={styles.moduleDesc}>
-                                  Specialized maternal wellness, core rehab, and guided postpartum strength.
-                                </Text>
-                              </View>
-
-                              {/* Pathway 4 */}
-                              <View style={styles.pathwayCard}>
-                                <View style={styles.pathwayIconBox}>
-                                  <Ionicons name="pulse-outline" size={18} color={THEME.colors.terracotta} />
-                                </View>
-                                <Text style={styles.moduleTitle}>Lifestyle Management</Text>
-                                <Text style={styles.moduleDesc}>
-                                  Circadian rhythm alignment, stress resilience, and deep restorative sleep.
-                                </Text>
-                              </View>
-                            </View>
-                          </View>
-                        </>
-              )}
-
-                      </View>
-                    </ScrollView>
+                      {/* Module 3: Session State */}
+                      <Pressable
+                        onPress={signOut}
+                        style={styles.moduleCard}
+                      >
+                        <View style={[styles.moduleIconWrapper, { backgroundColor: '#FEF2F2' }]}>
+                          <Ionicons name="log-out-outline" size={18} color={THEME.colors.error} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Terminate Session</Text>
+                        <Text style={styles.moduleDesc}>
+                          Securely sign out and clear active authentication tokens.
+                        </Text>
+                      </Pressable>
+                    </View>
                   </View>
 
-                </View>
+                  {/* SECTION: OUR PATHWAYS (Direct from example.html) */}
+                  <View style={styles.pathwaysSection}>
+                    <View style={styles.pathwayHeaderRow}>
+                      <View>
+                        <Text style={styles.pathwaySubheader}>THE HOLY TRIANGLE OF HEALTH</Text>
+                        <Text style={styles.sectionHeader}>Our Pathways</Text>
+                      </View>
+                      <Text style={styles.pathwayKicker}>Integrative Wellness</Text>
+                    </View>
+
+                    <View style={[styles.pathwaysGrid, !isDesktop && styles.modulesGridMobile]}>
+                      {/* Pathway 1 */}
+                      <View style={styles.pathwayCard}>
+                        <View style={styles.pathwayIconBox}>
+                          <Ionicons name="barbell-outline" size={18} color={THEME.colors.terracotta} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Pain Management</Text>
+                        <Text style={styles.moduleDesc}>
+                          Targeted physical therapy, postural correction, and chronic joint relief.
+                        </Text>
+                      </View>
+
+                      {/* Pathway 2 */}
+                      <View style={styles.pathwayCard}>
+                        <View style={styles.pathwayIconBox}>
+                          <Ionicons name="restaurant-outline" size={18} color={THEME.colors.terracotta} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Weight Management</Text>
+                        <Text style={styles.moduleDesc}>
+                          Metabolic testing, sustainable nutrition, and body recomposition.
+                        </Text>
+                      </View>
+
+                      {/* Pathway 3 */}
+                      <View style={styles.pathwayCard}>
+                        <View style={styles.pathwayIconBox}>
+                          <Ionicons name="heart-outline" size={18} color={THEME.colors.terracotta} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Pre & Post Natal</Text>
+                        <Text style={styles.moduleDesc}>
+                          Specialized maternal wellness, core rehab, and guided postpartum strength.
+                        </Text>
+                      </View>
+
+                      {/* Pathway 4 */}
+                      <View style={styles.pathwayCard}>
+                        <View style={styles.pathwayIconBox}>
+                          <Ionicons name="pulse-outline" size={18} color={THEME.colors.terracotta} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Lifestyle Management</Text>
+                        <Text style={styles.moduleDesc}>
+                          Circadian rhythm alignment, stress resilience, and deep restorative sleep.
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </>
+              )}
+
             </View>
-            );
+          </ScrollView>
+        </View>
+
+      </View>
+    </View>
+  );
 };
 
-            const styles = StyleSheet.create({
-              rootWrapper: {
-              flex: 1,
-            backgroundColor: THEME.colors.background,
+const styles = StyleSheet.create({
+  rootWrapper: {
+    flex: 1,
+    backgroundColor: THEME.colors.background,
   },
-            dashboardLayout: {
-              flex: 1,
+  dashboardLayout: {
+    flex: 1,
   },
-            layoutDesktop: {
-              flexDirection: 'row',
+  layoutDesktop: {
+    flexDirection: 'row',
   },
-            layoutMobile: {
-              flexDirection: 'column',
-  },
-
-            // Permanent Uncollapsible Sidebar (250px)
-            sidebar: {
-              width: 250,
-            backgroundColor: '#FFFFFF',
-            borderRightWidth: 1,
-            borderRightColor: THEME.colors.cardBorder,
-            padding: THEME.spacing.lg,
-            justifyContent: 'space-between',
-  },
-            sidebarTop: {
-              width: '100%',
-  },
-            brandRow: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            marginBottom: THEME.spacing.xl,
-  },
-            brandLogo: {
-              width: 28,
-            height: 28,
-            marginRight: 10,
-  },
-            brandTextCol: {
-              flexDirection: 'column',
-  },
-            brandSubtitle: {
-              fontSize: 10,
-            color: THEME.colors.textMuted,
-            fontWeight: '600',
-            letterSpacing: 0.5,
-            textTransform: 'uppercase',
-  },
-            brandRowMobile: {
-              flexDirection: 'row',
-            alignItems: 'center',
-  },
-            brandLogoMobile: {
-              width: 24,
-            height: 24,
-            marginRight: 8,
-  },
-            brandDot: {
-              width: 8,
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: THEME.colors.terracotta,
-            marginRight: 8,
-  },
-            brandName: {
-              fontFamily: THEME.typography.fontFamily.gilroy,
-            fontSize: 22,
-            fontWeight: '700',
-            color: THEME.colors.onyx,
-            letterSpacing: -0.5,
-  },
-            brandNameDark: {
-              fontFamily: THEME.typography.fontFamily.gilroy,
-            fontSize: 22,
-            fontWeight: '700',
-            color: THEME.colors.onyx,
-  },
-            menuList: {
-              gap: 6,
-  },
-            menuItem: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            paddingVertical: 10,
-            paddingHorizontal: 12,
-            borderRadius: THEME.borderRadius.md,
-  },
-            menuItemActive: {
-              backgroundColor: THEME.colors.creamDark,
-  },
-            menuIcon: {
-              marginRight: 10,
-  },
-            menuItemText: {
-              fontSize: 14,
-            color: THEME.colors.textSecondary,
-            fontWeight: '500',
-            flex: 1,
-  },
-            menuItemTextActive: {
-              color: THEME.colors.onyx,
-            fontWeight: '700',
-  },
-            sidebarFooter: {
-              borderTopWidth: 1,
-            borderTopColor: THEME.colors.divider,
-            paddingTop: THEME.spacing.md,
-  },
-            userProfileRow: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            marginBottom: 10,
-  },
-            userAvatar: {
-              width: 38,
-            height: 38,
-            borderRadius: 19,
-            marginRight: 10,
-  },
-            avatarFallback: {
-              width: 38,
-            height: 38,
-            borderRadius: 19,
-            backgroundColor: THEME.colors.onyx,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: 10,
-  },
-            avatarInitial: {
-              color: '#FFFFFF',
-            fontWeight: '700',
-            fontSize: 15,
-  },
-            userMetaCol: {
-              flex: 1,
-  },
-            userName: {
-              fontSize: 13,
-            fontWeight: '700',
-            color: THEME.colors.textPrimary,
-  },
-            userRoleText: {
-              fontSize: 11,
-            color: THEME.colors.textMuted,
-  },
-            signOutLink: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            paddingVertical: 4,
-  },
-            signOutText: {
-              fontSize: 12,
-            color: THEME.colors.error,
-            fontWeight: '600',
+  layoutMobile: {
+    flexDirection: 'column',
   },
 
-            // Main Content Area
-            contentArea: {
-              flex: 1,
+  // Permanent Uncollapsible Sidebar (250px)
+  sidebar: {
+    width: 250,
+    backgroundColor: '#FFFFFF',
+    borderRightWidth: 1,
+    borderRightColor: THEME.colors.cardBorder,
+    padding: THEME.spacing.lg,
+    justifyContent: 'space-between',
   },
-            mobileTopBar: {
-              height: 60,
-            backgroundColor: '#FFFFFF',
-            borderBottomWidth: 1,
-            borderBottomColor: THEME.colors.cardBorder,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingHorizontal: THEME.spacing.md,
+  sidebarTop: {
+    width: '100%',
   },
-            mobileNavPills: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            gap: 6,
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: THEME.spacing.xl,
   },
-            mobileNavPill: {
-              paddingHorizontal: 10,
-            paddingVertical: 5,
-            borderRadius: THEME.borderRadius.full,
-            backgroundColor: THEME.colors.creamDark,
-            borderWidth: 1,
-            borderColor: THEME.colors.cardBorder,
+  brandLogo: {
+    width: 28,
+    height: 28,
+    marginRight: 10,
   },
-            mobileNavPillActive: {
-              backgroundColor: THEME.colors.onyx,
-            borderColor: THEME.colors.onyx,
+  brandTextCol: {
+    flexDirection: 'column',
   },
-            mobileNavPillText: {
-              fontSize: 11,
-            fontWeight: '600',
-            color: THEME.colors.textSecondary,
+  brandSubtitle: {
+    fontSize: 10,
+    color: THEME.colors.textMuted,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
-            mobileNavPillTextActive: {
-              color: '#FFFFFF',
+  brandRowMobile: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-            mobileSignOut: {
-              paddingVertical: 6,
-            paddingHorizontal: 10,
-            borderRadius: THEME.borderRadius.sm,
-            backgroundColor: '#FEF2F2',
+  brandLogoMobile: {
+    width: 24,
+    height: 24,
+    marginRight: 8,
   },
-            mobileSignOutText: {
-              fontSize: 12,
-            fontWeight: '600',
-            color: THEME.colors.error,
+  brandDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: THEME.colors.terracotta,
+    marginRight: 8,
   },
-            scrollContent: {
-              padding: THEME.spacing.xl,
-            alignItems: 'center',
+  brandName: {
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontSize: 22,
+    fontWeight: '700',
+    color: THEME.colors.onyx,
+    letterSpacing: -0.5,
   },
-            innerContainer: {
-              maxWidth: 960,
-            width: '100%',
+  brandNameDark: {
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontSize: 22,
+    fontWeight: '700',
+    color: THEME.colors.onyx,
   },
-            greetingHeader: {
-              flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: THEME.spacing.lg,
-            flexWrap: 'wrap',
-            gap: 12,
+  menuList: {
+    gap: 6,
   },
-            greetingTitle: {
-              fontFamily: THEME.typography.fontFamily.serif,
-            fontSize: 32,
-            fontWeight: '700',
-            color: THEME.colors.textPrimary,
-            letterSpacing: -0.5,
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: THEME.borderRadius.md,
   },
-            greetingSubtitle: {
-              fontSize: THEME.typography.fontSize.sm,
-            color: THEME.colors.textSecondary,
-            marginTop: 4,
+  menuItemActive: {
+    backgroundColor: THEME.colors.creamDark,
   },
-            badgeCheck: {
-              color: THEME.colors.terracotta,
-            fontSize: 11,
-            fontWeight: 'bold',
+  menuIcon: {
+    marginRight: 10,
   },
-
-            // Hero Banner (Official Warm Stone & Terracotta luxury styling from example.html)
-            forestHeroBanner: {
-              backgroundColor: THEME.colors.creamDark,
-            borderRadius: THEME.borderRadius.card,
-            borderWidth: 1,
-            borderColor: THEME.colors.cardBorder,
-            padding: THEME.spacing.xl,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: THEME.spacing.lg,
-            ...THEME.shadows.sm,
+  menuItemText: {
+    fontSize: 14,
+    color: THEME.colors.textSecondary,
+    fontWeight: '500',
+    flex: 1,
   },
-            forestHeroLeft: {
-              flex: 1,
+  menuItemTextActive: {
+    color: THEME.colors.onyx,
+    fontWeight: '700',
   },
-            heroPill: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: '#FFFFFF',
-            paddingHorizontal: 10,
-            paddingVertical: 4,
-            borderRadius: THEME.borderRadius.full,
-            borderWidth: 1,
-            borderColor: THEME.colors.cardBorder,
-            alignSelf: 'flex-start',
-            marginBottom: 12,
+  sidebarFooter: {
+    borderTopWidth: 1,
+    borderTopColor: THEME.colors.divider,
+    paddingTop: THEME.spacing.md,
   },
-            heroPillDot: {
-              width: 6,
-            height: 6,
-            borderRadius: 3,
-            backgroundColor: THEME.colors.terracotta,
-            marginRight: 6,
+  userProfileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-            heroPillText: {
-              fontSize: 10,
-            fontWeight: '800',
-            color: THEME.colors.terracotta,
-            letterSpacing: 0.8,
+  userAvatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    marginRight: 10,
   },
-            forestHeroTitle: {
-              fontFamily: THEME.typography.fontFamily.serif,
-            fontSize: 28,
-            fontWeight: '700',
-            color: THEME.colors.onyx,
-            letterSpacing: -0.5,
+  avatarFallback: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: THEME.colors.onyx,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
   },
-            forestHeroSubtitle: {
-              fontSize: 14,
-            color: THEME.colors.textSecondary,
-            marginTop: 8,
-            lineHeight: 22,
-            maxWidth: 580,
+  avatarInitial: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 15,
   },
-            forestHeroRight: {
-              marginLeft: THEME.spacing.md,
+  userMetaCol: {
+    flex: 1,
   },
-            lockBadgeCircle: {
-              width: 48,
-            height: 48,
-            borderRadius: 24,
-            backgroundColor: '#FFFFFF',
-            borderWidth: 1,
-            borderColor: THEME.colors.cardBorder,
-            alignItems: 'center',
-            justifyContent: 'center',
-            ...THEME.shadows.sm,
+  userName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+  },
+  userRoleText: {
+    fontSize: 11,
+    color: THEME.colors.textMuted,
+  },
+  signOutLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  signOutText: {
+    fontSize: 12,
+    color: THEME.colors.error,
+    fontWeight: '600',
   },
 
-            // Admin Announcement
-            adminNotice: {
-              backgroundColor: THEME.colors.creamDark,
-            borderColor: THEME.colors.cardBorder,
-            borderWidth: 1.5,
-            borderRadius: THEME.borderRadius.card,
-            padding: THEME.spacing.md,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: THEME.spacing.lg,
-            ...THEME.shadows.sm,
+  // Main Content Area
+  contentArea: {
+    flex: 1,
   },
-            adminNoticeContent: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            flex: 1,
+  mobileTopBar: {
+    height: 60,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.colors.cardBorder,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: THEME.spacing.md,
   },
-            adminIconBox: {
-              marginRight: 12,
+  mobileNavPills: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
-            adminNoticeTitle: {
-              fontSize: 14,
-            fontWeight: '700',
-            color: THEME.colors.onyx,
+  mobileNavPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: THEME.borderRadius.full,
+    backgroundColor: THEME.colors.creamDark,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
   },
-            adminNoticeBody: {
-              fontSize: 12,
-            color: THEME.colors.textSecondary,
-            marginTop: 2,
+  mobileNavPillActive: {
+    backgroundColor: THEME.colors.onyx,
+    borderColor: THEME.colors.onyx,
   },
-            adminNoticeBtn: {
-              backgroundColor: THEME.colors.terracotta,
-            paddingVertical: 6,
-            paddingHorizontal: 12,
-            borderRadius: THEME.borderRadius.md,
-            marginLeft: 12,
+  mobileNavPillText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: THEME.colors.textSecondary,
   },
-            adminNoticeBtnText: {
-              color: '#FFFFFF',
-            fontWeight: '700',
-            fontSize: 12,
+  mobileNavPillTextActive: {
+    color: '#FFFFFF',
   },
-
-            // Elevate to Administrator Notice
-            elevateNotice: {
-              backgroundColor: '#FFF7ED',
-            borderColor: '#FED7AA',
-            borderWidth: 1.5,
-            borderRadius: THEME.borderRadius.card,
-            padding: THEME.spacing.md,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: THEME.spacing.lg,
-            flexWrap: 'wrap',
-            gap: 12,
-            ...THEME.shadows.sm,
+  mobileSignOut: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: THEME.borderRadius.sm,
+    backgroundColor: '#FEF2F2',
   },
-            elevateNoticeContent: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            flex: 1,
-            minWidth: 260,
+  mobileSignOutText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: THEME.colors.error,
   },
-            elevateIconBox: {
-              marginRight: 12,
+  scrollContent: {
+    padding: THEME.spacing.xl,
+    alignItems: 'center',
   },
-            elevateNoticeTitle: {
-              fontSize: 14,
-            fontWeight: '700',
-            color: '#9A3412',
+  innerContainer: {
+    maxWidth: 960,
+    width: '100%',
   },
-            elevateNoticeBody: {
-              fontSize: 12,
-            color: '#C2410C',
-            marginTop: 2,
-            lineHeight: 17,
+  greetingHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: THEME.spacing.lg,
+    flexWrap: 'wrap',
+    gap: 12,
   },
-            elevateBtn: {
-              backgroundColor: THEME.colors.terracotta,
-            paddingVertical: 8,
-            paddingHorizontal: 16,
-            borderRadius: THEME.borderRadius.md,
-            alignItems: 'center',
-            justifyContent: 'center',
+  greetingTitle: {
+    fontFamily: THEME.typography.fontFamily.serif,
+    fontSize: 32,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+    letterSpacing: -0.5,
   },
-            elevateBtnText: {
-              color: '#FFFFFF',
-            fontWeight: '700',
-            fontSize: 12,
+  greetingTitleMobile: {
+    fontSize: 22,
+    lineHeight: 28,
+    letterSpacing: -0.3,
+  },
+  greetingSubtitle: {
+    fontSize: THEME.typography.fontSize.sm,
+    color: THEME.colors.textSecondary,
+    marginTop: 4,
+  },
+  badgeCheck: {
+    color: THEME.colors.terracotta,
+    fontSize: 11,
+    fontWeight: 'bold',
   },
 
-            // Quick Grant Admin Row
-            grantAdminRow: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            gap: 10,
-            marginTop: 4,
+  // Hero Banner (Official Warm Stone & Terracotta luxury styling from example.html)
+  forestHeroBanner: {
+    backgroundColor: THEME.colors.creamDark,
+    borderRadius: THEME.borderRadius.card,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    padding: THEME.spacing.xl,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: THEME.spacing.lg,
+    ...THEME.shadows.sm,
   },
-            grantAdminRowMobile: {
-              flexDirection: 'column',
-            alignItems: 'stretch',
+  forestHeroLeft: {
+    flex: 1,
   },
-            grantAdminInputWrapper: {
-              flex: 1,
-            height: 44,
-            backgroundColor: '#FAF8F5',
-            borderWidth: 1.5,
-            borderColor: THEME.colors.cardBorder,
-            borderRadius: THEME.borderRadius.md,
-            paddingHorizontal: 12,
-            flexDirection: 'row',
-            alignItems: 'center',
+  heroPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: THEME.borderRadius.full,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
   },
-            quickGrantBtn: {
-              backgroundColor: THEME.colors.onyx,
-            height: 44,
-            paddingHorizontal: 18,
-            borderRadius: THEME.borderRadius.md,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
+  heroPillDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: THEME.colors.terracotta,
+    marginRight: 6,
   },
-            quickGrantBtnText: {
-              color: '#FFFFFF',
-            fontWeight: '700',
-            fontSize: 13,
+  heroPillText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: THEME.colors.terracotta,
+    letterSpacing: 0.8,
   },
-            quickAdminAlertSuccess: {
-              backgroundColor: '#FAF8F5',
-            borderColor: THEME.colors.cardBorder,
+  forestHeroTitle: {
+    fontFamily: THEME.typography.fontFamily.serif,
+    fontSize: 28,
+    fontWeight: '700',
+    color: THEME.colors.onyx,
+    letterSpacing: -0.5,
   },
-            quickAdminAlertTextSuccess: {
-              color: THEME.colors.textPrimary,
-            fontWeight: '600',
+  forestHeroSubtitle: {
+    fontSize: 14,
+    color: THEME.colors.textSecondary,
+    marginTop: 8,
+    lineHeight: 22,
+    maxWidth: 580,
   },
-            claimAdminPill: {
-              backgroundColor: '#FFF7ED',
-            borderWidth: 1,
-            borderColor: '#FED7AA',
-            borderRadius: THEME.borderRadius.full,
-            paddingHorizontal: 8,
-            paddingVertical: 2,
+  forestHeroRight: {
+    marginLeft: THEME.spacing.md,
   },
-            claimAdminPillText: {
-              fontSize: 11,
-            fontWeight: '700',
-            color: THEME.colors.terracotta,
-  },
-
-            // Account Card
-            cardContainer: {
-              backgroundColor: '#FFFFFF',
-            borderRadius: THEME.borderRadius.card,
-            borderColor: THEME.colors.cardBorder,
-            borderWidth: 1,
-            padding: THEME.spacing.lg,
-            marginBottom: THEME.spacing.lg,
-            ...THEME.shadows.sm,
-  },
-            cardContainerMobile: {
-              padding: THEME.spacing.md,
-  },
-            cardHeaderRow: {
-              flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: THEME.spacing.md,
-  },
-            cardHeaderRowMobile: {
-              flexDirection: 'column',
-            alignItems: 'flex-start',
-            gap: 10,
-  },
-            cardHeaderTitleCol: {
-              flex: 1,
-            minWidth: 0,
-            width: '100%',
-  },
-            cardTitle: {
-              fontFamily: THEME.typography.fontFamily.serif,
-            fontSize: 20,
-            fontWeight: '700',
-            color: THEME.colors.textPrimary,
-            letterSpacing: -0.3,
-  },
-            cardTitleMobile: {
-              fontSize: 17,
-            lineHeight: 22,
-  },
-            cardSubtitle: {
-              fontSize: 12,
-            color: THEME.colors.textSecondary,
-            marginTop: 3,
-            lineHeight: 18,
-            flexWrap: 'wrap',
-  },
-            cardSubtitleMobile: {
-              fontSize: 12,
-            lineHeight: 17,
-  },
-            cardHeaderBadgeMobile: {
-              marginTop: 2,
-            alignSelf: 'flex-start',
-  },
-            pwdAlertBox: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            padding: 10,
-            borderRadius: THEME.borderRadius.md,
-            marginBottom: 14,
-            width: '100%',
-            overflow: 'hidden',
-  },
-            pwdAlertSuccess: {
-              backgroundColor: '#FAF8F5',
-            borderColor: THEME.colors.cardBorder,
-            borderWidth: 1,
-  },
-            pwdAlertError: {
-              backgroundColor: THEME.colors.errorBg,
-            borderColor: THEME.colors.errorBorder,
-            borderWidth: 1,
-  },
-            pwdAlertText: {
-              fontSize: 12,
-            flex: 1,
-            minWidth: 0,
-            flexShrink: 1,
-            lineHeight: 18,
-  },
-            pwdAlertTextSuccess: {
-              color: THEME.colors.textPrimary,
-            fontWeight: '600',
-  },
-            pwdAlertTextError: {
-              color: THEME.colors.errorText,
-            fontWeight: '600',
-  },
-            pwdFormGrid: {
-              flexDirection: 'row',
-            gap: 12,
-            marginBottom: 14,
-  },
-            pwdFormGridMobile: {
-              flexDirection: 'column',
-  },
-            pwdFieldCol: {
-              flex: 1,
-            gap: 5,
-  },
-            pwdInputLabel: {
-              fontSize: 12,
-            fontWeight: '600',
-            color: THEME.colors.textPrimary,
-  },
-            pwdInputWrapper: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: '#FAF8F5',
-            borderWidth: 1.5,
-            borderColor: THEME.colors.cardBorder,
-            borderRadius: THEME.borderRadius.md,
-            paddingHorizontal: 12,
-            height: 42,
-  },
-            pwdInputIcon: {
-              marginRight: 8,
-  },
-            pwdTextInput: {
-              flex: 1,
-            fontSize: 13,
-            color: THEME.colors.textPrimary,
-            outlineWidth: 0,
-            height: '100%',
-  },
-            pwdActionRow: {
-              flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginTop: 4,
-            flexWrap: 'wrap',
-            gap: 10,
-  },
-            showPwdToggle: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            paddingVertical: 6,
-  },
-            showPwdText: {
-              fontSize: 12,
-            color: THEME.colors.textSecondary,
-            fontWeight: '500',
-  },
-            savePwdBtn: {
-              backgroundColor: THEME.colors.terracotta,
-            paddingVertical: 10,
-            paddingHorizontal: 18,
-            borderRadius: THEME.borderRadius.md,
-            alignItems: 'center',
-            justifyContent: 'center',
-  },
-            savePwdBtnText: {
-              color: '#FFFFFF',
-            fontWeight: '700',
-            fontSize: 13,
-  },
-            accountTable: {
-              borderTopWidth: 1,
-            borderTopColor: THEME.colors.divider,
-  },
-            tableRow: {
-              flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingVertical: 12,
-            borderBottomWidth: 1,
-            borderBottomColor: THEME.colors.divider,
-  },
-            tableLabel: {
-              fontSize: 13,
-            color: THEME.colors.textSecondary,
-            fontWeight: '500',
-  },
-            tableValue: {
-              fontSize: 13,
-            color: THEME.colors.textPrimary,
-            fontWeight: '500',
-  },
-            tableValueBold: {
-              fontSize: 13,
-            color: THEME.colors.textPrimary,
-            fontWeight: '700',
-  },
-            domainValueRow: {
-              flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
+  lockBadgeCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...THEME.shadows.sm,
   },
 
-            // Modules Section
-            modulesSection: {
-              marginTop: THEME.spacing.sm,
+  // Admin Announcement
+  adminNotice: {
+    backgroundColor: THEME.colors.creamDark,
+    borderColor: THEME.colors.cardBorder,
+    borderWidth: 1.5,
+    borderRadius: THEME.borderRadius.card,
+    padding: THEME.spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: THEME.spacing.lg,
+    ...THEME.shadows.sm,
   },
-            sectionHeader: {
-              fontFamily: THEME.typography.fontFamily.serif,
-            fontSize: 20,
-            fontWeight: '700',
-            color: THEME.colors.textPrimary,
-            letterSpacing: -0.3,
-            marginBottom: 12,
+  adminNoticeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
-            modulesGrid: {
-              flexDirection: 'row',
-            gap: 16,
+  adminIconBox: {
+    marginRight: 12,
   },
-            modulesGridMobile: {
-              flexDirection: 'column',
+  adminNoticeTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: THEME.colors.onyx,
   },
-            moduleCard: {
-              flex: 1,
-            backgroundColor: '#FFFFFF',
-            borderRadius: THEME.borderRadius.card,
-            borderWidth: 1,
-            borderColor: THEME.colors.cardBorder,
-            padding: THEME.spacing.md,
-            ...THEME.shadows.sm,
+  adminNoticeBody: {
+    fontSize: 12,
+    color: THEME.colors.textSecondary,
+    marginTop: 2,
   },
-            moduleIconWrapper: {
-              width: 36,
-            height: 36,
-            borderRadius: 8,
-            backgroundColor: THEME.colors.creamDark,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: 10,
+  adminNoticeBtn: {
+    backgroundColor: THEME.colors.terracotta,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: THEME.borderRadius.md,
+    marginLeft: 12,
   },
-            moduleTitle: {
-              fontSize: 14,
-            fontWeight: '700',
-            color: THEME.colors.textPrimary,
-  },
-            moduleDesc: {
-              fontSize: 12,
-            color: THEME.colors.textSecondary,
-            marginTop: 4,
-            lineHeight: 17,
+  adminNoticeBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 12,
   },
 
-            // Pathways Section (Direct from example.html)
-            pathwaysSection: {
-              marginTop: THEME.spacing.lg,
+  // Elevate to Administrator Notice
+  elevateNotice: {
+    backgroundColor: '#FFF7ED',
+    borderColor: '#FED7AA',
+    borderWidth: 1.5,
+    borderRadius: THEME.borderRadius.card,
+    padding: THEME.spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: THEME.spacing.lg,
+    flexWrap: 'wrap',
+    gap: 12,
+    ...THEME.shadows.sm,
   },
-            pathwayHeaderRow: {
-              flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'flex-end',
-            marginBottom: 12,
+  elevateNoticeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    minWidth: 260,
   },
-            pathwaySubheader: {
-              fontSize: 10,
-            fontWeight: '800',
-            color: THEME.colors.terracotta,
-            letterSpacing: 1,
-            textTransform: 'uppercase',
-            marginBottom: 2,
+  elevateIconBox: {
+    marginRight: 12,
   },
-            pathwayKicker: {
-              fontSize: 11,
-            color: THEME.colors.textMuted,
-            fontWeight: '600',
+  elevateNoticeTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#9A3412',
   },
-            pathwaysGrid: {
-              flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: 16,
+  elevateNoticeBody: {
+    fontSize: 12,
+    color: '#C2410C',
+    marginTop: 2,
+    lineHeight: 17,
   },
-            pathwayCard: {
-              flex: 1,
-            minWidth: 200,
-            backgroundColor: '#FFFFFF',
-            borderRadius: THEME.borderRadius.card,
-            borderWidth: 1,
-            borderColor: THEME.colors.cardBorder,
-            padding: THEME.spacing.md,
-            ...THEME.shadows.sm,
+  elevateBtn: {
+    backgroundColor: THEME.colors.terracotta,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: THEME.borderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-            pathwayIconBox: {
-              width: 36,
-            height: 36,
-            borderRadius: 8,
-            backgroundColor: THEME.colors.primaryLight,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: 10,
+  elevateBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+
+  // Quick Grant Admin Row
+  grantAdminRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 4,
+  },
+  grantAdminRowMobile: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
+  grantAdminInputWrapper: {
+    flex: 1,
+    height: 44,
+    backgroundColor: '#FAF8F5',
+    borderWidth: 1.5,
+    borderColor: THEME.colors.cardBorder,
+    borderRadius: THEME.borderRadius.md,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  quickGrantBtn: {
+    backgroundColor: THEME.colors.onyx,
+    height: 44,
+    paddingHorizontal: 18,
+    borderRadius: THEME.borderRadius.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickGrantBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  quickAdminAlertSuccess: {
+    backgroundColor: '#FAF8F5',
+    borderColor: THEME.colors.cardBorder,
+  },
+  quickAdminAlertTextSuccess: {
+    color: THEME.colors.textPrimary,
+    fontWeight: '600',
+  },
+  claimAdminPill: {
+    backgroundColor: '#FFF7ED',
+    borderWidth: 1,
+    borderColor: '#FED7AA',
+    borderRadius: THEME.borderRadius.full,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  claimAdminPillText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: THEME.colors.terracotta,
+  },
+
+  // Account Card
+  cardContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: THEME.borderRadius.card,
+    borderColor: THEME.colors.cardBorder,
+    borderWidth: 1,
+    padding: THEME.spacing.lg,
+    marginBottom: THEME.spacing.lg,
+    ...THEME.shadows.sm,
+  },
+  cardContainerMobile: {
+    padding: THEME.spacing.md,
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: THEME.spacing.md,
+  },
+  cardHeaderRowMobile: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  cardHeaderTitleCol: {
+    flex: 1,
+    minWidth: 0,
+    width: '100%',
+  },
+  cardTitle: {
+    fontFamily: THEME.typography.fontFamily.serif,
+    fontSize: 20,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+    letterSpacing: -0.3,
+  },
+  cardTitleMobile: {
+    fontSize: 17,
+    lineHeight: 22,
+  },
+  cardSubtitle: {
+    fontSize: 12,
+    color: THEME.colors.textSecondary,
+    marginTop: 3,
+    lineHeight: 18,
+    flexWrap: 'wrap',
+  },
+  cardSubtitleMobile: {
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  cardHeaderBadgeMobile: {
+    marginTop: 2,
+    alignSelf: 'flex-start',
+  },
+  pwdAlertBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: THEME.borderRadius.md,
+    marginBottom: 14,
+    width: '100%',
+    overflow: 'hidden',
+  },
+  pwdAlertSuccess: {
+    backgroundColor: '#FAF8F5',
+    borderColor: THEME.colors.cardBorder,
+    borderWidth: 1,
+  },
+  pwdAlertError: {
+    backgroundColor: THEME.colors.errorBg,
+    borderColor: THEME.colors.errorBorder,
+    borderWidth: 1,
+  },
+  pwdAlertText: {
+    fontSize: 12,
+    flex: 1,
+    minWidth: 0,
+    flexShrink: 1,
+    lineHeight: 18,
+  },
+  pwdAlertTextSuccess: {
+    color: THEME.colors.textPrimary,
+    fontWeight: '600',
+  },
+  pwdAlertTextError: {
+    color: THEME.colors.errorText,
+    fontWeight: '600',
+  },
+  pwdFormGrid: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 14,
+  },
+  pwdFormGridMobile: {
+    flexDirection: 'column',
+  },
+  pwdFieldCol: {
+    flex: 1,
+    gap: 5,
+  },
+  pwdInputLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: THEME.colors.textPrimary,
+  },
+  pwdInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FAF8F5',
+    borderWidth: 1.5,
+    borderColor: THEME.colors.cardBorder,
+    borderRadius: THEME.borderRadius.md,
+    paddingHorizontal: 12,
+    height: 42,
+  },
+  pwdInputIcon: {
+    marginRight: 8,
+  },
+  pwdTextInput: {
+    flex: 1,
+    fontSize: 13,
+    color: THEME.colors.textPrimary,
+    outlineWidth: 0,
+    height: '100%',
+  },
+  pwdActionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 4,
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  showPwdToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+  },
+  showPwdText: {
+    fontSize: 12,
+    color: THEME.colors.textSecondary,
+    fontWeight: '500',
+  },
+  savePwdBtn: {
+    backgroundColor: THEME.colors.terracotta,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: THEME.borderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  savePwdBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  accountTable: {
+    borderTopWidth: 1,
+    borderTopColor: THEME.colors.divider,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.colors.divider,
+  },
+  tableLabel: {
+    fontSize: 13,
+    color: THEME.colors.textSecondary,
+    fontWeight: '500',
+  },
+  tableValue: {
+    fontSize: 13,
+    color: THEME.colors.textPrimary,
+    fontWeight: '500',
+  },
+  tableValueBold: {
+    fontSize: 13,
+    color: THEME.colors.textPrimary,
+    fontWeight: '700',
+  },
+  domainValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+
+  // Modules Section
+  modulesSection: {
+    marginTop: THEME.spacing.sm,
+  },
+  sectionHeader: {
+    fontFamily: THEME.typography.fontFamily.serif,
+    fontSize: 20,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+    letterSpacing: -0.3,
+    marginBottom: 12,
+  },
+  modulesGrid: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  modulesGridMobile: {
+    flexDirection: 'column',
+  },
+  moduleCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: THEME.borderRadius.card,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    padding: THEME.spacing.md,
+    ...THEME.shadows.sm,
+  },
+  moduleIconWrapper: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: THEME.colors.creamDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  moduleTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+  },
+  moduleDesc: {
+    fontSize: 12,
+    color: THEME.colors.textSecondary,
+    marginTop: 4,
+    lineHeight: 17,
+  },
+
+  // Pathways Section (Direct from example.html)
+  pathwaysSection: {
+    marginTop: THEME.spacing.lg,
+  },
+  pathwayHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: 12,
+  },
+  pathwaySubheader: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: THEME.colors.terracotta,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: 2,
+  },
+  pathwayKicker: {
+    fontSize: 11,
+    color: THEME.colors.textMuted,
+    fontWeight: '600',
+  },
+  pathwaysGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+  },
+  pathwayCard: {
+    flex: 1,
+    minWidth: 200,
+    backgroundColor: '#FFFFFF',
+    borderRadius: THEME.borderRadius.card,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    padding: THEME.spacing.md,
+    ...THEME.shadows.sm,
+  },
+  pathwayIconBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: THEME.colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
   },
 });
