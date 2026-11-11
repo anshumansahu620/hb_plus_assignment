@@ -7,6 +7,7 @@ import {
   Image,
   useWindowDimensions,
   Pressable,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
@@ -21,99 +22,203 @@ export const DashboardScreen: React.FC = () => {
   const isDesktop = width >= THEME.breakpoints.tablet;
 
   const [activeTab, setActiveTab] = useState<'overview' | 'resources'>('overview');
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   const firstName = user?.fullName
     ? user.fullName.split(' ')[0]
     : user?.email.split('@')[0] || 'Member';
 
+  // Render Sidebar Content (shared between Desktop & Mobile Drawer)
+  const renderSidebarContent = (collapsed: boolean, isDrawer = false) => (
+    <View style={[styles.sidebarInner, collapsed && styles.sidebarInnerCollapsed]}>
+      <View style={styles.sidebarTop}>
+        {/* Brand Row & Collapse Toggle Button */}
+        <View style={[styles.brandRow, collapsed && styles.brandRowCollapsed]}>
+          {!collapsed ? (
+            <View style={styles.brandRowLeft}>
+              <View style={styles.brandDot} />
+              <Text style={styles.brandName}>hbplus</Text>
+            </View>
+          ) : (
+            <View style={styles.brandLogoIconBadge}>
+              <View style={styles.brandDot} />
+              <Text style={styles.brandMiniText}>HB</Text>
+            </View>
+          )}
+
+          {/* Toggle Button (Collapse on Desktop / Close on Mobile Drawer) */}
+          <Pressable
+            onPress={() => isDrawer ? setIsMobileDrawerOpen(false) : setIsCollapsed(!collapsed)}
+            style={({ pressed }) => [styles.collapseToggleBtn, pressed && { opacity: 0.7 }]}
+            accessibilityLabel={isDrawer ? "Close drawer" : collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <Ionicons
+              name={isDrawer ? "close-outline" : collapsed ? "chevron-forward-outline" : "chevron-back-outline"}
+              size={18}
+              color={THEME.colors.textSecondary}
+            />
+          </Pressable>
+        </View>
+
+        {/* Sidebar Menu Items */}
+        <View style={[styles.menuList, collapsed && styles.menuListCollapsed]}>
+          {/* Overview */}
+          <Pressable
+            onPress={() => {
+              setActiveTab('overview');
+              if (isDrawer) setIsMobileDrawerOpen(false);
+            }}
+            style={[
+              styles.menuItem,
+              activeTab === 'overview' && styles.menuItemActive,
+              collapsed && styles.menuItemCollapsed,
+            ]}
+          >
+            <Ionicons
+              name="grid-outline"
+              size={18}
+              color={activeTab === 'overview' ? THEME.colors.forestGreen : THEME.colors.textSecondary}
+              style={!collapsed ? styles.menuIcon : undefined}
+            />
+            {!collapsed && (
+              <Text style={[styles.menuItemText, activeTab === 'overview' && styles.menuItemTextActive]}>
+                Overview
+              </Text>
+            )}
+          </Pressable>
+
+          {/* Admin Panel (if admin) */}
+          {user?.role === 'admin' && (
+            <Pressable
+              onPress={() => {
+                navigateTo('admin');
+                if (isDrawer) setIsMobileDrawerOpen(false);
+              }}
+              style={[
+                styles.menuItem,
+                collapsed && styles.menuItemCollapsed,
+              ]}
+            >
+              <Ionicons
+                name="shield-checkmark-outline"
+                size={18}
+                color={THEME.colors.textSecondary}
+                style={!collapsed ? styles.menuIcon : undefined}
+              />
+              {!collapsed && (
+                <>
+                  <Text style={styles.menuItemText}>Admin Panel</Text>
+                  <Badge label="RBAC" variant="admin" />
+                </>
+              )}
+            </Pressable>
+          )}
+
+          {/* Resources */}
+          <Pressable
+            onPress={() => {
+              setActiveTab('resources');
+              if (isDrawer) setIsMobileDrawerOpen(false);
+            }}
+            style={[
+              styles.menuItem,
+              activeTab === 'resources' && styles.menuItemActive,
+              collapsed && styles.menuItemCollapsed,
+            ]}
+          >
+            <Ionicons
+              name="folder-outline"
+              size={18}
+              color={activeTab === 'resources' ? THEME.colors.forestGreen : THEME.colors.textSecondary}
+              style={!collapsed ? styles.menuIcon : undefined}
+            />
+            {!collapsed && (
+              <Text style={[styles.menuItemText, activeTab === 'resources' && styles.menuItemTextActive]}>
+                Resources
+              </Text>
+            )}
+          </Pressable>
+        </View>
+      </View>
+
+      {/* Sidebar User Footer */}
+      <View style={[styles.sidebarFooter, collapsed && styles.sidebarFooterCollapsed]}>
+        {!collapsed ? (
+          <>
+            <View style={styles.userProfileRow}>
+              {user?.avatarUrl ? (
+                <Image source={{ uri: user.avatarUrl }} style={styles.userAvatar} />
+              ) : (
+                <View style={styles.avatarFallback}>
+                  <Text style={styles.avatarInitial}>{firstName[0].toUpperCase()}</Text>
+                </View>
+              )}
+              <View style={styles.userMetaCol}>
+                <Text style={styles.userName} numberOfLines={1}>{user?.fullName || firstName}</Text>
+                <Text style={styles.userRoleText}>{user?.role === 'admin' ? 'Administrator' : 'Team Member'}</Text>
+              </View>
+            </View>
+
+            <Pressable
+              onPress={signOut}
+              style={({ pressed }) => [styles.signOutLink, pressed && { opacity: 0.6 }]}
+            >
+              <Ionicons name="log-out-outline" size={14} color={THEME.colors.error} style={{ marginRight: 6 }} />
+              <Text style={styles.signOutText}>Sign out</Text>
+            </Pressable>
+          </>
+        ) : (
+          <View style={styles.userProfileCollapsed}>
+            {user?.avatarUrl ? (
+              <Image source={{ uri: user.avatarUrl }} style={styles.userAvatarCollapsed} />
+            ) : (
+              <View style={styles.avatarFallbackCollapsed}>
+                <Text style={styles.avatarInitial}>{firstName[0].toUpperCase()}</Text>
+              </View>
+            )}
+            <Pressable
+              onPress={signOut}
+              style={({ pressed }) => [styles.signOutIconBtn, pressed && { opacity: 0.6 }]}
+              accessibilityLabel="Sign out"
+            >
+              <Ionicons name="log-out-outline" size={18} color={THEME.colors.error} />
+            </Pressable>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+
   return (
     <View style={styles.rootWrapper}>
       <View style={[styles.dashboardLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
         
-        {/* SIDEBAR (Desktop only - matches Figma middle screen) */}
+        {/* DESKTOP SIDEBAR (Collapsible) */}
         {isDesktop && (
-          <View style={styles.sidebar}>
-            <View style={styles.sidebarTop}>
-              {/* Brand Logo */}
-              <View style={styles.brandRow}>
-                <View style={styles.brandDot} />
-                <Text style={styles.brandName}>hbplus</Text>
-              </View>
-
-              {/* Sidebar Menu Items */}
-              <View style={styles.menuList}>
-                <Pressable
-                  onPress={() => setActiveTab('overview')}
-                  style={[styles.menuItem, activeTab === 'overview' && styles.menuItemActive]}
-                >
-                  <Ionicons
-                    name="grid-outline"
-                    size={17}
-                    color={activeTab === 'overview' ? THEME.colors.forestGreen : THEME.colors.textSecondary}
-                    style={styles.menuIcon}
-                  />
-                  <Text style={[styles.menuItemText, activeTab === 'overview' && styles.menuItemTextActive]}>
-                    Overview
-                  </Text>
-                </Pressable>
-
-                {user?.role === 'admin' && (
-                  <Pressable
-                    onPress={() => navigateTo('admin')}
-                    style={styles.menuItem}
-                  >
-                    <Ionicons
-                      name="shield-checkmark-outline"
-                      size={17}
-                      color={THEME.colors.textSecondary}
-                      style={styles.menuIcon}
-                    />
-                    <Text style={styles.menuItemText}>Admin Panel</Text>
-                    <Badge label="RBAC" variant="admin" />
-                  </Pressable>
-                )}
-
-                <Pressable
-                  onPress={() => setActiveTab('resources')}
-                  style={[styles.menuItem, activeTab === 'resources' && styles.menuItemActive]}
-                >
-                  <Ionicons
-                    name="folder-outline"
-                    size={17}
-                    color={activeTab === 'resources' ? THEME.colors.forestGreen : THEME.colors.textSecondary}
-                    style={styles.menuIcon}
-                  />
-                  <Text style={[styles.menuItemText, activeTab === 'resources' && styles.menuItemTextActive]}>
-                    Resources
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
-
-            {/* Sidebar User Footer */}
-            <View style={styles.sidebarFooter}>
-              <View style={styles.userProfileRow}>
-                {user?.avatarUrl ? (
-                  <Image source={{ uri: user.avatarUrl }} style={styles.userAvatar} />
-                ) : (
-                  <View style={styles.avatarFallback}>
-                    <Text style={styles.avatarInitial}>{firstName[0].toUpperCase()}</Text>
-                  </View>
-                )}
-                <View style={styles.userMetaCol}>
-                  <Text style={styles.userName} numberOfLines={1}>{user?.fullName || firstName}</Text>
-                  <Text style={styles.userRoleText}>{user?.role === 'admin' ? 'Administrator' : 'Team Member'}</Text>
-                </View>
-              </View>
-
-              <Pressable
-                onPress={signOut}
-                style={({ pressed }) => [styles.signOutLink, pressed && { opacity: 0.6 }]}
-              >
-                <Text style={styles.signOutText}>Sign out</Text>
-              </Pressable>
-            </View>
+          <View style={[styles.sidebar, isCollapsed ? styles.sidebarCollapsed : styles.sidebarExpanded]}>
+            {renderSidebarContent(isCollapsed, false)}
           </View>
+        )}
+
+        {/* MOBILE DRAWER MODAL */}
+        {!isDesktop && (
+          <Modal
+            visible={isMobileDrawerOpen}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={() => setIsMobileDrawerOpen(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <Pressable
+                style={styles.modalBackdrop}
+                onPress={() => setIsMobileDrawerOpen(false)}
+              />
+              <View style={styles.modalDrawerContent}>
+                {renderSidebarContent(false, true)}
+              </View>
+            </View>
+          </Modal>
         )}
 
         {/* MAIN DASHBOARD CONTENT AREA */}
@@ -121,9 +226,18 @@ export const DashboardScreen: React.FC = () => {
           {/* Top Mobile Bar if mobile */}
           {!isDesktop && (
             <View style={styles.mobileTopBar}>
-              <View style={styles.brandRow}>
-                <View style={styles.brandDot} />
-                <Text style={styles.brandNameDark}>hbplus</Text>
+              <View style={styles.mobileLeftGroup}>
+                <Pressable
+                  onPress={() => setIsMobileDrawerOpen(true)}
+                  style={({ pressed }) => [styles.mobileMenuButton, pressed && { opacity: 0.6 }]}
+                  accessibilityLabel="Open navigation menu"
+                >
+                  <Ionicons name="menu-outline" size={24} color={THEME.colors.forestGreen} />
+                </Pressable>
+                <View style={styles.brandRow}>
+                  <View style={styles.brandDot} />
+                  <Text style={styles.brandNameDark}>hbplus</Text>
+                </View>
               </View>
               <Pressable onPress={signOut} style={styles.mobileSignOut}>
                 <Text style={styles.mobileSignOutText}>Sign out</Text>
@@ -306,27 +420,69 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
 
-  // Sidebar Styles (Figma Screen 2)
+  // Sidebar Styles (Collapsible)
   sidebar: {
-    width: 250,
     backgroundColor: '#FFFFFF',
     borderRightWidth: 1,
     borderRightColor: THEME.colors.cardBorder,
+  },
+  sidebarExpanded: {
+    width: 240,
     padding: THEME.spacing.lg,
+  },
+  sidebarCollapsed: {
+    width: 72,
+    paddingVertical: THEME.spacing.lg,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+  },
+  sidebarInner: {
+    flex: 1,
     justifyContent: 'space-between',
   },
-  sidebarTop: {},
+  sidebarInnerCollapsed: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  sidebarTop: {
+    width: '100%',
+  },
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: THEME.spacing.xl,
+    width: '100%',
+  },
+  brandRowCollapsed: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: THEME.spacing.xl,
+  },
+  brandRowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  brandLogoIconBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: THEME.colors.sageBg,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: THEME.borderRadius.sm,
+  },
+  brandMiniText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: THEME.colors.forestGreen,
   },
   brandDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: THEME.colors.forestGreenHighlight,
-    marginRight: 8,
+    marginRight: 6,
   },
   brandName: {
     fontSize: 20,
@@ -339,8 +495,20 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: THEME.colors.forestGreen,
   },
+  collapseToggleBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   menuList: {
     gap: 6,
+    width: '100%',
+  },
+  menuListCollapsed: {
+    alignItems: 'center',
   },
   menuItem: {
     flexDirection: 'row',
@@ -348,6 +516,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: THEME.borderRadius.md,
+  },
+  menuItemCollapsed: {
+    justifyContent: 'center',
+    paddingHorizontal: 0,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   menuItemActive: {
     backgroundColor: THEME.colors.sageBg,
@@ -368,6 +543,11 @@ const styles = StyleSheet.create({
   sidebarFooter: {
     borderTopWidth: 1,
     borderTopColor: THEME.colors.divider,
+    paddingTop: THEME.spacing.md,
+    width: '100%',
+  },
+  sidebarFooterCollapsed: {
+    alignItems: 'center',
     paddingTop: THEME.spacing.md,
   },
   userProfileRow: {
@@ -390,10 +570,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 10,
   },
+  userProfileCollapsed: {
+    alignItems: 'center',
+    gap: 12,
+  },
+  userAvatarCollapsed: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+  },
+  avatarFallbackCollapsed: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: THEME.colors.forestGreen,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   avatarInitial: {
     color: '#FFFFFF',
     fontWeight: '700',
-    fontSize: 15,
+    fontSize: 14,
   },
   userMetaCol: {
     flex: 1,
@@ -408,12 +605,44 @@ const styles = StyleSheet.create({
     color: THEME.colors.textMuted,
   },
   signOutLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 4,
   },
   signOutText: {
     fontSize: 12,
     color: THEME.colors.error,
     fontWeight: '600',
+  },
+  signOutIconBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#FEF2F2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // Mobile Drawer Modal
+  modalOverlay: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  modalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+  },
+  modalDrawerContent: {
+    width: 270,
+    backgroundColor: '#FFFFFF',
+    height: '100%',
+    padding: THEME.spacing.lg,
+    ...THEME.shadows.lg,
+    zIndex: 100,
   },
 
   // Main Content Area
@@ -429,6 +658,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: THEME.spacing.md,
+  },
+  mobileLeftGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  mobileMenuButton: {
+    padding: 6,
+    borderRadius: THEME.borderRadius.sm,
   },
   mobileSignOut: {
     paddingVertical: 6,
@@ -534,9 +772,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  lockBadgeIcon: {
-    fontSize: 22,
   },
 
   // Admin Announcement
@@ -673,9 +908,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
-  },
-  moduleIcon: {
-    fontSize: 18,
   },
   moduleTitle: {
     fontSize: 14,
