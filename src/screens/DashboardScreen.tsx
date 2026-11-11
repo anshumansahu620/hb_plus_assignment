@@ -281,14 +281,25 @@ export const DashboardScreen: React.FC = () => {
                   {/* HB+ LUXURY HERO CARD (From example.html) */}
                   <View style={styles.forestHeroBanner}>
                     <View style={styles.forestHeroLeft}>
-
+                      <View style={styles.heroPill}>
+                        <View style={styles.heroPillDot} />
+                        <Text style={styles.heroPillText}>HOP WITH HB • OFFICIAL TEAM PORTAL</Text>
+                      </View>
                       <Text style={styles.forestHeroTitle}>Wellness That Understands Your Lifestyle.</Text>
                       <Text style={styles.forestHeroSubtitle}>
-                        Real health goes beyond fitness. It lives at the intersection of body, mind, and gut.
+                        Real health goes beyond fitness. It lives at the intersection of body, mind, and gut. Welcome to the official HB+ team portal trusted by{' '}
+                        <Text style={styles.heroHighlightText}>1550+ Members</Text>.
                       </Text>
                     </View>
 
-
+                    {isDesktop && (
+                      <View style={styles.forestHeroRight}>
+                        <View style={styles.memberStatCard}>
+                          <Text style={styles.memberStatNum}>1550+</Text>
+                          <Text style={styles.memberStatLabel}>Active Members</Text>
+                        </View>
+                      </View>
+                    )}
                   </View>
 
                   {/* Admin Announcement Callout (If user is Admin) */}
@@ -910,6 +921,37 @@ const styles = StyleSheet.create({
   },
   forestHeroRight: {
     marginLeft: THEME.spacing.md,
+  },
+  heroHighlightText: {
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontWeight: '700',
+    color: THEME.colors.onyx,
+  },
+  memberStatCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: THEME.borderRadius.md,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...THEME.shadows.sm,
+  },
+  memberStatNum: {
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontSize: 24,
+    fontWeight: '800',
+    color: THEME.colors.terracotta,
+    letterSpacing: -0.5,
+  },
+  memberStatLabel: {
+    fontFamily: THEME.typography.fontFamily.sans,
+    fontSize: 11,
+    color: THEME.colors.textSecondary,
+    marginTop: 2,
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
   lockBadgeCircle: {
     width: 48,
