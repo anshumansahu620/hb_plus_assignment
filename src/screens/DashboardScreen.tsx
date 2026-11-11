@@ -14,6 +14,8 @@ import { Badge } from '../components/Badge';
 import { THEME } from '../constants/theme';
 import { APP_CONFIG } from '../constants/config';
 
+const hbplusLogo = require('../../assets/hbplus-logo.png');
+
 export const DashboardScreen: React.FC = () => {
   const { user, signOut, navigateTo } = useAuth();
   const { width } = useWindowDimensions();
@@ -35,8 +37,15 @@ export const DashboardScreen: React.FC = () => {
             <View style={styles.sidebarTop}>
               {/* Brand Header */}
               <View style={styles.brandRow}>
-                <View style={styles.brandDot} />
-                <Text style={styles.brandName}>hbplus</Text>
+                <Image
+                  source={hbplusLogo}
+                  style={styles.brandLogo}
+                  resizeMode="contain"
+                />
+                <View style={styles.brandTextCol}>
+                  <Text style={styles.brandName}>hbplus</Text>
+                  <Text style={styles.brandSubtitle}>Hop with HB</Text>
+                </View>
               </View>
 
               {/* Sidebar Menu Items */}
@@ -122,7 +131,11 @@ export const DashboardScreen: React.FC = () => {
           {!isDesktop && (
             <View style={styles.mobileTopBar}>
               <View style={styles.brandRowMobile}>
-                <View style={styles.brandDot} />
+                <Image
+                  source={hbplusLogo}
+                  style={styles.brandLogoMobile}
+                  resizeMode="contain"
+                />
                 <Text style={styles.brandNameDark}>hbplus</Text>
               </View>
               <Pressable onPress={signOut} style={styles.mobileSignOut}>
@@ -312,9 +325,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: THEME.spacing.xl,
   },
+  brandLogo: {
+    width: 28,
+    height: 28,
+    marginRight: 10,
+  },
+  brandTextCol: {
+    flexDirection: 'column',
+  },
+  brandSubtitle: {
+    fontSize: 10,
+    color: THEME.colors.textMuted,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
   brandRowMobile: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  brandLogoMobile: {
+    width: 24,
+    height: 24,
+    marginRight: 8,
   },
   brandDot: {
     width: 8,

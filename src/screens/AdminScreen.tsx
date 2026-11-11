@@ -22,6 +22,8 @@ import {
 } from '../services/db';
 import { UserProfile, UserRole } from '../types/auth';
 
+const hbplusLogo = require('../../assets/hbplus-logo.png');
+
 export const AdminScreen: React.FC = () => {
   const { user, navigateTo, signOut } = useAuth();
   const { width } = useWindowDimensions();
@@ -76,7 +78,11 @@ export const AdminScreen: React.FC = () => {
       {/* Top Header */}
       <View style={styles.adminHeader}>
         <View style={styles.headerBrandRow}>
-          <View style={styles.brandDot} />
+          <Image
+            source={hbplusLogo}
+            style={styles.brandLogo}
+            resizeMode="contain"
+          />
           <Text style={styles.brandName}>hbplus</Text>
           <View style={{ width: 12 }} />
           <Badge label="ADMIN CONTROL CENTER" variant="admin" />
@@ -235,6 +241,11 @@ const styles = StyleSheet.create({
   headerBrandRow: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  brandLogo: {
+    width: 26,
+    height: 26,
+    marginRight: 8,
   },
   brandDot: {
     width: 8,

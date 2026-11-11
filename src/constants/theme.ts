@@ -1,59 +1,70 @@
 /**
- * Design Tokens matching the official Figma Prototype:
- * Forest Green (#0F382C) & Modern Sage (#F4F6F3) palette.
+ * Design Tokens matching the official HB+ Brand (https://hbplus.fit/):
+ * Extracted from example.html (Framer site) & Figma Portal design.
+ * Warm luxury wellness cream (#F5F2E9), Rich Onyx (#1A1A1A), 
+ * Signature Terracotta (#9F4022), and Forest Green (#0F382C).
  */
 export const THEME = {
   colors: {
-    // Forest Green Theme from Figma
+    // HB+ Official Core Brand Colors (from example.html)
+    onyx: '#1A1A1A',              // Official dark charcoal / text
+    onyxDeep: '#101703',          // Deep olive-onyx
+    cream: '#F5F2E9',             // Signature warm sand/cream canvas
+    creamDark: '#EDEAE7',         // Warm card background
+    terracotta: '#9F4022',        // Official HB+ signature accent
+    terracottaHover: '#87341B',
+    tealAccent: '#619FA3',        // Soft coastal teal
+    limeAccent: '#F0FF00',        // Electric energetic lime
+
+    // Figma Portal Colors
     forestGreenDark: '#0A261E',
-    forestGreen: '#0F382C',        // Primary hero banner & left side
-    forestGreenCard: '#154436',    // Inner dark card on hero
+    forestGreen: '#0F382C',
+    forestGreenCard: '#154436',
     forestGreenLight: '#1E5343',
-    forestGreenHighlight: '#34D399',// Bright mint accent
-    
-    // Core brand aliases
-    primary: '#0F382C',
-    primaryHover: '#154436',
-    primaryLight: '#E9EFE7',
-    border: '#E3E8E1',
-    
-    // Backgrounds & Neutrals
-    background: '#F4F6F3',         // Soft Sage/Cream background
+    forestGreenHighlight: '#34D399',
+
+    // Core Brand Aliases
+    primary: '#1A1A1A',
+    primaryHover: '#2A2A2A',
+    primaryLight: '#EDEAE7',
+    border: '#DAD3CE',
+
+    // Surfaces & Backgrounds
+    background: '#F5F2E9',        // Official warm cream
     surface: '#FFFFFF',
-    surfaceSubtle: '#F9FAF8',
+    surfaceSubtle: '#FAF8F5',
     card: '#FFFFFF',
-    cardBorder: '#E3E8E1',         // Clean subtle sage border
-    divider: '#EBEFE9',
-    
+    cardBorder: '#DAD3CE',        // Warm soft border from website
+    divider: '#E5E0D8',
+
     // Text colors
-    textPrimary: '#141E18',        // Deep forest-slate for high contrast
-    textSecondary: '#4B5850',      // Muted sage-slate
-    textMuted: '#8A978E',          // Light slate
-    textLight: '#F3F6F2',          // Inverted text for dark green panels
-    textLightMuted: '#95B8AB',     // Muted text for dark green panels
-    
-    // Sage Badges & Accents
-    sageBg: '#E9EFE7',
+    textPrimary: '#1A1A1A',       // Rich onyx
+    textSecondary: '#636363',     // Muted gray
+    textMuted: '#999999',
+    textLight: '#F5F2E9',
+    textLightMuted: '#D8D3C8',
+
+    // Sage & Status Badges
+    sageBg: '#E8EFE6',
     sageBorder: '#CDDBD8',
     sageText: '#154436',
-    
-    // Status colors
-    success: '#10B981',
+
+    success: '#047857',
     successBg: '#ECFDF5',
     successBorder: '#A7F3D0',
     successText: '#065F46',
-    
+
     error: '#DC2626',
     errorBg: '#FEF2F2',
     errorBorder: '#FECACA',
     errorText: '#991B1B',
-    
+
     // Google Button
     googleBtnBg: '#FFFFFF',
-    googleBtnBorder: '#D8DFD7',
-    googleBtnText: '#202124',
+    googleBtnBorder: '#DAD3CE',
+    googleBtnText: '#1A1A1A',
   },
-  
+
   spacing: {
     xs: 4,
     sm: 8,
@@ -62,17 +73,21 @@ export const THEME = {
     xl: 32,
     xxl: 48,
   },
-  
+
   borderRadius: {
     sm: 6,
     md: 10,
-    lg: 14,
-    xl: 20,
-    xxl: 28,
+    lg: 16,
+    xl: 22,
+    xxl: 30,
     full: 9999,
   },
-  
+
   typography: {
+    fontFamily: {
+      sans: "'DM Sans', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      mono: "'Fragment Mono', 'DM Mono', monospace",
+    },
     fontSize: {
       xs: 12,
       sm: 13,
@@ -90,31 +105,31 @@ export const THEME = {
       extrabold: '800' as const,
     },
   },
-  
+
   shadows: {
     sm: {
-      shadowColor: '#0A261E',
+      shadowColor: '#1A1A1A',
       shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.04,
+      shadowOpacity: 0.05,
       shadowRadius: 3,
       elevation: 2,
     },
     md: {
-      shadowColor: '#0A261E',
+      shadowColor: '#1A1A1A',
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.06,
-      shadowRadius: 10,
+      shadowRadius: 12,
       elevation: 4,
     },
     lg: {
-      shadowColor: '#0A261E',
+      shadowColor: '#1A1A1A',
       shadowOffset: { width: 0, height: 12 },
-      shadowOpacity: 0.09,
-      shadowRadius: 24,
+      shadowOpacity: 0.08,
+      shadowRadius: 28,
       elevation: 8,
     },
   },
-  
+
   breakpoints: {
     mobile: 600,
     tablet: 880,

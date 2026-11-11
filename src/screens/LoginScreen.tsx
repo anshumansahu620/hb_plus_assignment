@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   Pressable,
   TextInput,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
@@ -15,6 +16,8 @@ import { ErrorAlert } from '../components/ErrorAlert';
 import { Button } from '../components/Button';
 import { THEME } from '../constants/theme';
 import { APP_CONFIG, ALLOWED_DOMAIN } from '../constants/config';
+
+const hbplusLogo = require('../../assets/hbplus-logo.png');
 
 export const LoginScreen: React.FC = () => {
   const { signInWithGoogle, signInWithEmail, simulateLogin, error, clearError, isLoading } = useAuth();
@@ -39,28 +42,51 @@ export const LoginScreen: React.FC = () => {
     >
       <View style={[styles.mainLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
         
-        {/* LEFT / TOP HERO PANEL (Forest Green from Figma) */}
+        {/* LEFT / TOP HERO PANEL (Official HB+ Branding from example.html) */}
         <View style={[styles.heroPanel, isDesktop ? styles.heroPanelDesktop : styles.heroPanelMobile]}>
           <View style={styles.heroTop}>
             <View style={styles.brandRow}>
-              <View style={styles.brandDot} />
-              <Text style={styles.brandName}>hbplus</Text>
+              <Image
+                source={hbplusLogo}
+                style={styles.heroBrandLogo}
+                resizeMode="contain"
+              />
+              <View style={styles.brandTextCol}>
+                <Text style={styles.brandSubtitleText}>Hop with HB</Text>
+              </View>
+            </View>
+            <View style={styles.officialPill}>
+              <Text style={styles.officialPillText}>Corporate SSO</Text>
             </View>
           </View>
 
           <View style={styles.heroMiddle}>
-            <Text style={styles.heroTitle}>Good work.{'\n'}Stronger together.</Text>
+            <Text style={styles.heroTaglineKicker}>HOP WITH HB</Text>
+            <Text style={styles.heroTitle}>Wellness That Understands Your Lifestyle.</Text>
             <Text style={styles.heroDescription}>
-              Your team, your tools, your workday. All in one secure place.
+              Your team, your tools, your workday. All in one secure, unified portal.
             </Text>
+
+            {/* Official Workspace Badge Card */}
+            <View style={styles.domainHighlightCard}>
+              <View style={styles.domainCardTop}>
+                <Text style={styles.domainCardDomain}>@{ALLOWED_DOMAIN}</Text>
+                <View style={styles.domainCardBadge}>
+                  <Text style={styles.domainCardBadgeText}>Official Workspace</Text>
+                </View>
+              </View>
+              <Text style={styles.domainCardDesc}>
+                Access is strictly restricted to verified corporate team members.
+              </Text>
+            </View>
           </View>
 
           <View style={styles.heroFooter}>
-            <Text style={styles.heroFooterText}>Built for teams that move fast.</Text>
+            <Text style={styles.heroFooterText}>The ultimate fusion of wellness & work.</Text>
           </View>
         </View>
 
-        {/* RIGHT / BOTTOM AUTH PANEL (Clean Sage from Figma) */}
+        {/* RIGHT / BOTTOM AUTH PANEL (Warm Cream & Terracotta from example.html) */}
         <View style={[styles.authPanel, isDesktop ? styles.authPanelDesktop : styles.authPanelMobile]}>
           {/* Top Support link */}
           <View style={styles.authTopBar}>
@@ -73,9 +99,9 @@ export const LoginScreen: React.FC = () => {
           </View>
 
           <View style={styles.authContentContainer}>
-            {/* Kicker & Headline from Figma */}
+            {/* Header */}
             <View style={styles.authHeader}>
-              <Text style={styles.kickerText}>WELCOME BACK</Text>
+              <Text style={styles.kickerText}>SIGN IN TO YOUR ACCOUNT</Text>
               <Text style={styles.authTitle}>Your workspace awaits.</Text>
               <Text style={styles.authSubtitle}>
                 Sign in with your official @{ALLOWED_DOMAIN} account to continue.
@@ -93,7 +119,7 @@ export const LoginScreen: React.FC = () => {
               </View>
             )}
 
-            {/* Google OAuth Action Button */}
+            {/* Google OAuth Action Button with assets/google-logo.svg */}
             <View style={styles.buttonWrapper}>
               <GoogleSignInButton
                 onPress={signInWithGoogle}
@@ -160,7 +186,7 @@ export const LoginScreen: React.FC = () => {
                 </View>
               </View>
 
-              {/* Email Sign In Button */}
+              {/* Email Sign In Button (Styled in HB+ Terracotta #9F4022) */}
               <Button
                 label="Sign In with Work Email"
                 onPress={handleEmailSubmit}
@@ -239,6 +265,8 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.surface,
     borderRadius: THEME.borderRadius.xxl,
     overflow: 'hidden',
+    borderColor: THEME.colors.cardBorder,
+    borderWidth: 1,
     ...THEME.shadows.lg,
   },
   layoutDesktop: {
@@ -251,7 +279,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
 
-  // Hero Panel Styles (Figma Forest Green)
+  // Hero Panel Styles (HB+ Onyx & Forest Styling)
   heroPanel: {
     backgroundColor: THEME.colors.forestGreen,
     padding: THEME.spacing.xl,
@@ -274,35 +302,92 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  brandDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: THEME.colors.forestGreenHighlight,
-    marginRight: 8,
+  heroBrandLogo: {
+    width: 44,
+    height: 44,
+    tintColor: '#FFFFFF',
+    marginRight: 10,
   },
-  brandName: {
-    fontSize: 20,
-    fontWeight: '800',
+  brandTextCol: {
+    justifyContent: 'center',
+  },
+  brandSubtitleText: {
+    fontSize: 14,
+    fontWeight: '700',
     color: '#FFFFFF',
-    letterSpacing: -0.5,
+    letterSpacing: -0.3,
+  },
+  officialPill: {
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: THEME.borderRadius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.18)',
+  },
+  officialPillText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#D1FAE5',
   },
   heroMiddle: {
     marginVertical: THEME.spacing.lg,
   },
+  heroTaglineKicker: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: THEME.colors.forestGreenHighlight,
+    letterSpacing: 1.5,
+    marginBottom: 8,
+  },
   heroTitle: {
-    fontSize: THEME.typography.fontSize.hero,
+    fontSize: 32,
     fontWeight: '800',
     color: '#FFFFFF',
-    lineHeight: 44,
-    letterSpacing: -0.8,
+    lineHeight: 40,
+    letterSpacing: -0.6,
   },
   heroDescription: {
     fontSize: THEME.typography.fontSize.base,
     color: THEME.colors.textLightMuted,
-    marginTop: 14,
+    marginTop: 12,
     lineHeight: 22,
     maxWidth: 340,
+  },
+  domainHighlightCard: {
+    backgroundColor: THEME.colors.forestGreenCard,
+    borderRadius: THEME.borderRadius.lg,
+    padding: THEME.spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    marginTop: THEME.spacing.lg,
+  },
+  domainCardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  domainCardDomain: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  domainCardBadge: {
+    backgroundColor: '#064E3B',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: THEME.borderRadius.full,
+  },
+  domainCardBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#6EE7B7',
+  },
+  domainCardDesc: {
+    fontSize: 12,
+    color: THEME.colors.textLightMuted,
+    lineHeight: 16,
   },
   heroFooter: {
     marginTop: THEME.spacing.lg,
@@ -312,7 +397,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.45)',
   },
 
-  // Auth Panel Styles (Clean Sage Right side from Figma)
+  // Auth Panel Styles (Warm Canvas & Terracotta from example.html)
   authPanel: {
     backgroundColor: '#FFFFFF',
     padding: THEME.spacing.xl,
@@ -335,7 +420,7 @@ const styles = StyleSheet.create({
   },
   supportLinkText: {
     fontSize: 12,
-    color: THEME.colors.textMuted,
+    color: THEME.colors.textSecondary,
     fontWeight: '500',
   },
   authContentContainer: {
@@ -349,7 +434,7 @@ const styles = StyleSheet.create({
   kickerText: {
     fontSize: 11,
     fontWeight: '700',
-    color: THEME.colors.forestGreen,
+    color: THEME.colors.terracotta,
     letterSpacing: 1,
     marginBottom: 6,
   },
@@ -407,7 +492,7 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F9FAF8',
+    backgroundColor: '#FAF8F5',
     borderColor: THEME.colors.cardBorder,
     borderWidth: 1.5,
     borderRadius: THEME.borderRadius.md,
@@ -428,9 +513,10 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   emailSubmitButton: {
-    backgroundColor: THEME.colors.forestGreen,
+    backgroundColor: THEME.colors.terracotta,
     paddingVertical: 12,
     marginTop: 4,
+    borderRadius: THEME.borderRadius.md,
   },
   emailSubmitButtonText: {
     color: '#FFFFFF',
