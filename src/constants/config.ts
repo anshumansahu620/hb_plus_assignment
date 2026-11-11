@@ -18,7 +18,7 @@ export const SUPABASE_URL =
 export const SUPABASE_ANON_KEY =
   process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'dummy_anon_key_for_offline_mode';
 
-// Optional extra super user from environment variable (kept private in .env)
+// Optional extra super user from environment variable (kept private in gitignored .env)
 const ENV_SUPER_USER = process.env.EXPO_PUBLIC_SUPER_USER_EMAIL?.trim().toLowerCase();
 
 // Super user accounts granted administrative access and domain restriction bypass

@@ -337,7 +337,6 @@ Super Users receive:
 // Add your Google email address to the Super User array
 export const SUPER_USER_EMAILS = [
   'superuser@gmail.com',
-  'evaluator@gmail.com',
   'your-email@gmail.com',
 ];
 
@@ -349,7 +348,8 @@ export const ADMIN_EMAILS = [
   `user@${ALLOWED_DOMAIN}`,
   `alex.trainer@${ALLOWED_DOMAIN}`,
   `sarah.fitness@${ALLOWED_DOMAIN}`,
-  ...SUPER_USER_EMAILS,
+  'admin@gmail.com',
+  'your-email@gmail.com',
 ];
 ```
 
