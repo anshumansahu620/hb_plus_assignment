@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: THEME.borderRadius.lg,
+    borderRadius: THEME.borderRadius.card,
     borderWidth: 1,
     borderColor: THEME.colors.cardBorder,
     padding: THEME.spacing.lg,
@@ -378,10 +378,10 @@ const styles = StyleSheet.create({
   roleToggleBtn: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: THEME.borderRadius.sm,
-    backgroundColor: '#F3F4F6',
+    borderRadius: THEME.borderRadius.md,
+    backgroundColor: THEME.colors.creamDark,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: THEME.colors.cardBorder,
   },
   roleToggleText: {
     fontSize: 12,

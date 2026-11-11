@@ -1,48 +1,51 @@
 /**
  * Design Tokens matching the official HB+ Brand (https://hbplus.fit/):
- * Extracted from example.html (Framer site).
+ * Extracted directly from example.html (Framer site).
  * Warm luxury wellness cream (#F5F2E9), Rich Onyx (#1A1A1A), 
  * Signature Terracotta (#9F4022), and Warm Sand (#EDEAE7 / #DAD3CE).
  */
 export const THEME = {
   colors: {
     // HB+ Official Core Brand Colors (from example.html)
-    onyx: '#1A1A1A',              // Official dark charcoal / text
-    onyxDeep: '#111111',          // Pure deep charcoal
-    cream: '#F5F2E9',             // Signature warm sand/cream canvas
-    creamDark: '#EDEAE7',         // Warm card background
-    terracotta: '#9F4022',        // Official HB+ signature accent
-    terracottaHover: '#87341B',
-    tealAccent: '#619FA3',        // Soft coastal teal
-    limeAccent: '#F0FF00',        // Electric energetic lime
+    cream: '#F5F2E9',              // Main page canvas (--token-de1a3a5a-1b37-4a90-b65a-50b0604a7d8a)
+    creamDark: '#EDEAE7',          // Warm stone/sand card background (--token-dbc7086f-78f2-4fb8-8e17-180925f9d132)
+    sandLight: '#F4F2F0',          // Subtle sand tint (--token-caf11e93-356d-47e9-bfac-1c0ae08d458b)
+    cardBorder: '#DAD3CE',         // Warm sand hairline border (--token-d8a72793-a1f4-42d6-b32f-e677b73f5d5c)
 
-    // Palette Tokens (Replacing Green with Onyx & Warm Sand from example.html)
+    onyx: '#1A1A1A',               // Primary text & dark accents (--token-98ebc7ad-d789-4050-894b-3168f6f6c2d0)
+    onyxDeep: '#111111',           // Pure charcoal
+    terracotta: '#9F4022',         // Signature CTA button & accent (--token-2ec42960-b9c3-4efc-9a56-7ac25a33578c)
+    terracottaHover: '#87341B',    // Pressed / hover state
+    terracottaLight: 'rgba(159, 64, 34, 0.08)',
+    tealAccent: '#619FA3',         // Soft coastal teal (--token-40f6bade-262a-4cb9-9f41-c76a47fed416)
+    limeAccent: '#F0FF00',         // Electric energetic lime
+
+    // Primary action alias (Terracotta is the official HB+ button color from example.html)
+    primary: '#9F4022',
+    primaryHover: '#87341B',
+    primaryLight: 'rgba(159, 64, 34, 0.08)',
+    border: '#DAD3CE',
+
+    // Backward-compatibility aliases
     forestGreenDark: '#111111',
     forestGreen: '#1A1A1A',
-    forestGreenCard: '#242424',
+    forestGreenCard: '#EDEAE7',
     forestGreenLight: '#2C2C2C',
     forestGreenHighlight: '#9F4022',
-
-    // Core Brand Aliases
-    primary: '#1A1A1A',
-    primaryHover: '#2A2A2A',
-    primaryLight: '#EDEAE7',
-    border: '#DAD3CE',
 
     // Surfaces & Backgrounds
     background: '#F5F2E9',        // Official warm cream
     surface: '#FFFFFF',
     surfaceSubtle: '#FAF8F5',
     card: '#FFFFFF',
-    cardBorder: '#DAD3CE',        // Warm soft border from website
-    divider: '#E5E0D8',
+    divider: '#DAD3CE',
 
     // Text colors
     textPrimary: '#1A1A1A',       // Rich onyx
-    textSecondary: '#636363',     // Muted gray
+    textSecondary: '#636363',     // Muted gray (--token-a4e15d40-f485-4830-b24f-df7ea79c60bd)
     textMuted: '#999999',
     textLight: '#F5F2E9',
-    textLightMuted: '#D8D3C8',
+    textLightMuted: '#DAD3CE',
 
     // Neutral & Status Badges (Zero Green - Warm Sand & Onyx)
     sageBg: '#EDEAE7',
@@ -76,16 +79,18 @@ export const THEME = {
 
   borderRadius: {
     sm: 6,
-    md: 10,
-    lg: 16,
-    xl: 22,
-    xxl: 30,
+    md: 8,           // Button border-radius in example.html
+    lg: 12,
+    xl: 16,
+    card: 20,        // Card border-radius in example.html
+    xxl: 24,
     full: 9999,
   },
 
   typography: {
     fontFamily: {
       sans: "'DM Sans', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      serif: "'The Seasons', 'Georgia', 'Times New Roman', serif",
       mono: "'Fragment Mono', 'DM Mono', monospace",
     },
     fontSize: {

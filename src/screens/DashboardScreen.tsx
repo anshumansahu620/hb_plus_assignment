@@ -159,17 +159,22 @@ export const DashboardScreen: React.FC = () => {
 
               </View>
 
-              {/* FOREST GREEN HERO BANNER (Matches Figma Screen 2 & 4) */}
+              {/* HB+ LUXURY HERO CARD (From example.html) */}
               <View style={styles.forestHeroBanner}>
                 <View style={styles.forestHeroLeft}>
-
-                  <Text style={styles.forestHeroTitle}>One team. Connected securely.</Text>
-
+                  <View style={styles.heroPill}>
+                    <View style={styles.heroPillDot} />
+                    <Text style={styles.heroPillText}>HOP WITH HB • OFFICIAL PORTAL</Text>
+                  </View>
+                  <Text style={styles.forestHeroTitle}>Wellness That Understands Your Lifestyle.</Text>
+                  <Text style={styles.forestHeroSubtitle}>
+                    Real health goes beyond fitness. It lives at the intersection of body, mind, and gut. One team, securely connected under @{APP_CONFIG.allowedDomain}.
+                  </Text>
                 </View>
 
                 <View style={styles.forestHeroRight}>
                   <View style={styles.lockBadgeCircle}>
-                    <Ionicons name="shield-checkmark-outline" size={18} color={THEME.colors.terracotta} />
+                    <Ionicons name="shield-checkmark-outline" size={22} color={THEME.colors.terracotta} />
                   </View>
                 </View>
               </View>
@@ -259,8 +264,8 @@ export const DashboardScreen: React.FC = () => {
                     onPress={() => alert(`Policy: Access restricted exclusively to @${APP_CONFIG.allowedDomain}. Non-official emails are rejected immediately.`)}
                     style={styles.moduleCard}
                   >
-                    <View style={[styles.moduleIconWrapper, { backgroundColor: '#F0FDF4' }]}>
-                      <Ionicons name="lock-closed-outline" size={18} color="#059669" />
+                    <View style={styles.moduleIconWrapper}>
+                      <Ionicons name="shield-checkmark-outline" size={18} color={THEME.colors.terracotta} />
                     </View>
                     <Text style={styles.moduleTitle}>Domain Security</Text>
                     <Text style={styles.moduleDesc}>
@@ -281,6 +286,63 @@ export const DashboardScreen: React.FC = () => {
                       Securely sign out and clear active authentication tokens.
                     </Text>
                   </Pressable>
+                </View>
+              </View>
+
+              {/* SECTION: OUR PATHWAYS (Direct from example.html) */}
+              <View style={styles.pathwaysSection}>
+                <View style={styles.pathwayHeaderRow}>
+                  <View>
+                    <Text style={styles.pathwaySubheader}>THE HOLY TRIANGLE OF HEALTH</Text>
+                    <Text style={styles.sectionHeader}>Our Pathways</Text>
+                  </View>
+                  <Text style={styles.pathwayKicker}>Integrative Wellness</Text>
+                </View>
+
+                <View style={[styles.pathwaysGrid, !isDesktop && styles.modulesGridMobile]}>
+                  {/* Pathway 1 */}
+                  <View style={styles.pathwayCard}>
+                    <View style={styles.pathwayIconBox}>
+                      <Ionicons name="barbell-outline" size={18} color={THEME.colors.terracotta} />
+                    </View>
+                    <Text style={styles.moduleTitle}>Pain Management</Text>
+                    <Text style={styles.moduleDesc}>
+                      Targeted physical therapy, postural correction, and chronic joint relief.
+                    </Text>
+                  </View>
+
+                  {/* Pathway 2 */}
+                  <View style={styles.pathwayCard}>
+                    <View style={styles.pathwayIconBox}>
+                      <Ionicons name="restaurant-outline" size={18} color={THEME.colors.terracotta} />
+                    </View>
+                    <Text style={styles.moduleTitle}>Weight Management</Text>
+                    <Text style={styles.moduleDesc}>
+                      Metabolic testing, sustainable nutrition, and body recomposition.
+                    </Text>
+                  </View>
+
+                  {/* Pathway 3 */}
+                  <View style={styles.pathwayCard}>
+                    <View style={styles.pathwayIconBox}>
+                      <Ionicons name="heart-outline" size={18} color={THEME.colors.terracotta} />
+                    </View>
+                    <Text style={styles.moduleTitle}>Pre & Post Natal</Text>
+                    <Text style={styles.moduleDesc}>
+                      Specialized maternal wellness, core rehab, and guided postpartum strength.
+                    </Text>
+                  </View>
+
+                  {/* Pathway 4 */}
+                  <View style={styles.pathwayCard}>
+                    <View style={styles.pathwayIconBox}>
+                      <Ionicons name="pulse-outline" size={18} color={THEME.colors.terracotta} />
+                    </View>
+                    <Text style={styles.moduleTitle}>Lifestyle Management</Text>
+                    <Text style={styles.moduleDesc}>
+                      Circadian rhythm alignment, stress resilience, and deep restorative sleep.
+                    </Text>
+                  </View>
                 </View>
               </View>
 
@@ -504,16 +566,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-  // Hero Banner (Official Onyx & Terracotta luxury styling)
+  // Hero Banner (Official Warm Stone & Terracotta luxury styling from example.html)
   forestHeroBanner: {
-    backgroundColor: THEME.colors.onyx,
-    borderRadius: THEME.borderRadius.xl,
+    backgroundColor: THEME.colors.creamDark,
+    borderRadius: THEME.borderRadius.card,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
     padding: THEME.spacing.xl,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: THEME.spacing.lg,
-    ...THEME.shadows.md,
+    ...THEME.shadows.sm,
   },
   forestHeroLeft: {
     flex: 1,
@@ -521,10 +585,12 @@ const styles = StyleSheet.create({
   heroPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: THEME.borderRadius.full,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
     alignSelf: 'flex-start',
     marginBottom: 12,
   },
@@ -536,23 +602,23 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   heroPillText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#FAF8F5',
-    letterSpacing: 0.5,
+    fontSize: 10,
+    fontWeight: '800',
+    color: THEME.colors.terracotta,
+    letterSpacing: 0.8,
   },
   forestHeroTitle: {
-    fontSize: THEME.typography.fontSize.xl,
+    fontSize: 26,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: THEME.colors.onyx,
     letterSpacing: -0.5,
   },
   forestHeroSubtitle: {
-    fontSize: THEME.typography.fontSize.sm,
-    color: THEME.colors.textLightMuted,
-    marginTop: 6,
-    lineHeight: 20,
-    maxWidth: 520,
+    fontSize: 14,
+    color: THEME.colors.textSecondary,
+    marginTop: 8,
+    lineHeight: 22,
+    maxWidth: 580,
   },
   forestHeroRight: {
     marginLeft: THEME.spacing.md,
@@ -561,9 +627,12 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
     alignItems: 'center',
     justifyContent: 'center',
+    ...THEME.shadows.sm,
   },
 
   // Admin Announcement
@@ -571,7 +640,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAF5FF',
     borderColor: '#DDD6FE',
     borderWidth: 1.5,
-    borderRadius: THEME.borderRadius.lg,
+    borderRadius: THEME.borderRadius.card,
     padding: THEME.spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -613,7 +682,7 @@ const styles = StyleSheet.create({
   // Account Card
   cardContainer: {
     backgroundColor: '#FFFFFF',
-    borderRadius: THEME.borderRadius.lg,
+    borderRadius: THEME.borderRadius.card,
     borderColor: THEME.colors.cardBorder,
     borderWidth: 1,
     padding: THEME.spacing.lg,
@@ -686,7 +755,7 @@ const styles = StyleSheet.create({
   moduleCard: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    borderRadius: THEME.borderRadius.lg,
+    borderRadius: THEME.borderRadius.card,
     borderWidth: 1,
     borderColor: THEME.colors.cardBorder,
     padding: THEME.spacing.md,
@@ -711,5 +780,53 @@ const styles = StyleSheet.create({
     color: THEME.colors.textSecondary,
     marginTop: 4,
     lineHeight: 17,
+  },
+
+  // Pathways Section (Direct from example.html)
+  pathwaysSection: {
+    marginTop: THEME.spacing.lg,
+  },
+  pathwayHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: 12,
+  },
+  pathwaySubheader: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: THEME.colors.terracotta,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: 2,
+  },
+  pathwayKicker: {
+    fontSize: 11,
+    color: THEME.colors.textMuted,
+    fontWeight: '600',
+  },
+  pathwaysGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+  },
+  pathwayCard: {
+    flex: 1,
+    minWidth: 200,
+    backgroundColor: '#FFFFFF',
+    borderRadius: THEME.borderRadius.card,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    padding: THEME.spacing.md,
+    ...THEME.shadows.sm,
+  },
+  pathwayIconBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: THEME.colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
   },
 });

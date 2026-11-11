@@ -64,7 +64,7 @@ export const LoginScreen: React.FC = () => {
             <Text style={styles.heroTaglineKicker}>HOP WITH HB</Text>
             <Text style={styles.heroTitle}>Wellness That Understands Your Lifestyle.</Text>
             <Text style={styles.heroDescription}>
-              Your team, your tools, your workday. All in one secure, unified portal.
+              Real health goes beyond fitness. It lives at the intersection of body, mind, and gut. Welcome to the official HB+ team portal.
             </Text>
 
             {/* Official Workspace Badge Card */}
@@ -78,6 +78,19 @@ export const LoginScreen: React.FC = () => {
               <Text style={styles.domainCardDesc}>
                 Access is strictly restricted to verified corporate team members.
               </Text>
+            </View>
+
+            {/* Numbers strip from example.html */}
+            <View style={styles.numbersStrip}>
+              <View style={styles.numberItem}>
+                <Text style={styles.numberValue}>1550<Text style={{ color: THEME.colors.terracotta }}>+</Text></Text>
+                <Text style={styles.numberLabel}>Active Members</Text>
+              </View>
+              <View style={styles.numberDivider} />
+              <View style={styles.numberItem}>
+                <Text style={styles.numberValue}>100<Text style={{ color: THEME.colors.terracotta }}>%</Text></Text>
+                <Text style={styles.numberLabel}>Verified SSO</Text>
+              </View>
             </View>
           </View>
 
@@ -279,11 +292,13 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
 
-  // Hero Panel Styles (HB+ Rich Onyx & Terracotta Luxury Styling)
+  // Hero Panel Styles (HB+ Warm Stone, Onyx & Terracotta from example.html)
   heroPanel: {
-    backgroundColor: THEME.colors.onyx,
+    backgroundColor: THEME.colors.creamDark,
     padding: THEME.spacing.xl,
     justifyContent: 'space-between',
+    borderRightWidth: 1,
+    borderRightColor: THEME.colors.cardBorder,
   },
   heroPanelDesktop: {
     width: '46%',
@@ -291,6 +306,9 @@ const styles = StyleSheet.create({
   heroPanelMobile: {
     width: '100%',
     paddingVertical: THEME.spacing.lg,
+    borderRightWidth: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.colors.cardBorder,
   },
   heroTop: {
     flexDirection: 'row',
@@ -305,7 +323,7 @@ const styles = StyleSheet.create({
   heroBrandLogo: {
     width: 44,
     height: 44,
-    tintColor: '#FFFFFF',
+    tintColor: THEME.colors.onyx,
     marginRight: 10,
   },
   brandTextCol: {
@@ -314,21 +332,21 @@ const styles = StyleSheet.create({
   brandSubtitleText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: THEME.colors.onyx,
     letterSpacing: -0.3,
   },
   officialPill: {
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: THEME.borderRadius.full,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.18)',
+    borderColor: THEME.colors.cardBorder,
   },
   officialPillText: {
     fontSize: 11,
-    fontWeight: '600',
-    color: THEME.colors.cream,
+    fontWeight: '700',
+    color: THEME.colors.terracotta,
   },
   heroMiddle: {
     marginVertical: THEME.spacing.lg,
@@ -343,24 +361,25 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: THEME.colors.onyx,
     lineHeight: 40,
     letterSpacing: -0.6,
   },
   heroDescription: {
     fontSize: THEME.typography.fontSize.base,
-    color: THEME.colors.textLightMuted,
+    color: THEME.colors.textSecondary,
     marginTop: 12,
     lineHeight: 22,
     maxWidth: 340,
   },
   domainHighlightCard: {
-    backgroundColor: '#262626',
-    borderRadius: THEME.borderRadius.lg,
+    backgroundColor: '#FFFFFF',
+    borderRadius: THEME.borderRadius.card,
     padding: THEME.spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
+    borderColor: THEME.colors.cardBorder,
     marginTop: THEME.spacing.lg,
+    ...THEME.shadows.sm,
   },
   domainCardTop: {
     flexDirection: 'row',
@@ -371,30 +390,63 @@ const styles = StyleSheet.create({
   domainCardDomain: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: THEME.colors.onyx,
   },
   domainCardBadge: {
-    backgroundColor: 'rgba(159, 64, 34, 0.3)',
+    backgroundColor: THEME.colors.primaryLight,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: THEME.borderRadius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(159, 64, 34, 0.2)',
   },
   domainCardBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#FAF8F5',
+    color: THEME.colors.terracotta,
   },
   domainCardDesc: {
     fontSize: 12,
-    color: THEME.colors.textLightMuted,
+    color: THEME.colors.textSecondary,
     lineHeight: 16,
+  },
+  numbersStrip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: THEME.borderRadius.card,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 16,
+    justifyContent: 'space-around',
+    ...THEME.shadows.sm,
+  },
+  numberItem: {
+    alignItems: 'center',
+  },
+  numberValue: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: THEME.colors.onyx,
+  },
+  numberLabel: {
+    fontSize: 11,
+    color: THEME.colors.textSecondary,
+    marginTop: 2,
+  },
+  numberDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: THEME.colors.cardBorder,
   },
   heroFooter: {
     marginTop: THEME.spacing.lg,
   },
   heroFooterText: {
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.45)',
+    color: THEME.colors.textMuted,
   },
 
   // Auth Panel Styles (Warm Canvas & Terracotta from example.html)
