@@ -205,8 +205,8 @@ The application provides a switchable login form supporting both Google OAuth an
 
 | Account Type | Mode | Email Address | Password | Access Rights & Features |
 | :--- | :--- | :--- | :--- | :--- |
-| Super User | Google OAuth | sjugal884@gmail.com | Select Google Account | Domain bypass, Admin Panel, Audit Trail |
-| Super User | Work Email | sjugal884@gmail.com | admin123 | Domain bypass, Admin Panel, Audit Trail |
+| Super User | Google OAuth | superuser@gmail.com | Select Google Account | Domain bypass, Admin Panel, Audit Trail |
+| Super User | Work Email | superuser@gmail.com | admin123 | Domain bypass, Admin Panel, Audit Trail |
 | Administrator | Work Email | admin@hbplus.fit | admin123 | Administrator, RBAC delegation, Audit Logs |
 | Administrator | Work Email | rahul@hbplus.fit | admin123 | Administrator, RBAC delegation, Audit Logs |
 | Administrator | Work Email | security@hbplus.fit | admin123 | Administrator, RBAC delegation, Audit Logs |
@@ -325,8 +325,8 @@ Super Users receive:
 
 | Method | Email Address | Password / Action | Resulting Role |
 | :--- | :--- | :--- | :--- |
-| Google OAuth (SSO) | sjugal884@gmail.com | Click "Continue with Google" | Super User (Admin) |
-| Work Email Sign-In | sjugal884@gmail.com | admin123 | Super User (Admin) |
+| Google OAuth (SSO) | superuser@gmail.com | Click "Continue with Google" | Super User (Admin) |
+| Work Email Sign-In | superuser@gmail.com | admin123 | Super User (Admin) |
 
 ### How to Configure or Become a Super User
 
@@ -336,7 +336,8 @@ Super Users receive:
 ```typescript
 // Add your Google email address to the Super User array
 export const SUPER_USER_EMAILS = [
-  'sjugal884@gmail.com',
+  'superuser@gmail.com',
+  'evaluator@gmail.com',
   'your-email@gmail.com',
 ];
 
@@ -348,8 +349,7 @@ export const ADMIN_EMAILS = [
   `user@${ALLOWED_DOMAIN}`,
   `alex.trainer@${ALLOWED_DOMAIN}`,
   `sarah.fitness@${ALLOWED_DOMAIN}`,
-  'sjugal884@gmail.com',
-  'your-email@gmail.com',
+  ...SUPER_USER_EMAILS,
 ];
 ```
 

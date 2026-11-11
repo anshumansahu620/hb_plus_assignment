@@ -18,6 +18,16 @@ export const SUPABASE_URL =
 export const SUPABASE_ANON_KEY =
   process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'dummy_anon_key_for_offline_mode';
 
+// Optional extra super user from environment variable (kept private in .env)
+const ENV_SUPER_USER = process.env.EXPO_PUBLIC_SUPER_USER_EMAIL?.trim().toLowerCase();
+
+// Super user accounts granted administrative access and domain restriction bypass
+export const SUPER_USER_EMAILS = [
+  'superuser@gmail.com',
+  'evaluator@gmail.com',
+  ...(ENV_SUPER_USER ? [ENV_SUPER_USER] : []),
+];
+
 // Admin emails for Role-Based Access Control
 export const ADMIN_EMAILS = [
   `admin@${ALLOWED_DOMAIN}`,
@@ -26,12 +36,7 @@ export const ADMIN_EMAILS = [
   `user@${ALLOWED_DOMAIN}`,
   `alex.trainer@${ALLOWED_DOMAIN}`,
   `sarah.fitness@${ALLOWED_DOMAIN}`,
-  'sjugal884@gmail.com',
-];
-
-// Super user accounts granted administrative access and domain restriction bypass
-export const SUPER_USER_EMAILS = [
-  'sjugal884@gmail.com',
+  ...SUPER_USER_EMAILS,
 ];
 
 // App branding
