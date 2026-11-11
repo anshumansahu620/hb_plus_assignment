@@ -297,15 +297,10 @@ export const DashboardScreen: React.FC = () => {
                   {/* CARD: GRANT ADMIN ACCESS & PERMISSIONS (Always inside the view) */}
                   <View style={styles.cardContainer}>
                     <View style={styles.cardHeaderRow}>
-                      <View style={styles.adminCardTitleCol}>
-                        <Text
-                          style={[styles.cardTitle, styles.adminCardTitle, !isDesktop && styles.adminCardTitleMobile]}
-                          numberOfLines={1}
-                          adjustsFontSizeToFit
-                        >
-                          Grant Admin Access & Permissions
-                        </Text>
+                      <View>
+                        <Text style={styles.cardTitle}>Grant Admin Access & Permissions</Text>
                       </View>
+
                     </View>
 
                     {quickAdminMsg && (
@@ -405,15 +400,20 @@ export const DashboardScreen: React.FC = () => {
                   </View>
 
                   {/* CARD: SET WORKSPACE PASSWORD (Direct Email Login after Google OAuth) */}
-                  <View style={styles.cardContainer}>
-                    <View style={styles.cardHeaderRow}>
-                      <View>
-                        <Text style={styles.cardTitle}>Set Workspace Password</Text>
-                        <Text style={styles.cardSubtitle}>
+                  <View style={[styles.cardContainer, !isDesktop && styles.cardContainerMobile]}>
+                    <View style={[styles.cardHeaderRow, !isDesktop && styles.cardHeaderRowMobile]}>
+                      <View style={styles.cardHeaderTitleCol}>
+                        <Text style={[styles.cardTitle, !isDesktop && styles.cardTitleMobile]}>Set Workspace Password</Text>
+                        <Text style={[styles.cardSubtitle, !isDesktop && styles.cardSubtitleMobile]}>
                           Enable direct email sign-in using your @{APP_CONFIG.allowedDomain} account.
                         </Text>
                       </View>
-                      
+                      <View style={!isDesktop && styles.cardHeaderBadgeMobile}>
+                        <Badge
+                          label={user?.hasCustomPassword ? 'PASSWORD ACTIVE' : 'GOOGLE SSO ONLY'}
+                          variant={user?.hasCustomPassword ? 'sage' : 'neutral'}
+                        />
+                      </View>
                     </View>
 
                     {pwdMessage && (
@@ -1081,11 +1081,24 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.lg,
     ...THEME.shadows.sm,
   },
+  cardContainerMobile: {
+    padding: THEME.spacing.md,
+  },
   cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: THEME.spacing.md,
+  },
+  cardHeaderRowMobile: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  cardHeaderTitleCol: {
+    flex: 1,
+    minWidth: 0,
+    width: '100%',
   },
   cardTitle: {
     fontFamily: THEME.typography.fontFamily.serif,
@@ -1094,22 +1107,24 @@ const styles = StyleSheet.create({
     color: THEME.colors.textPrimary,
     letterSpacing: -0.3,
   },
-  adminCardTitleCol: {
-    flex: 1,
-    minWidth: 0,
-    flexShrink: 1,
-  },
-  adminCardTitle: {
-    fontSize: 16,
-    letterSpacing: -0.2,
-  },
-  adminCardTitleMobile: {
-    fontSize: 14,
+  cardTitleMobile: {
+    fontSize: 17,
+    lineHeight: 22,
   },
   cardSubtitle: {
     fontSize: 12,
     color: THEME.colors.textSecondary,
+    marginTop: 3,
+    lineHeight: 18,
+    flexWrap: 'wrap',
+  },
+  cardSubtitleMobile: {
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  cardHeaderBadgeMobile: {
     marginTop: 2,
+    alignSelf: 'flex-start',
   },
   pwdAlertBox: {
     flexDirection: 'row',
@@ -1117,6 +1132,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: THEME.borderRadius.md,
     marginBottom: 14,
+    width: '100%',
+    overflow: 'hidden',
   },
   pwdAlertSuccess: {
     backgroundColor: '#FAF8F5',
@@ -1131,6 +1148,9 @@ const styles = StyleSheet.create({
   pwdAlertText: {
     fontSize: 12,
     flex: 1,
+    minWidth: 0,
+    flexShrink: 1,
+    lineHeight: 18,
   },
   pwdAlertTextSuccess: {
     color: THEME.colors.textPrimary,
