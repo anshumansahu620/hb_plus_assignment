@@ -1,281 +1,292 @@
-# HB+ Security Portal — Cross-Platform React Native App with Domain-Restricted Google Authentication
+# HB+ Security & Team Portal
 
-[![React Native](https://img.shields.io/badge/React%20Native-0.88-61DAFB?logo=react&logoColor=black)](https://reactnative.dev/)
-[![Expo](https://img.shields.io/badge/Expo-SDK%2058-000020?logo=expo&logoColor=white)](https://expo.dev/)
-[![React Native Web](https://img.shields.io/badge/React%20Native%20for%20Web-Supported-blue)](https://necolas.github.io/react-native-web/)
-[![Google OAuth 2.0](https://img.shields.io/badge/Google%20OAuth-2.0-4285F4?logo=google&logoColor=white)](https://developers.google.com/identity/protocols/oauth2)
-[![Supabase](https://img.shields.io/badge/Database-Supabase%20PostgreSQL-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
-[![Deployment](https://img.shields.io/badge/Deploy-Netlify-00C7B7?logo=netlify&logoColor=white)](https://www.netlify.com/)
-
-A modern, production-ready cross-platform application built with **React Native** and **React Native for Web** that enforces **Google OAuth 2.0 authentication** strictly restricted to corporate domain accounts ending in **`@hbplus.fit`**.
+A cross-platform React Native and React Native for Web application built for Hop with HB (`hbplus.fit`). The portal enforces corporate domain-restricted authentication supporting both Google OAuth 2.0 and Work Email credentials, granting access exclusively to accounts under `@hbplus.fit` while strictly blocking unauthorized domains.
 
 ---
 
-## 🚀 Live Demo & Deployment
+## 1. Executive Summary & Problem Statement
 
-- **Netlify Deployment Link:** [https://hbplus-portal.netlify.app](https://hbplus-portal.netlify.app) *(or your deployed Netlify URL)*
-- **GitHub Repository:** *(Submit your repo URL here)*
-- **Supported Platforms:**
-  - 🌐 **Web**: Desktop & Mobile Browsers (Chrome, Safari, Edge, Firefox)
-  - 📱 **Mobile**: Android & iOS (via Expo Go / emulator)
+### Objective
+Design and implement a cross-platform web and mobile security portal that satisfies the following core requirements:
 
----
-
-## 📋 Problem Statement & Objectives
-
-Design and develop a secure web and mobile application using React Native that:
-1. Allows users to log in using **Google OAuth 2.0**.
-2. Verifies the user's email domain against the official company domain (`@hbplus.fit`).
-3. Grants access **only** if the email belongs to `@hbplus.fit`.
-4. Strictly restricts all other domains:
-   - If email = `example@hbplus.fit` → **Allow login & grant dashboard access**
-   - If email = `example@gmail.com` (or any external domain) → **Display error:**
-     > `"Access restricted. Please login using your official domain email."`
+1. **Authentication Options**: Support single sign-on via Google OAuth 2.0 and direct Work Email authentication.
+2. **Strict Domain Validation**: Verify the user email domain against the authorized corporate domain (`@hbplus.fit`).
+3. **Domain Whitelisting**:
+   - Authorized Domain: Users with `@hbplus.fit` emails (for example, `employee@hbplus.fit`) are validated, their profile is synchronized, and access to the protected Dashboard and Resource Library is granted.
+   - Unauthorized Domain: Users authenticating with any non-whitelisted email (for example, `user@gmail.com` or `user@yahoo.com`) are immediately rejected, session tokens are revoked, and the exact error alert is displayed:
+     > "Access restricted. Please login using your official domain email."
+4. **Custom Password Setup**: Allow users who authenticate via Google OAuth to configure a personal workspace password directly from the dashboard, enabling direct work email sign-in.
+5. **Role-Based Access Control**: Standard users and Administrators are segregated with role-specific views, permission delegation capabilities, and security audit logging.
+6. **Brand Design Alignment**: Visual layout, color palette (Warm Sand, Terracotta, Onyx, Warm Cream), typography (The Seasons, Gilroy, DM Sans), and iconography (clean lock symbols) extracted directly from the Hop with HB production design.
 
 ---
 
-## 🔒 How Domain Restriction Works
+## 2. System Architecture & How the Code Works
 
-The application employs a defense-in-depth approach to enforce domain restrictions:
+The application operates as a single-page application on the web and as an Expo React Native application on mobile devices.
+
+### 2.1 Authentication & Domain Validation Pipeline
 
 ```
-                          ┌───────────────────────────┐
-                          │    Google OAuth 2.0       │
-                          │   (accounts.google.com)   │
-                          └─────────────┬─────────────┘
-                                        │ Token & Email payload
-                                        ▼
-                          ┌───────────────────────────┐
-                          │   Domain Guard Engine     │
-                          │  validateEmailDomain()    │
-                          └─────────────┬─────────────┘
-                                        │
-                 ┌──────────────────────┴──────────────────────┐
-                 │                                             │
-      Domain == '@hbplus.fit'                     Domain != '@hbplus.fit'
-                 │                                             │
-                 ▼                                             ▼
-    ┌───────────────────────────┐                ┌───────────────────────────┐
-    │ 1. Sync User in Database  │                │ 1. Terminate Session      │
-    │ 2. Grant Session Token    │                │ 2. Revoke OAuth Tokens    │
-    │ 3. Unlock Dashboard       │                │ 3. Dispatch Exact Error:  │
-    │ 4. Log "ALLOWED" in Audit │                │    "Access restricted.    │
-    └───────────────────────────┘                │    Please login using     │
-                                                 │    your official domain   │
-                                                 │    email."                │
-                                                 │ 4. Log "RESTRICTED" Audit │
-                                                 └───────────────────────────┘
+  [User Action]
+        |
+        +---> Google Sign-In (OAuth 2.0 via Supabase)
+        |
+        +---> Work Email & Password Sign-In
+        |
+        v
+  [Domain Validation Engine] (src/utils/domainValidator.ts)
+        |
+        +---> validateEmailDomain(email)
+        |     - Normalize: lowercase, trim whitespace
+        |     - Split: isolate domain after '@' character
+        |     - Exact match comparison against ALLOWED_DOMAIN (hbplus.fit)
+        |
+        +-----------------------+-----------------------+
+        |                                               |
+  [Domain Matches: @hbplus.fit]             [Domain Mismatch: e.g. @gmail.com]
+        |                                               |
+        v                                               v
+  1. Initialize/Sync User Profile           1. Terminate Supabase session
+  2. Query admin registry for roles         2. Revoke active OAuth tokens
+  3. Store user session locally             3. Clear local storage cache
+  4. Write "ALLOWED" log to audit trail     4. Write "BLOCKED" log to audit trail
+  5. Redirect to Protected Dashboard        5. Set global error state:
+                                               "Access restricted. Please login
+                                               using your official domain email."
+                                            6. User stays on Login Screen
 ```
 
-### 1. Extraction & Normalization
-Upon OAuth callback, the authenticated email is extracted, lowercased, and trimmed. The domain portion is isolated via `email.slice(email.lastIndexOf('@') + 1)`.
+### 2.2 Global State Management (`src/context/AuthContext.tsx`)
+The `AuthProvider` context acts as the central state controller for the entire application lifecycle:
+- **Session Restoration**: On application mount, `initAuth()` checks for active Supabase sessions or persisted local sessions (`appStorage`). If a cached session belongs to an unauthorized domain, it is purged automatically.
+- **Switchable Authentication**: Handles OAuth redirect callbacks for Web and native URL schemes for Mobile (`supabase.auth.onAuthStateChange`).
+- **Domain Enforcement**: Both `signInWithGoogle` and `signInWithEmail` pass candidate emails through `validateEmailDomain()` before setting the authenticated user state.
+- **Password Management**: The `setPassword()` method allows authenticated domain users to store an encrypted credential in Supabase and local storage for direct email sign-in.
+- **Admin Delegation**: `grantAdminAccess()` and `revokeAdminAccess()` persist administrator rights across browser and device restarts using Supabase and `appStorage`.
+- **Client Route Guard**: Exposes `activeRoute` and `navigateTo()` functions that enforce view access controls.
 
-### 2. Strict Equality Matching
-The domain is matched strictly against `ALLOWED_DOMAIN` (`hbplus.fit`). Subdomain tampering, prefix spoofing (e.g., `attacker@fakehbplus.fit`), and trailing suffixes (e.g., `user@hbplus.fit.attacker.com`) are rejected.
+### 2.3 Route Protection (`App.tsx`)
+Route protection is enforced declaratively at the application root:
+- If `isLoading` is true, an animated loading screen displays while checking session credentials.
+- If `!isAuthenticated`, the application renders `LoginScreen`. Any direct route navigation to protected paths (such as `#dashboard` or `#admin`) is intercepted and redirected back to `login`.
+- If `isAuthenticated` and `activeRoute === 'admin'`, the app verifies that `user.role === 'admin'`. Non-admin attempts to open the admin view are intercepted and redirected to the dashboard.
+- If `isAuthenticated` and `activeRoute === 'dashboard'` or `activeRoute === 'resources'`, the protected `DashboardScreen` is rendered.
 
-### 3. Immediate Session Termination
-If a user authenticates with an unauthorized account (e.g., their personal `@gmail.com`), the client **instantly** signs out from Supabase/Google (`supabase.auth.signOut()`), deletes local session cache, and registers a security audit log.
-
-### 4. Required Error Dispatch
-The UI displays the exact required error alert banner:
-> **"Access restricted. Please login using your official domain email."**
-
----
-
-## 🔄 Authentication & Navigation Flow
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as User
-    participant App as React Native App (Web/Mobile)
-    participant OAuth as Supabase / Google OAuth
-    participant Guard as Domain Validator
-    participant Store as Session & Database
-
-    User->>App: Clicks "Sign in with Google"
-    App->>OAuth: Redirects to Google OAuth Consent Screen
-    User->>OAuth: Authorizes Google Account
-    OAuth-->>App: Returns OAuth Session & User Profile
-    App->>Guard: validateEmailDomain(session.user.email)
-
-    alt Email domain is @hbplus.fit
-        Guard-->>App: Domain Validated (hbplus.fit)
-        App->>Store: Persist Session & Sync User Profile
-        App->>User: Redirects to Protected Dashboard (/dashboard)
-    else Email domain is @gmail.com or other
-        Guard-->>App: Domain REJECTED
-        App->>OAuth: Terminate / Revoke Unauthorized Session
-        App->>Store: Clear Local Session Cache
-        App->>User: Displays: "Access restricted. Please login using your official domain email."
-    end
-```
+### 2.4 Multi-Tier Storage Architecture (`src/utils/storage.ts`)
+React Native applications running on the web do not have native access to `AsyncStorage` without proper fallback handling. The `appStorage` utility implements a resilient storage adapter:
+1. Web Platform: Uses browser `localStorage`.
+2. Mobile Platform: Uses in-memory storage with fallbacks to avoid unhandled native bridge exceptions.
+3. Safe Parsing: Every read/write operation is wrapped in try-catch handlers to prevent application crashes during private browsing or restricted browser cookie modes.
 
 ---
 
-## ✨ Features
-
-### Core Requirements
-- [x] **Cross-Platform**: Exact same codebase runs seamlessly on Web (Netlify) and Mobile (Expo/Android/iOS).
-- [x] **Official Google Sign-In**: Branded Google button (`assets/google-logo.svg`) with real OAuth 2.0 integration via Supabase.
-- [x] **Email & Password Authentication**: Work email/password option with the exact same domain whitelist validation.
-- [x] **Set Password after Google Login**: Users authenticated via Google OAuth can set/change their own personal workspace password on the Dashboard, enabling direct email sign-in using their `@hbplus.fit` email and new password.
-- [x] **Domain Validation**: Robust algorithm enforcing `@hbplus.fit` whitelist.
-- [x] **Exact Error Messaging**: Strictly returns `"Access restricted. Please login using your official domain email."` on any non-whitelisted domain (e.g. `@gmail.com`).
-- [x] **Official Hop with HB Branding**: Colors, typography, and logo (`assets/hbplus-logo.png`) extracted directly from `hbplus.fit` (`example.html`) and Figma prototype.
-- [x] **Permanent Uncollapsible Sidebar**: 250px fixed navigation sidebar on Desktop matching Figma layout with zero emojis (clean Ionicons vector icons throughout).
-- [x] **Protected Routes**: Direct URL visits (e.g., typing `/#dashboard` or `/#admin` in browser) without authentication are intercepted and redirected to `/`.
-- [x] **Logout Flow**: Safely terminates the session and resets auth state.
-- [x] **Loading States**: Animated indicator while authenticating and validating session tokens.
-- [x] **Error Handling**: Dedicated, dismissible security error alerts.
-- [x] **Responsive Layout**: Fluid UI adapting between Desktop Web, Tablet, and Mobile devices.
-
-### Bonus Features Implemented
-- [x] 🛡️ **Role-Based Access Control (RBAC)**: Supports `Admin` and `User` roles with granular access permissions.
-- [x] 📊 **Admin Control Center**: Admins can view all registered users and promote/demote user roles.
-- [x] 📜 **Security Audit Trail**: Real-time logging of allowed logins and blocked non-domain access attempts.
-- [x] 💾 **Persistent Database Integration**: User profiles stored and synchronized with Supabase PostgreSQL.
-- [x] 🧪 **Interactive Evaluator Test Suite**: 1-click sandbox accounts on the login screen to test:
-  - 🟢 **user@hbplus.fit** *(Allowed User)*
-  - 🛡️ **admin@hbplus.fit** *(Allowed Admin)*
-  - 🔴 **example@gmail.com** *(Blocked Domain)*
-  - 🔴 **personal@yahoo.com** *(Blocked Domain)*
-
----
-
-## 📁 Clean Folder Structure
+## 3. Directory & File Structure
 
 ```
 hb_assignment/
-├── assets/                       # Icons, adaptive icons, and favicons
-├── scripts/
-│   └── verifyDomain.mjs          # Standalone verification script for domain logic
+├── assets/                                 # Static image assets and application icons
+│   ├── favicon.png                         # Browser tab favicon (official HB+ mark)
+│   ├── google-logo.svg                     # Official multicolor Google G logo
+│   ├── hbplus-logo.png                     # Official Hop with HB brand logo
+│   ├── icon.png                            # Application launcher icon
+│   └── splash-icon.png                     # Splash screen icon
+├── public/                                 # Web root served by Metro bundler
+│   ├── favicon.ico                         # Root favicon
+│   ├── hbplus-logo.png                     # Static root asset for HTML headers
+│   └── index.html                          # HTML shell with Google Fonts and meta tags
 ├── src/
-│   ├── components/               # Modular, reusable UI components
-│   │   ├── Badge.tsx             # Domain verified & role badges
-│   │   ├── Button.tsx            # Styled cross-platform button
-│   │   ├── Card.tsx              # Modern dashboard cards
-│   │   ├── ErrorAlert.tsx        # Security error notification banner
-│   │   ├── GoogleSignInButton.tsx# Official Google-branded sign-in button
-│   │   └── Navbar.tsx            # Responsive navigation header
+│   ├── components/                         # Modular, reusable UI components
+│   │   ├── Badge.tsx                       # Status and role indicator badges
+│   │   ├── Button.tsx                      # Primary and secondary tactile buttons
+│   │   ├── Card.tsx                        # Reusable dashboard card wrapper
+│   │   ├── ErrorAlert.tsx                  # Dismissible security alert banner
+│   │   ├── GoogleSignInButton.tsx          # Google-branded sign-in button
+│   │   ├── Navbar.tsx                      # Responsive navigation header & sidebar
+│   │   └── ResourcesView.tsx               # 14-protocol team resource library
 │   ├── constants/
-│   │   ├── config.ts             # Domain constants, admin emails, Supabase URLs
-│   │   └── theme.ts              # Design tokens (colors, typography, shadows, breakpoints)
+│   │   ├── config.ts                       # Configuration constants and domain settings
+│   │   └── theme.ts                        # Design system tokens (colors, typography, spacing)
 │   ├── context/
-│   │   └── AuthContext.tsx       # Global Auth state, Google OAuth, route guards
+│   │   └── AuthContext.tsx                 # Core authentication context and state machine
 │   ├── screens/
-│   │   ├── LoginScreen.tsx       # Login page with Google OAuth & Evaluator suite
-│   │   ├── DashboardScreen.tsx   # Protected corporate dashboard
-│   │   └── AdminScreen.tsx       # Bonus: RBAC user directory & audit logs
+│   │   ├── AdminScreen.tsx                 # Administrator management and audit trail
+│   │   ├── DashboardScreen.tsx             # Authenticated user dashboard and settings
+│   │   └── LoginScreen.tsx                 # Switchable Google/Email login screen
 │   ├── services/
-│   │   ├── db.ts                 # Database sync, user roles, security audit trail
-│   │   └── supabase.ts           # Supabase client initialization & OAuth config
+│   │   ├── db.ts                           # Database operations and audit logging
+│   │   └── supabase.ts                     # Supabase client and OAuth configuration
 │   ├── types/
-│   │   └── auth.ts               # TypeScript interfaces & types
+│   │   └── auth.ts                         # TypeScript data contracts and interfaces
 │   └── utils/
-│       ├── domainValidator.ts    # Domain validation engine (@hbplus.fit)
-│       └── storage.ts            # Cross-platform storage adapter (Web + Mobile)
-├── App.tsx                       # Root application component with route navigation
-├── app.json                      # Expo application manifest
-├── netlify.toml                  # Netlify deployment configuration & SPA redirects
-├── package.json
-└── README.md                     # Documentation & setup instructions
+│       ├── __tests__/                      # Automated unit test suites
+│       │   └── domainValidator.test.ts     # Domain validator unit tests
+│       ├── domainValidator.ts              # Strict domain validation logic
+│       ├── loadFonts.ts                    # Dynamic web font injector (The Seasons, Gilroy)
+│       └── storage.ts                      # Cross-platform persistent storage adapter
+├── App.tsx                                 # Application entrypoint and route dispatcher
+├── app.json                                # Expo project configuration manifest
+├── index.ts                                # Registration wrapper for Expo runtime
+├── netlify.toml                            # Netlify production build and redirect rules
+├── package.json                            # Package dependencies and execution scripts
+├── tsconfig.json                           # TypeScript compiler configuration
+└── README.md                               # Project documentation
 ```
 
 ---
 
-## 🛠️ Getting Started & Setup Instructions
+## 4. Key Screens & Component Descriptions
+
+### 4.1 Login Screen (`src/screens/LoginScreen.tsx`)
+- **Desktop Split View**: Left side features the Hop with HB editorial brand banner with responsive title typography and the verified member trust statement. The right side contains the authentication card.
+- **Switchable Authentication Tabs**: A segmented tab control allows users to cleanly toggle between **Google SSO** and **Work Email** without visual clutter.
+- **Google OAuth Button**: Initiates standard OAuth consent flow.
+- **Work Email Form**: Validates corporate work email and password inputs with field validation and toggleable password visibility.
+- **Error Presentation**: Displays the exact required domain restriction error whenever a non-domain account is rejected.
+- **Evaluator Sandbox**: Provides quick one-click evaluator credentials to easily test allowed domain access, admin privileges, and blocked domain scenarios.
+
+### 4.2 Dashboard Screen (`src/screens/DashboardScreen.tsx`)
+- **Fixed Sidebar Navigation**: On desktop viewports (880px and wider), a permanent 250px uncollapsible sidebar provides fast navigation between Overview, Resources, and Admin views.
+- **Hero Welcome Banner**: Displays the active workspace greeting, personalized with the user name and the official Hop with HB lifestyle statement.
+- **Admin Access Management**: An embedded management card allowing verified team members to assign administrator privileges to any colleague under `@hbplus.fit`. Includes title auto-scaling and responsive container boundaries.
+- **Account Overview Table**: Displays authenticated email, domain status, assigned role, and last login timestamp.
+- **Set Workspace Password Card**: Allows Google-authenticated users to create or update their direct email password with confirmation matching and validation feedback.
+- **Quick Access Modules**: Shortcut cards for Team Directory, Resource Library, and Session Termination.
+- **Integrative Pathways Section**: Overview cards detailing Pain Management, Weight Management, Pre & Post Natal Care, and Lifestyle Management.
+
+### 4.3 Resource Library (`src/components/ResourcesView.tsx`)
+- Interactive document repository containing 14 clinical protocols, brand kits, and security compliance handbooks.
+- Real-time search filtering by document title, code, and description.
+- Category pills: Clinical Protocols, Brand & Design, Security & Compliance, Operations.
+- Interactive download action with confirmation toast feedback.
+
+### 4.4 Admin Panel (`src/screens/AdminScreen.tsx`)
+- **Role Assignment**: Grant or revoke administrator privileges for any `@hbplus.fit` email.
+- **Team Directory Table**: Lists verified corporate members with active status indicators, role badges, and action buttons.
+- **Security Audit Log**: Displays chronological records of all authentication events, distinguishing allowed logins from blocked access attempts with timestamps and IP metadata.
+
+---
+
+## 5. Security & Domain Validation Logic
+
+### Validation Rules in `domainValidator.ts`
+
+```typescript
+export const ALLOWED_DOMAIN = 'hbplus.fit';
+
+export const validateEmailDomain = (email: string): boolean => {
+  if (!email || typeof email !== 'string') return false;
+  const trimmed = email.trim().toLowerCase();
+  const atIndex = trimmed.lastIndexOf('@');
+  if (atIndex === -1 || atIndex === 0 || atIndex === trimmed.length - 1) {
+    return false;
+  }
+  const domain = trimmed.slice(atIndex + 1);
+  return domain === ALLOWED_DOMAIN.toLowerCase();
+};
+```
+
+### Validation Test Scenarios
+
+| Input Email | Validation Outcome | User Experience |
+| :--- | :--- | :--- |
+| `member@hbplus.fit` | Pass | Login granted, redirected to Dashboard |
+| `admin@hbplus.fit` | Pass | Login granted, Admin privileges activated |
+| `user.name@hbplus.fit` | Pass | Login granted, complex local-part supported |
+| `user@gmail.com` | Fail | Session rejected, exact error displayed |
+| `user@yahoo.com` | Fail | Session rejected, exact error displayed |
+| `user@hbplus.fit.attacker.com` | Fail | Subdomain spoofing rejected |
+| `user@fakehbplus.fit` | Fail | Prefix domain spoofing rejected |
+| `user@HBPLUS.FIT` | Pass | Case-insensitive matching accepted |
+
+---
+
+## 6. Installation & Local Development
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) v18+ or v20+ or v22+
+- Node.js (version 18, 20, or 22 recommended)
 - npm or yarn
-- Expo Go app on your physical mobile device (optional, for mobile preview)
+- Modern web browser (Chrome, Edge, Safari, Firefox)
 
-### 1. Clone & Install Dependencies
+### Step 1: Clone Repository & Install Dependencies
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/your-username/hb-security-portal.git
 cd hb_assignment
 npm install
 ```
 
-### 2. Environment Configuration
-Create a `.env` file in the root directory (or copy from `.env.example`):
+### Step 2: Configure Environment Variables
+Create a `.env` file in the project root:
 ```env
-# Target allowed corporate domain (default: hbplus.fit)
 EXPO_PUBLIC_ALLOWED_DOMAIN=hbplus.fit
-
-# Supabase Project Credentials
 EXPO_PUBLIC_SUPABASE_URL=https://uwklwnsrgbzkhpqcbqqj.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 ```
 
-### 3. Running the Application
-
-#### Run on Web (Browser)
+### Step 3: Run Development Server
 ```bash
+# Launch on web browser (recommended)
 npm run web
-```
-The application will launch in your default browser at `http://localhost:8081`.
 
-#### Run on Mobile (Android / iOS)
-```bash
-# Start Expo development server
+# Alternatively launch Expo interactive CLI
 npm run start
-
-# Then:
-# - Press 'a' for Android Emulator
-# - Press 'i' for iOS Simulator (macOS only)
-# - Scan the displayed QR code using the Expo Go mobile app
 ```
+The application will open at `http://localhost:8081`.
 
-#### Run Domain Validation Tests
+### Step 4: Run Typecheck and Unit Tests
 ```bash
-node scripts/verifyDomain.mjs
+# Run TypeScript compilation check
+npx tsc --noEmit
+
+# Run domain validator unit tests
+npm test
 ```
 
 ---
 
-## 🌐 Netlify Deployment Guide
+## 7. Production Build & Deployment
 
-This repository includes a pre-configured `netlify.toml` file ready for one-click deployment:
-
-### Option A: Deploy via GitHub (Recommended)
-1. Push your repository to GitHub.
-2. Log in to [Netlify](https://app.netlify.com/).
-3. Click **"Add new site"** → **"Import an existing project"**.
-4. Select your GitHub repository.
-5. The build settings will be automatically detected from `netlify.toml`:
-   - **Build command:** `npm run build:web`
-   - **Publish directory:** `dist`
-6. Under **Environment variables**, add:
-   - `EXPO_PUBLIC_ALLOWED_DOMAIN`: `hbplus.fit`
-   - `EXPO_PUBLIC_SUPABASE_URL`: `https://uwklwnsrgbzkhpqcbqqj.supabase.co`
-   - `EXPO_PUBLIC_SUPABASE_ANON_KEY`: `your_supabase_anon_key`
-7. Click **Deploy Site**!
-
-### Option B: Deploy via Netlify CLI
+### Static Web Export
+The project uses Expo static web export to generate production-ready HTML, CSS, and JavaScript bundles:
 ```bash
-npm install -g netlify-cli
 npm run build:web
-netlify deploy --prod --dir=dist
+```
+The output files are compiled into the `dist/` directory.
+
+### Netlify Deployment
+The repository includes a production-ready `netlify.toml` file:
+```toml
+[build]
+  command = "npm run build:web"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 ```
 
----
-
-## 🧪 Testing Scenarios Guide
-
-| Test Scenario | Action | Expected Result |
-| :--- | :--- | :--- |
-| **Allowed Domain** | Sign in with `@hbplus.fit` | ✅ Access granted. Redirects to `/dashboard` with verified badge. |
-| **Set Password after Google Login** | Log in with Google → enter new password on Dashboard → Sign out → log in with email & custom password | ✅ Custom password saved to Supabase & local storage. Direct email login succeeds with new password. |
-| **Restricted Domain** | Sign in with `@gmail.com` | ❌ Access blocked. Session revoked. Shows: *"Access restricted. Please login using your official domain email."* |
-| **Direct URL Tampering** | Open `/#dashboard` while logged out | ❌ Intercepted by route guard. Redirects back to `/#login`. |
-| **Admin Route Protection** | Navigate to `/#admin` as standard user | ❌ Blocked by RBAC. Shows unauthorized message and returns to dashboard. |
-| **Admin Privilege** | Sign in with `admin@hbplus.fit` | ✅ Admin badge displayed. Admin Panel unlocked with User Directory & Audit Logs. |
+To deploy on Netlify:
+1. Connect the GitHub repository to your Netlify account.
+2. Ensure the build command is set to `npm run build:web` and the publish directory is `dist`.
+3. Add the environment variables (`EXPO_PUBLIC_ALLOWED_DOMAIN`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`) in the Netlify site settings.
+4. Deploy the site.
 
 ---
 
-## 🛡️ License & Credits
+## 8. Design System Tokens & Brand Standards
 
-Developed for the **HB+ Technical Assessment**. Built with modern standards in TypeScript, React Native, and Netlify.
+All styles are governed by design tokens located in `src/constants/theme.ts`:
 
+- **Page Background Canvas**: `#F5F2E9` (Warm Linen Cream)
+- **Card & Surface Background**: `#FFFFFF` / `#EDEAE7` (Warm Stone Sand)
+- **Hairline Border Color**: `#DAD3CE` (Warm Sand Border)
+- **Primary Text & Accents**: `#1A1A1A` (Rich Onyx Charcoal)
+- **Primary CTA / Buttons**: `#9F4022` (Signature Terracotta)
+- **Button Pressed / Hover**: `#87341B` (Deep Terracotta)
+- **Secondary Muted Text**: `#636363` (Muted Slate)
+- **Font Families**:
+  - Serif Display: `The Seasons`, serif
+  - Brand Display: `Gilroy`, sans-serif
+  - Interface Body: `DM Sans`, sans-serif
+- **Iconography**: Clean vector icons from `@expo/vector-icons/Ionicons` utilizing lock symbols (`lock-closed-outline`, `lock-closed`) for security context.

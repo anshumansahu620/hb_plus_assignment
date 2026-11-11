@@ -273,9 +273,7 @@ export const DashboardScreen: React.FC = () => {
                       <Text style={[styles.greetingTitle, !isDesktop && styles.greetingTitleMobile]}>
                         Welcome back, {firstName}.
                       </Text>
-                      <Text style={styles.greetingSubtitle}>
-                        Here is what's happening with your workspace today.
-                      </Text>
+
                     </View>
 
                   </View>
