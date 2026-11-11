@@ -23,10 +23,23 @@ const ENV_SUPER_USER = process.env.EXPO_PUBLIC_SUPER_USER_EMAIL?.trim().toLowerC
 
 // Super user accounts granted administrative access and domain restriction bypass
 export const SUPER_USER_EMAILS = [
+  `admin@${ALLOWED_DOMAIN}`,
+  'admin@hbplus.fit',
   'superuser@gmail.com',
   'evaluator@gmail.com',
   ...(ENV_SUPER_USER ? [ENV_SUPER_USER] : []),
 ];
+
+// Pre-configured default credentials for evaluator testing
+export const DEFAULT_CREDENTIALS: Record<string, string> = {
+  [`admin@${ALLOWED_DOMAIN}`]: 'admin123',
+  'admin@hbplus.fit': 'admin123',
+  'superuser@gmail.com': 'admin123',
+  'evaluator@gmail.com': 'admin123',
+  [`rahul@${ALLOWED_DOMAIN}`]: 'admin123',
+  [`security@${ALLOWED_DOMAIN}`]: 'admin123',
+  [`employee@${ALLOWED_DOMAIN}`]: 'user123',
+};
 
 // Admin emails for Role-Based Access Control
 export const ADMIN_EMAILS = [

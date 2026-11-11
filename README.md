@@ -205,9 +205,9 @@ The application provides a switchable login form supporting both Google OAuth an
 
 | Account Type | Mode | Email Address | Password | Access Rights & Features |
 | :--- | :--- | :--- | :--- | :--- |
-| Super User | Google OAuth | superuser@gmail.com | Select Google Account | Domain bypass, Admin Panel, Audit Trail |
-| Super User | Work Email | superuser@gmail.com | admin123 | Domain bypass, Admin Panel, Audit Trail |
-| Administrator | Work Email | admin@hbplus.fit | admin123 | Administrator, RBAC delegation, Audit Logs |
+| Corporate Super User | Work Email | admin@hbplus.fit | admin123 | Full Admin, Super User, RBAC delegation, Audit Logs |
+| External Super User | Google OAuth | superuser@gmail.com | Select Google Account | Domain bypass, Admin Panel, Audit Trail |
+| External Super User | Work Email | superuser@gmail.com | admin123 | Domain bypass, Admin Panel, Audit Trail |
 | Administrator | Work Email | rahul@hbplus.fit | admin123 | Administrator, RBAC delegation, Audit Logs |
 | Administrator | Work Email | security@hbplus.fit | admin123 | Administrator, RBAC delegation, Audit Logs |
 | Team Member | Work Email | employee@hbplus.fit | user123 | Standard Member, Overview, Resource Library |
@@ -323,10 +323,11 @@ Super Users receive:
 
 ### Super User Login Credentials
 
-| Method | Email Address | Password / Action | Resulting Role |
-| :--- | :--- | :--- | :--- |
-| Google OAuth (SSO) | superuser@gmail.com | Click "Continue with Google" | Super User (Admin) |
-| Work Email Sign-In | superuser@gmail.com | admin123 | Super User (Admin) |
+| Account Type | Authentication Mode | Email Address | Password / Action | Resulting Role |
+| :--- | :--- | :--- | :--- | :--- |
+| Corporate Super User | Work Email Sign-In | admin@hbplus.fit | admin123 | Super User & Administrator |
+| External Super User | Google OAuth (SSO) | superuser@gmail.com | Click "Continue with Google" | Super User & Administrator |
+| External Super User | Work Email Sign-In | superuser@gmail.com | admin123 | Super User & Administrator |
 
 ### How to Configure or Become a Super User
 
@@ -334,10 +335,14 @@ Super Users receive:
 
 1. Open src/constants/config.ts:
 ```typescript
-// Add your Google email address to the Super User array
+// Add super user email addresses to the Super User array
 export const SUPER_USER_EMAILS = [
+  `admin@${ALLOWED_DOMAIN}`,
+  'admin@hbplus.fit',
   'superuser@gmail.com',
+  'evaluator@gmail.com',
   'your-email@gmail.com',
+];
 ];
 
 // Add the same email to ADMIN_EMAILS for role authorization

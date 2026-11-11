@@ -5,7 +5,7 @@ import { validateEmailDomain } from '../utils/domainValidator';
 import { supabase, startGoogleOAuth, endSession, signInWithSupabaseEmail, setAccountPassword } from '../services/supabase';
 import { syncUserProfile, determineRoleForEmail, logAuthEvent, grantAdminRole, revokeAdminRole } from '../services/db';
 import { appStorage } from '../utils/storage';
-import { ALLOWED_DOMAIN } from '../constants/config';
+import { ALLOWED_DOMAIN, DEFAULT_CREDENTIALS } from '../constants/config';
 
 const CURRENT_USER_KEY = 'hbplus_current_active_user';
 
@@ -308,7 +308,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       const normalized = validation.email.toLowerCase().trim();
-      const savedPassword = await appStorage.getItem(`hbplus_pwd_${normalized}`);
+      const savedPassword = (await appStorage.getItem(`hbplus_pwd_${normalized}`)) || DEFAULT_CREDENTIALS[normalized];
 
       // 2. If user previously set their custom password after Google Login, verify it
       if (savedPassword) {
