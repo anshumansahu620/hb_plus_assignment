@@ -17,16 +17,11 @@ export const Badge: React.FC<BadgeProps> = ({
     switch (variant) {
       case 'primary':
       case 'sage':
-        return {
-          bg: THEME.colors.sageBg,
-          text: THEME.colors.sageText,
-          border: THEME.colors.sageBorder,
-        };
       case 'success':
         return {
-          bg: '#ECFDF5',
-          text: '#047857',
-          border: '#A7F3D0',
+          bg: THEME.colors.creamDark,
+          text: THEME.colors.textPrimary,
+          border: THEME.colors.cardBorder,
         };
       case 'danger':
         return {
@@ -42,9 +37,9 @@ export const Badge: React.FC<BadgeProps> = ({
         };
       case 'darkGreen':
         return {
-          bg: 'rgba(255, 255, 255, 0.12)',
-          text: '#D1FAE5',
-          border: 'rgba(255, 255, 255, 0.2)',
+          bg: 'rgba(255, 255, 255, 0.16)',
+          text: '#FFFFFF',
+          border: 'rgba(255, 255, 255, 0.25)',
         };
       default:
         return {

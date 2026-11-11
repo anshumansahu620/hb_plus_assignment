@@ -1,14 +1,14 @@
 /**
  * Design Tokens matching the official HB+ Brand (https://hbplus.fit/):
- * Extracted from example.html (Framer site) & Figma Portal design.
+ * Extracted from example.html (Framer site).
  * Warm luxury wellness cream (#F5F2E9), Rich Onyx (#1A1A1A), 
- * Signature Terracotta (#9F4022), and Forest Green (#0F382C).
+ * Signature Terracotta (#9F4022), and Warm Sand (#EDEAE7 / #DAD3CE).
  */
 export const THEME = {
   colors: {
     // HB+ Official Core Brand Colors (from example.html)
     onyx: '#1A1A1A',              // Official dark charcoal / text
-    onyxDeep: '#101703',          // Deep olive-onyx
+    onyxDeep: '#111111',          // Pure deep charcoal
     cream: '#F5F2E9',             // Signature warm sand/cream canvas
     creamDark: '#EDEAE7',         // Warm card background
     terracotta: '#9F4022',        // Official HB+ signature accent
@@ -16,12 +16,12 @@ export const THEME = {
     tealAccent: '#619FA3',        // Soft coastal teal
     limeAccent: '#F0FF00',        // Electric energetic lime
 
-    // Figma Portal Colors
-    forestGreenDark: '#0A261E',
-    forestGreen: '#0F382C',
-    forestGreenCard: '#154436',
-    forestGreenLight: '#1E5343',
-    forestGreenHighlight: '#34D399',
+    // Palette Tokens (Replacing Green with Onyx & Warm Sand from example.html)
+    forestGreenDark: '#111111',
+    forestGreen: '#1A1A1A',
+    forestGreenCard: '#242424',
+    forestGreenLight: '#2C2C2C',
+    forestGreenHighlight: '#9F4022',
 
     // Core Brand Aliases
     primary: '#1A1A1A',
@@ -44,15 +44,15 @@ export const THEME = {
     textLight: '#F5F2E9',
     textLightMuted: '#D8D3C8',
 
-    // Sage & Status Badges
-    sageBg: '#E8EFE6',
-    sageBorder: '#CDDBD8',
-    sageText: '#154436',
+    // Neutral & Status Badges (Zero Green - Warm Sand & Onyx)
+    sageBg: '#EDEAE7',
+    sageBorder: '#DAD3CE',
+    sageText: '#1A1A1A',
 
-    success: '#047857',
-    successBg: '#ECFDF5',
-    successBorder: '#A7F3D0',
-    successText: '#065F46',
+    success: '#1A1A1A',
+    successBg: '#FAF8F5',
+    successBorder: '#DAD3CE',
+    successText: '#1A1A1A',
 
     error: '#DC2626',
     errorBg: '#FEF2F2',

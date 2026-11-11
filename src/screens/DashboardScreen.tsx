@@ -57,7 +57,7 @@ export const DashboardScreen: React.FC = () => {
                   <Ionicons
                     name="grid-outline"
                     size={17}
-                    color={activeTab === 'overview' ? THEME.colors.forestGreen : THEME.colors.textSecondary}
+                    color={activeTab === 'overview' ? THEME.colors.terracotta : THEME.colors.textSecondary}
                     style={styles.menuIcon}
                   />
                   <Text style={[styles.menuItemText, activeTab === 'overview' && styles.menuItemTextActive]}>
@@ -88,7 +88,7 @@ export const DashboardScreen: React.FC = () => {
                   <Ionicons
                     name="folder-outline"
                     size={17}
-                    color={activeTab === 'resources' ? THEME.colors.forestGreen : THEME.colors.textSecondary}
+                    color={activeTab === 'resources' ? THEME.colors.terracotta : THEME.colors.textSecondary}
                     style={styles.menuIcon}
                   />
                   <Text style={[styles.menuItemText, activeTab === 'resources' && styles.menuItemTextActive]}>
@@ -169,7 +169,7 @@ export const DashboardScreen: React.FC = () => {
 
                 <View style={styles.forestHeroRight}>
                   <View style={styles.lockBadgeCircle}>
-                    <Ionicons name="shield-checkmark-outline" size={18} color="#D1FAE5" />
+                    <Ionicons name="shield-checkmark-outline" size={18} color={THEME.colors.terracotta} />
                   </View>
                 </View>
               </View>
@@ -246,7 +246,7 @@ export const DashboardScreen: React.FC = () => {
                     style={styles.moduleCard}
                   >
                     <View style={styles.moduleIconWrapper}>
-                      <Ionicons name="people-outline" size={18} color={THEME.colors.forestGreen} />
+                      <Ionicons name="people-outline" size={18} color={THEME.colors.onyx} />
                     </View>
                     <Text style={styles.moduleTitle}>Team Directory</Text>
                     <Text style={styles.moduleDesc}>
@@ -353,19 +353,19 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: THEME.colors.forestGreenHighlight,
+    backgroundColor: THEME.colors.terracotta,
     marginRight: 8,
   },
   brandName: {
     fontSize: 20,
     fontWeight: '800',
-    color: THEME.colors.forestGreen,
+    color: THEME.colors.onyx,
     letterSpacing: -0.5,
   },
   brandNameDark: {
     fontSize: 20,
     fontWeight: '800',
-    color: THEME.colors.forestGreen,
+    color: THEME.colors.onyx,
   },
   menuList: {
     gap: 6,
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
     borderRadius: THEME.borderRadius.md,
   },
   menuItemActive: {
-    backgroundColor: THEME.colors.sageBg,
+    backgroundColor: THEME.colors.creamDark,
   },
   menuIcon: {
     marginRight: 10,
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuItemTextActive: {
-    color: THEME.colors.forestGreen,
+    color: THEME.colors.onyx,
     fontWeight: '700',
   },
   sidebarFooter: {
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: THEME.colors.forestGreen,
+    backgroundColor: THEME.colors.onyx,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -499,14 +499,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   badgeCheck: {
-    color: '#059669',
+    color: THEME.colors.terracotta,
     fontSize: 11,
     fontWeight: 'bold',
   },
 
-  // Forest Hero Banner (Figma Screen 2)
+  // Hero Banner (Official Onyx & Terracotta luxury styling)
   forestHeroBanner: {
-    backgroundColor: THEME.colors.forestGreen,
+    backgroundColor: THEME.colors.onyx,
     borderRadius: THEME.borderRadius.xl,
     padding: THEME.spacing.xl,
     flexDirection: 'row',
@@ -532,13 +532,13 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: THEME.colors.forestGreenHighlight,
+    backgroundColor: THEME.colors.terracotta,
     marginRight: 6,
   },
   heroPillText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#D1FAE5',
+    color: '#FAF8F5',
     letterSpacing: 0.5,
   },
   forestHeroTitle: {
@@ -696,7 +696,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 8,
-    backgroundColor: THEME.colors.sageBg,
+    backgroundColor: THEME.colors.creamDark,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,

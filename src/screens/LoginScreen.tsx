@@ -279,9 +279,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
 
-  // Hero Panel Styles (HB+ Onyx & Forest Styling)
+  // Hero Panel Styles (HB+ Rich Onyx & Terracotta Luxury Styling)
   heroPanel: {
-    backgroundColor: THEME.colors.forestGreen,
+    backgroundColor: THEME.colors.onyx,
     padding: THEME.spacing.xl,
     justifyContent: 'space-between',
   },
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   officialPillText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#D1FAE5',
+    color: THEME.colors.cream,
   },
   heroMiddle: {
     marginVertical: THEME.spacing.lg,
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
   heroTaglineKicker: {
     fontSize: 11,
     fontWeight: '800',
-    color: THEME.colors.forestGreenHighlight,
+    color: THEME.colors.terracotta,
     letterSpacing: 1.5,
     marginBottom: 8,
   },
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     maxWidth: 340,
   },
   domainHighlightCard: {
-    backgroundColor: THEME.colors.forestGreenCard,
+    backgroundColor: '#262626',
     borderRadius: THEME.borderRadius.lg,
     padding: THEME.spacing.md,
     borderWidth: 1,
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   domainCardBadge: {
-    backgroundColor: '#064E3B',
+    backgroundColor: 'rgba(159, 64, 34, 0.3)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: THEME.borderRadius.full,
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
   domainCardBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#6EE7B7',
+    color: '#FAF8F5',
   },
   domainCardDesc: {
     fontSize: 12,
@@ -550,12 +550,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   testBtnSuccess: {
-    borderColor: '#A7F3D0',
-    backgroundColor: '#ECFDF5',
+    borderColor: THEME.colors.cardBorder,
+    backgroundColor: '#FAF8F5',
     paddingVertical: 9,
   },
   testBtnTextSuccess: {
-    color: '#065F46',
+    color: THEME.colors.textPrimary,
     fontSize: 12,
     fontWeight: '600',
   },
