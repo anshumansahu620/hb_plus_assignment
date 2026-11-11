@@ -28,7 +28,7 @@ export const DashboardScreen: React.FC = () => {
   return (
     <View style={styles.rootWrapper}>
       <View style={[styles.dashboardLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
-        
+
         {/* PERMANENT UNCOLLAPSIBLE DESKTOP SIDEBAR (Figma Prototype Standard) */}
         {isDesktop && (
           <View style={styles.sidebar}>
@@ -133,7 +133,7 @@ export const DashboardScreen: React.FC = () => {
 
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.innerContainer}>
-              
+
               {/* Header Greeting */}
               <View style={styles.greetingHeader}>
                 <View>
@@ -143,31 +143,20 @@ export const DashboardScreen: React.FC = () => {
                   </Text>
                 </View>
 
-                {isDesktop && (
-                  <Badge
-                    label={`@${APP_CONFIG.allowedDomain} Verified`}
-                    variant="success"
-                    icon={<Text style={styles.badgeCheck}>✓</Text>}
-                  />
-                )}
+
               </View>
 
               {/* FOREST GREEN HERO BANNER (Matches Figma Screen 2 & 4) */}
               <View style={styles.forestHeroBanner}>
                 <View style={styles.forestHeroLeft}>
-                  <View style={styles.heroPill}>
-                    <View style={styles.heroPillDot} />
-                    <Text style={styles.heroPillText}>DOMAIN VERIFIED</Text>
-                  </View>
+
                   <Text style={styles.forestHeroTitle}>One team. Connected securely.</Text>
-                  <Text style={styles.forestHeroSubtitle}>
-                    Your session is authenticated and protected under @{APP_CONFIG.allowedDomain}.
-                  </Text>
+
                 </View>
 
                 <View style={styles.forestHeroRight}>
                   <View style={styles.lockBadgeCircle}>
-                    <Ionicons name="shield-checkmark-outline" size={24} color="#D1FAE5" />
+                    <Ionicons name="shield-checkmark-outline" size={18} color="#D1FAE5" />
                   </View>
                 </View>
               </View>

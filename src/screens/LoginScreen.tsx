@@ -26,7 +26,7 @@ export const LoginScreen: React.FC = () => {
       keyboardShouldPersistTaps="handled"
     >
       <View style={[styles.mainLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
-        
+
         {/* LEFT / TOP HERO PANEL (Forest Green from Figma) */}
         <View style={[styles.heroPanel, isDesktop ? styles.heroPanelDesktop : styles.heroPanelMobile]}>
           <View style={styles.heroTop}>
@@ -34,9 +34,7 @@ export const LoginScreen: React.FC = () => {
               <View style={styles.brandDot} />
               <Text style={styles.brandName}>hbplus</Text>
             </View>
-            <View style={styles.workspacePill}>
-              <Text style={styles.workspacePillText}>Workspace Security</Text>
-            </View>
+
           </View>
 
           <View style={styles.heroMiddle}>
@@ -46,18 +44,7 @@ export const LoginScreen: React.FC = () => {
             </Text>
           </View>
 
-          {/* Bottom Card inside Hero from Figma */}
-          <View style={styles.heroCard}>
-            <View style={styles.heroCardTop}>
-              <Text style={styles.heroCardDomain}>{ALLOWED_DOMAIN}</Text>
-              <View style={styles.verifiedTag}>
-                <Text style={styles.verifiedTagText}>✓ Official workspace</Text>
-              </View>
-            </View>
-            <Text style={styles.heroCardNotice}>
-              Restricted exclusively to authorized organizational members.
-            </Text>
-          </View>
+
 
           <View style={styles.heroFooter}>
             <Text style={styles.heroFooterText}>Built for teams that move fast.</Text>
@@ -107,17 +94,7 @@ export const LoginScreen: React.FC = () => {
             </View>
 
             {/* Exclusive to @hbplus.fit Notice Card from Figma */}
-            <View style={styles.domainNoticeCard}>
-              <View style={styles.domainNoticeHeader}>
-                <View style={styles.greenDot} />
-                <Text style={styles.domainNoticeTitle}>
-                  Exclusive to @{ALLOWED_DOMAIN}
-                </Text>
-              </View>
-              <Text style={styles.domainNoticeBody}>
-                Please sign in with your official @{ALLOWED_DOMAIN} email address. External accounts will be automatically blocked.
-              </Text>
-            </View>
+
 
             {/* Evaluator & Recruiter Sandbox Suite */}
             <View style={styles.evaluatorSection}>
@@ -199,7 +176,7 @@ const styles = StyleSheet.create({
     maxWidth: 480,
     flexDirection: 'column',
   },
-  
+
   // Hero Panel Styles (Figma Forest Green)
   heroPanel: {
     backgroundColor: THEME.colors.forestGreen,
