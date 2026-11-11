@@ -27,6 +27,7 @@ export const LoginScreen: React.FC = () => {
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [authMethod, setAuthMethod] = useState<'google' | 'email'>('google');
 
   const handleEmailSubmit = async () => {
     if (!emailInput.trim()) {
@@ -112,82 +113,166 @@ export const LoginScreen: React.FC = () => {
               </View>
             )}
 
-            {/* Google OAuth Action Button with assets/google-logo.svg */}
-            <View style={styles.buttonWrapper}>
-              <GoogleSignInButton
-                onPress={signInWithGoogle}
-                isLoading={isLoading}
-                label="Continue with Google"
-              />
+            {/* AUTH METHOD SEGMENTED SWITCHER */}
+            <View style={styles.authSwitcherContainer}>
+              <Pressable
+                onPress={() => {
+                  setAuthMethod('google');
+                  if (error) clearError();
+                }}
+                style={[
+                  styles.authSwitchTab,
+                  authMethod === 'google' && styles.authSwitchTabActive,
+                ]}
+                accessibilityLabel="Switch to Google SSO"
+              >
+                <Ionicons
+                  name="logo-google"
+                  size={14}
+                  color={authMethod === 'google' ? THEME.colors.terracotta : THEME.colors.textMuted}
+                  style={{ marginRight: 6 }}
+                />
+                <Text
+                  style={[
+                    styles.authSwitchText,
+                    authMethod === 'google' && styles.authSwitchTextActive,
+                  ]}
+                >
+                  Google SSO
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={() => {
+                  setAuthMethod('email');
+                  if (error) clearError();
+                }}
+                style={[
+                  styles.authSwitchTab,
+                  authMethod === 'email' && styles.authSwitchTabActive,
+                ]}
+                accessibilityLabel="Switch to Work Email"
+              >
+                <Ionicons
+                  name="mail-outline"
+                  size={15}
+                  color={authMethod === 'email' ? THEME.colors.terracotta : THEME.colors.textMuted}
+                  style={{ marginRight: 6 }}
+                />
+                <Text
+                  style={[
+                    styles.authSwitchText,
+                    authMethod === 'email' && styles.authSwitchTextActive,
+                  ]}
+                >
+                  Work Email
+                </Text>
+              </Pressable>
             </View>
 
-            {/* Divider: OR CONTINUE WITH EMAIL */}
-            <View style={styles.orDividerRow}>
-              <View style={styles.orLine} />
-              <Text style={styles.orText}>OR CONTINUE WITH EMAIL</Text>
-              <View style={styles.orLine} />
-            </View>
-
-            {/* EMAIL AUTHENTICATION FORM */}
-            <View style={styles.emailFormContainer}>
-              {/* Work Email Input */}
-              <View style={styles.inputFieldGroup}>
-                <Text style={styles.inputLabel}>Work Email</Text>
-                <View style={styles.inputWrapper}>
-                  <Ionicons name="mail-outline" size={17} color={THEME.colors.textMuted} style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder={`e.g. name@${ALLOWED_DOMAIN}`}
-                    placeholderTextColor={THEME.colors.textMuted}
-                    value={emailInput}
-                    onChangeText={(txt) => {
-                      setEmailInput(txt);
-                      if (error) clearError();
-                    }}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    keyboardType="email-address"
+            {authMethod === 'google' ? (
+              <View style={styles.authMethodContent}>
+                {/* Google OAuth Action Button with assets/google-logo.svg */}
+                <View style={styles.buttonWrapper}>
+                  <GoogleSignInButton
+                    onPress={signInWithGoogle}
+                    isLoading={isLoading}
+                    label="Continue with Google"
                   />
                 </View>
-              </View>
 
-              {/* Password Input */}
-              <View style={styles.inputFieldGroup}>
-                <Text style={styles.inputLabel}>Password</Text>
-                <View style={styles.inputWrapper}>
-                  <Ionicons name="lock-closed-outline" size={17} color={THEME.colors.textMuted} style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder="Enter password"
-                    placeholderTextColor={THEME.colors.textMuted}
-                    value={passwordInput}
-                    onChangeText={setPasswordInput}
-                    secureTextEntry={!showPassword}
-                    autoCapitalize="none"
+                <Text style={styles.authMethodHint}>
+                  Instant 1-click single sign-on with your official @{ALLOWED_DOMAIN} Google Workspace account.
+                </Text>
+
+                <Pressable
+                  onPress={() => {
+                    setAuthMethod('email');
+                    if (error) clearError();
+                  }}
+                  style={styles.switchMethodLink}
+                >
+                  <Text style={styles.switchMethodLinkText}>
+                    Prefer password login? <Text style={styles.switchMethodLinkBold}>Switch to Work Email</Text>
+                  </Text>
+                </Pressable>
+              </View>
+            ) : (
+              <View style={styles.authMethodContent}>
+                {/* EMAIL AUTHENTICATION FORM */}
+                <View style={styles.emailFormContainer}>
+                  {/* Work Email Input */}
+                  <View style={styles.inputFieldGroup}>
+                    <Text style={styles.inputLabel}>Work Email</Text>
+                    <View style={styles.inputWrapper}>
+                      <Ionicons name="mail-outline" size={17} color={THEME.colors.textMuted} style={styles.inputIcon} />
+                      <TextInput
+                        style={styles.textInput}
+                        placeholder={`e.g. name@${ALLOWED_DOMAIN}`}
+                        placeholderTextColor={THEME.colors.textMuted}
+                        value={emailInput}
+                        onChangeText={(txt) => {
+                          setEmailInput(txt);
+                          if (error) clearError();
+                        }}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        keyboardType="email-address"
+                      />
+                    </View>
+                  </View>
+
+                  {/* Password Input */}
+                  <View style={styles.inputFieldGroup}>
+                    <Text style={styles.inputLabel}>Password</Text>
+                    <View style={styles.inputWrapper}>
+                      <Ionicons name="lock-closed-outline" size={17} color={THEME.colors.textMuted} style={styles.inputIcon} />
+                      <TextInput
+                        style={styles.textInput}
+                        placeholder="Enter password"
+                        placeholderTextColor={THEME.colors.textMuted}
+                        value={passwordInput}
+                        onChangeText={setPasswordInput}
+                        secureTextEntry={!showPassword}
+                        autoCapitalize="none"
+                      />
+                      <Pressable
+                        onPress={() => setShowPassword(!showPassword)}
+                        style={styles.eyeBtn}
+                        accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+                      >
+                        <Ionicons
+                          name={showPassword ? "eye-off-outline" : "eye-outline"}
+                          size={18}
+                          color={THEME.colors.textMuted}
+                        />
+                      </Pressable>
+                    </View>
+                  </View>
+
+                  {/* Email Sign In Button (Styled in HB+ Terracotta #9F4022) */}
+                  <Button
+                    label="Sign In with Work Email"
+                    onPress={handleEmailSubmit}
+                    isLoading={isLoading}
+                    style={styles.emailSubmitButton}
+                    textStyle={styles.emailSubmitButtonText}
                   />
-                  <Pressable
-                    onPress={() => setShowPassword(!showPassword)}
-                    style={styles.eyeBtn}
-                    accessibilityLabel={showPassword ? "Hide password" : "Show password"}
-                  >
-                    <Ionicons
-                      name={showPassword ? "eye-off-outline" : "eye-outline"}
-                      size={18}
-                      color={THEME.colors.textMuted}
-                    />
-                  </Pressable>
                 </View>
-              </View>
 
-              {/* Email Sign In Button (Styled in HB+ Terracotta #9F4022) */}
-              <Button
-                label="Sign In with Work Email"
-                onPress={handleEmailSubmit}
-                isLoading={isLoading}
-                style={styles.emailSubmitButton}
-                textStyle={styles.emailSubmitButtonText}
-              />
-            </View>
+                <Pressable
+                  onPress={() => {
+                    setAuthMethod('google');
+                    if (error) clearError();
+                  }}
+                  style={styles.switchMethodLink}
+                >
+                  <Text style={styles.switchMethodLinkText}>
+                    Prefer Google single sign-on? <Text style={styles.switchMethodLinkBold}>Switch to Google SSO</Text>
+                  </Text>
+                </Pressable>
+              </View>
+            )}
 
             {/* Evaluator & Recruiter Sandbox Suite */}
 
@@ -463,6 +548,67 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     marginBottom: THEME.spacing.md,
+  },
+  // Auth Switcher
+  authSwitcherContainer: {
+    flexDirection: 'row',
+    backgroundColor: THEME.colors.creamDark,
+    borderRadius: THEME.borderRadius.md,
+    padding: 3,
+    marginBottom: THEME.spacing.lg,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+  },
+  authSwitchTab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 9,
+    borderRadius: THEME.borderRadius.sm,
+  },
+  authSwitchTabActive: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    ...THEME.shadows.sm,
+  },
+  authSwitchText: {
+    fontFamily: THEME.typography.fontFamily.sans,
+    fontSize: 13,
+    fontWeight: '600',
+    color: THEME.colors.textSecondary,
+  },
+  authSwitchTextActive: {
+    color: THEME.colors.terracotta,
+    fontWeight: '700',
+  },
+  authMethodContent: {
+    width: '100%',
+  },
+  authMethodHint: {
+    fontFamily: THEME.typography.fontFamily.sans,
+    fontSize: 12,
+    color: THEME.colors.textSecondary,
+    textAlign: 'center',
+    marginTop: 12,
+    lineHeight: 18,
+  },
+  switchMethodLink: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    marginTop: 6,
+  },
+  switchMethodLinkText: {
+    fontFamily: THEME.typography.fontFamily.sans,
+    fontSize: 12,
+    color: THEME.colors.textSecondary,
+  },
+  switchMethodLinkBold: {
+    color: THEME.colors.terracotta,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
   },
   buttonWrapper: {
     width: '100%',
