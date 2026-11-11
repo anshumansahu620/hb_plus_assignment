@@ -148,7 +148,7 @@ export const AdminScreen: React.FC = () => {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.innerContainer}>
-          
+
           <View style={styles.pageTitleBlock}>
             <Text style={styles.pageTitle}>User Directory & Domain Auditing</Text>
             <Text style={styles.pageSubtitle}>
@@ -165,7 +165,7 @@ export const AdminScreen: React.FC = () => {
                   Authorize any @{APP_CONFIG.allowedDomain} team member with administrator privileges.
                 </Text>
               </View>
-              <Badge label="RBAC Manager" variant="admin" />
+
             </View>
 
             {grantMessage && (
@@ -283,8 +283,8 @@ export const AdminScreen: React.FC = () => {
                           {isUpdating === item.id
                             ? 'Updating...'
                             : item.role === 'admin'
-                            ? 'Revoke Admin'
-                            : 'Grant Admin Access'}
+                              ? 'Revoke Admin'
+                              : 'Grant Admin Access'}
                         </Text>
                       </Pressable>
                     )}

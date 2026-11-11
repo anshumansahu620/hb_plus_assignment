@@ -12,6 +12,8 @@ import { THEME } from '../constants/theme';
 import { Badge } from './Badge';
 import { APP_CONFIG } from '../constants/config';
 
+const hbplusLogo = require('../../assets/hbplus-logo.png');
+
 export const Navbar: React.FC = () => {
   const { user, signOut, activeRoute, navigateTo } = useAuth();
   const { width } = useWindowDimensions();
@@ -25,9 +27,11 @@ export const Navbar: React.FC = () => {
           onPress={() => navigateTo('dashboard')}
           style={styles.brandContainer}
         >
-          <View style={styles.logoBadge}>
-            <Text style={styles.logoText}>HB+</Text>
-          </View>
+          <Image
+            source={hbplusLogo}
+            style={styles.navbarLogo}
+            resizeMode="contain"
+          />
           {!isMobile && (
             <View style={styles.brandTitleContainer}>
               <Text style={styles.brandTitle}>{APP_CONFIG.name}</Text>
@@ -170,20 +174,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: THEME.spacing.lg,
   },
-  logoBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: THEME.borderRadius.md,
-    backgroundColor: THEME.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+  navbarLogo: {
+    width: 36,
+    height: 36,
     marginRight: THEME.spacing.sm,
-  },
-  logoText: {
-    color: '#FFFFFF',
-    fontWeight: '900',
-    fontSize: 16,
-    letterSpacing: 0.5,
   },
   brandTitleContainer: {
     justifyContent: 'center',

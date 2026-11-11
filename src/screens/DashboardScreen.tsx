@@ -278,373 +278,373 @@ export const DashboardScreen: React.FC = () => {
 
                   </View>
 
-              {/* HB+ LUXURY HERO CARD (From example.html) */}
-              <View style={styles.forestHeroBanner}>
-                <View style={styles.forestHeroLeft}>
+                  {/* HB+ LUXURY HERO CARD (From example.html) */}
+                  <View style={styles.forestHeroBanner}>
+                    <View style={styles.forestHeroLeft}>
 
-                  <Text style={styles.forestHeroTitle}>Wellness That Understands Your Lifestyle.</Text>
-                  <Text style={styles.forestHeroSubtitle}>
-                    Real health goes beyond fitness. It lives at the intersection of body, mind, and gut.
-                  </Text>
-                </View>
-
-
-              </View>
-
-              {/* Admin Announcement Callout (If user is Admin) */}
-              {user?.role === 'admin' ? (
-                <Pressable
-                  onPress={() => navigateTo('admin')}
-                  style={({ pressed }) => [styles.adminNotice, pressed && { opacity: 0.85 }]}
-                >
-                  <View style={styles.adminNoticeContent}>
-                    <View style={styles.adminIconBox}>
-                      <Ionicons name="shield-outline" size={20} color="#6D28D9" />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.adminNoticeTitle}>Administrator Controls Active</Text>
-                      <Text style={styles.adminNoticeBody}>
-                        You have permission to manage team accounts, grant/revoke admin permissions, and review security audit logs.
+                      <Text style={styles.forestHeroTitle}>Wellness That Understands Your Lifestyle.</Text>
+                      <Text style={styles.forestHeroSubtitle}>
+                        Real health goes beyond fitness. It lives at the intersection of body, mind, and gut.
                       </Text>
                     </View>
-                  </View>
-                  <View style={styles.adminNoticeBtn}>
-                    <Text style={styles.adminNoticeBtnText}>Open Panel →</Text>
-                  </View>
-                </Pressable>
-              ) : (
-                /* Elevation Callout (If user is not yet Admin) */
-                <View style={styles.elevateNotice}>
-                  <View style={styles.elevateNoticeContent}>
-                    <View style={styles.elevateIconBox}>
-                      <Ionicons name="shield-checkmark-outline" size={22} color={THEME.colors.terracotta} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.elevateNoticeTitle}>Elevate to Administrator</Text>
-                      <Text style={styles.elevateNoticeBody}>
-                        Claim administrator privileges to grant admin access to colleagues, manage team roles, and inspect security audit logs.
-                      </Text>
-                    </View>
-                  </View>
-                  <Pressable
-                    onPress={elevateToAdmin}
-                    style={({ pressed }) => [styles.elevateBtn, pressed && { opacity: 0.85 }]}
-                  >
-                    <Text style={styles.elevateBtnText}>👑 Grant Myself Admin Access</Text>
-                  </Pressable>
-                </View>
-              )}
 
-              {/* CARD: QUICK GRANT ADMIN ACCESS (Directly on Dashboard if Admin) */}
-              {user?.role === 'admin' && (
-                <View style={styles.cardContainer}>
-                  <View style={styles.cardHeaderRow}>
-                    <View>
-                      <Text style={styles.cardTitle}>Grant Admin Access & Permissions</Text>
-                      <Text style={styles.cardSubtitle}>
-                        Assign administrator permissions to any verified @{APP_CONFIG.allowedDomain} team member.
-                      </Text>
-                    </View>
-                    <Badge label="ADMIN PRIVILEGES" variant="admin" />
+
                   </View>
 
-                  {quickAdminMsg && (
-                    <View style={[styles.pwdAlertBox, quickAdminMsg.type === 'success' ? styles.quickAdminAlertSuccess : styles.pwdAlertError]}>
-                      <Ionicons
-                        name={quickAdminMsg.type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'}
-                        size={16}
-                        color={quickAdminMsg.type === 'success' ? '#6D28D9' : THEME.colors.error}
-                        style={{ marginRight: 6 }}
-                      />
-                      <Text style={[styles.pwdAlertText, quickAdminMsg.type === 'success' ? styles.quickAdminAlertTextSuccess : styles.pwdAlertTextError]}>
-                        {quickAdminMsg.text}
-                      </Text>
+                  {/* Admin Announcement Callout (If user is Admin) */}
+                  {user?.role === 'admin' ? (
+                    <Pressable
+                      onPress={() => navigateTo('admin')}
+                      style={({ pressed }) => [styles.adminNotice, pressed && { opacity: 0.85 }]}
+                    >
+                      <View style={styles.adminNoticeContent}>
+                        <View style={styles.adminIconBox}>
+                          <Ionicons name="shield-outline" size={20} color="#d8931cff" />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.adminNoticeTitle}>Administrator Controls Active</Text>
+                          <Text style={styles.adminNoticeBody}>
+                            You have permission to manage team accounts, grant/revoke admin permissions, and review security audit logs.
+                          </Text>
+                        </View>
+                      </View>
+                      <View style={styles.adminNoticeBtn}>
+                        <Text style={styles.adminNoticeBtnText}>Open Panel →</Text>
+                      </View>
+                    </Pressable>
+                  ) : (
+                    /* Elevation Callout (If user is not yet Admin) */
+                    <View style={styles.elevateNotice}>
+                      <View style={styles.elevateNoticeContent}>
+                        <View style={styles.elevateIconBox}>
+                          <Ionicons name="shield-checkmark-outline" size={22} color={THEME.colors.terracotta} />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.elevateNoticeTitle}>Elevate to Administrator</Text>
+                          <Text style={styles.elevateNoticeBody}>
+                            Claim administrator privileges to grant admin access to colleagues, manage team roles, and inspect security audit logs.
+                          </Text>
+                        </View>
+                      </View>
+                      <Pressable
+                        onPress={elevateToAdmin}
+                        style={({ pressed }) => [styles.elevateBtn, pressed && { opacity: 0.85 }]}
+                      >
+                        <Text style={styles.elevateBtnText}>👑 Grant Myself Admin Access</Text>
+                      </Pressable>
                     </View>
                   )}
 
-                  <View style={[styles.grantAdminRow, !isDesktop && styles.grantAdminRowMobile]}>
-                    <View style={styles.grantAdminInputWrapper}>
-                      <Ionicons name="mail-outline" size={16} color={THEME.colors.textMuted} style={styles.pwdInputIcon} />
-                      <TextInput
-                        style={styles.pwdTextInput}
-                        placeholder={`colleague@${APP_CONFIG.allowedDomain}`}
-                        placeholderTextColor={THEME.colors.textMuted}
-                        value={quickAdminEmail}
-                        onChangeText={setQuickAdminEmail}
-                        autoCapitalize="none"
-                        keyboardType="email-address"
-                      />
-                    </View>
-                    <Pressable
-                      onPress={handleQuickGrantAdmin}
-                      disabled={isQuickGranting}
-                      style={({ pressed }) => [
-                        styles.quickGrantBtn,
-                        pressed && { opacity: 0.8 },
-                        isQuickGranting && { opacity: 0.6 },
-                      ]}
-                    >
-                      <Ionicons name="shield-checkmark" size={15} color="#FFFFFF" style={{ marginRight: 6 }} />
-                      <Text style={styles.quickGrantBtnText}>
-                        {isQuickGranting ? 'Granting...' : 'Grant Admin Access'}
-                      </Text>
-                    </Pressable>
-                  </View>
-                </View>
-              )}
+                  {/* CARD: QUICK GRANT ADMIN ACCESS (Directly on Dashboard if Admin) */}
+                  {user?.role === 'admin' && (
+                    <View style={styles.cardContainer}>
+                      <View style={styles.cardHeaderRow}>
+                        <View>
+                          <Text style={styles.cardTitle}>Grant Admin Access & Permissions</Text>
+                          <Text style={styles.cardSubtitle}>
+                            Assign administrator permissions to any verified @{APP_CONFIG.allowedDomain} team member.
+                          </Text>
+                        </View>
+                        <Badge label="ADMIN PRIVILEGES" variant="admin" />
+                      </View>
 
-              {/* CARD: YOUR ACCOUNT (From Figma Screen 2 & 4) */}
-              <View style={styles.cardContainer}>
-                <View style={styles.cardHeaderRow}>
-                  <Text style={styles.cardTitle}>Your account</Text>
-                  <Badge label="ACTIVE" variant="sage" />
-                </View>
-
-                <View style={styles.accountTable}>
-                  <View style={styles.tableRow}>
-                    <Text style={styles.tableLabel}>Email address</Text>
-                    <Text style={styles.tableValueBold}>{user?.email}</Text>
-                  </View>
-
-                  <View style={styles.tableRow}>
-                    <Text style={styles.tableLabel}>Domain status</Text>
-                    <View style={styles.domainValueRow}>
-                      <Text style={styles.tableValue}>{user?.domain}</Text>
-                      <Badge label="Allowed Domain" variant="success" />
-                    </View>
-                  </View>
-
-                  <View style={styles.tableRow}>
-                    <Text style={styles.tableLabel}>Assigned role</Text>
-                    <Badge
-                      label={user?.role === 'admin' ? 'Administrator' : 'Team Member'}
-                      variant={user?.role === 'admin' ? 'admin' : 'sage'}
-                    />
-                  </View>
-
-                  <View style={styles.tableRow}>
-                    <Text style={styles.tableLabel}>Admin privileges</Text>
-                    <View style={styles.domainValueRow}>
-                      <Text style={styles.tableValue}>
-                        {user?.role === 'admin' ? 'Full Access (Can Grant & Revoke Roles)' : 'Standard Access'}
-                      </Text>
-                      {user?.role !== 'admin' && (
-                        <Pressable onPress={elevateToAdmin} style={styles.claimAdminPill}>
-                          <Text style={styles.claimAdminPillText}>Claim Admin</Text>
-                        </Pressable>
+                      {quickAdminMsg && (
+                        <View style={[styles.pwdAlertBox, quickAdminMsg.type === 'success' ? styles.quickAdminAlertSuccess : styles.pwdAlertError]}>
+                          <Ionicons
+                            name={quickAdminMsg.type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'}
+                            size={16}
+                            color={quickAdminMsg.type === 'success' ? '#6D28D9' : THEME.colors.error}
+                            style={{ marginRight: 6 }}
+                          />
+                          <Text style={[styles.pwdAlertText, quickAdminMsg.type === 'success' ? styles.quickAdminAlertTextSuccess : styles.pwdAlertTextError]}>
+                            {quickAdminMsg.text}
+                          </Text>
+                        </View>
                       )}
+
+                      <View style={[styles.grantAdminRow, !isDesktop && styles.grantAdminRowMobile]}>
+                        <View style={styles.grantAdminInputWrapper}>
+                          <Ionicons name="mail-outline" size={16} color={THEME.colors.textMuted} style={styles.pwdInputIcon} />
+                          <TextInput
+                            style={styles.pwdTextInput}
+                            placeholder={`colleague@${APP_CONFIG.allowedDomain}`}
+                            placeholderTextColor={THEME.colors.textMuted}
+                            value={quickAdminEmail}
+                            onChangeText={setQuickAdminEmail}
+                            autoCapitalize="none"
+                            keyboardType="email-address"
+                          />
+                        </View>
+                        <Pressable
+                          onPress={handleQuickGrantAdmin}
+                          disabled={isQuickGranting}
+                          style={({ pressed }) => [
+                            styles.quickGrantBtn,
+                            pressed && { opacity: 0.8 },
+                            isQuickGranting && { opacity: 0.6 },
+                          ]}
+                        >
+                          <Ionicons name="shield-checkmark" size={15} color="#FFFFFF" style={{ marginRight: 6 }} />
+                          <Text style={styles.quickGrantBtnText}>
+                            {isQuickGranting ? 'Granting...' : 'Grant Admin Access'}
+                          </Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  )}
+
+                  {/* CARD: YOUR ACCOUNT (From Figma Screen 2 & 4) */}
+                  <View style={styles.cardContainer}>
+                    <View style={styles.cardHeaderRow}>
+                      <Text style={styles.cardTitle}>Your account</Text>
+                      <Badge label="ACTIVE" variant="sage" />
+                    </View>
+
+                    <View style={styles.accountTable}>
+                      <View style={styles.tableRow}>
+                        <Text style={styles.tableLabel}>Email address</Text>
+                        <Text style={styles.tableValueBold}>{user?.email}</Text>
+                      </View>
+
+                      <View style={styles.tableRow}>
+                        <Text style={styles.tableLabel}>Domain status</Text>
+                        <View style={styles.domainValueRow}>
+                          <Text style={styles.tableValue}>{user?.domain}</Text>
+                          <Badge label="Allowed Domain" variant="success" />
+                        </View>
+                      </View>
+
+                      <View style={styles.tableRow}>
+                        <Text style={styles.tableLabel}>Assigned role</Text>
+                        <Badge
+                          label={user?.role === 'admin' ? 'Administrator' : 'Team Member'}
+                          variant={user?.role === 'admin' ? 'admin' : 'sage'}
+                        />
+                      </View>
+
+                      <View style={styles.tableRow}>
+                        <Text style={styles.tableLabel}>Admin privileges</Text>
+                        <View style={styles.domainValueRow}>
+                          <Text style={styles.tableValue}>
+                            {user?.role === 'admin' ? 'Full Access (Can Grant & Revoke Roles)' : 'Standard Access'}
+                          </Text>
+                          {user?.role !== 'admin' && (
+                            <Pressable onPress={elevateToAdmin} style={styles.claimAdminPill}>
+                              <Text style={styles.claimAdminPillText}>Claim Admin</Text>
+                            </Pressable>
+                          )}
+                        </View>
+                      </View>
+
+                      <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
+                        <Text style={styles.tableLabel}>Last sign-in</Text>
+                        <Text style={styles.tableValue}>
+                          {user?.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : 'Just now'}
+                        </Text>
+                      </View>
                     </View>
                   </View>
 
-                  <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
-                    <Text style={styles.tableLabel}>Last sign-in</Text>
-                    <Text style={styles.tableValue}>
-                      {user?.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : 'Just now'}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-
-              {/* CARD: SET WORKSPACE PASSWORD (Direct Email Login after Google OAuth) */}
-              <View style={styles.cardContainer}>
-                <View style={styles.cardHeaderRow}>
-                  <View>
-                    <Text style={styles.cardTitle}>Set Workspace Password</Text>
-                    <Text style={styles.cardSubtitle}>
-                      Enable direct email sign-in using your @{APP_CONFIG.allowedDomain} account.
-                    </Text>
-                  </View>
-                  <Badge
-                    label={user?.hasCustomPassword ? 'PASSWORD ACTIVE' : 'GOOGLE SSO ONLY'}
-                    variant={user?.hasCustomPassword ? 'sage' : 'neutral'}
-                  />
-                </View>
-
-                {pwdMessage && (
-                  <View style={[styles.pwdAlertBox, pwdMessage.type === 'success' ? styles.pwdAlertSuccess : styles.pwdAlertError]}>
-                    <Ionicons
-                      name={pwdMessage.type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'}
-                      size={16}
-                      color={pwdMessage.type === 'success' ? THEME.colors.textPrimary : THEME.colors.error}
-                      style={{ marginRight: 6 }}
-                    />
-                    <Text style={[styles.pwdAlertText, pwdMessage.type === 'success' ? styles.pwdAlertTextSuccess : styles.pwdAlertTextError]}>
-                      {pwdMessage.text}
-                    </Text>
-                  </View>
-                )}
-
-                <View style={[styles.pwdFormGrid, !isDesktop && styles.pwdFormGridMobile]}>
-                  <View style={styles.pwdFieldCol}>
-                    <Text style={styles.pwdInputLabel}>New Password</Text>
-                    <View style={styles.pwdInputWrapper}>
-                      <Ionicons name="key-outline" size={16} color={THEME.colors.textMuted} style={styles.pwdInputIcon} />
-                      <TextInput
-                        style={styles.pwdTextInput}
-                        secureTextEntry={!showPwd}
-                        placeholder="At least 6 characters"
-                        placeholderTextColor={THEME.colors.textMuted}
-                        value={newPassword}
-                        onChangeText={setNewPassword}
+                  {/* CARD: SET WORKSPACE PASSWORD (Direct Email Login after Google OAuth) */}
+                  <View style={styles.cardContainer}>
+                    <View style={styles.cardHeaderRow}>
+                      <View>
+                        <Text style={styles.cardTitle}>Set Workspace Password</Text>
+                        <Text style={styles.cardSubtitle}>
+                          Enable direct email sign-in using your @{APP_CONFIG.allowedDomain} account.
+                        </Text>
+                      </View>
+                      <Badge
+                        label={user?.hasCustomPassword ? 'PASSWORD ACTIVE' : 'GOOGLE SSO ONLY'}
+                        variant={user?.hasCustomPassword ? 'sage' : 'neutral'}
                       />
                     </View>
-                  </View>
 
-                  <View style={styles.pwdFieldCol}>
-                    <Text style={styles.pwdInputLabel}>Confirm Password</Text>
-                    <View style={styles.pwdInputWrapper}>
-                      <Ionicons name="lock-closed-outline" size={16} color={THEME.colors.textMuted} style={styles.pwdInputIcon} />
-                      <TextInput
-                        style={styles.pwdTextInput}
-                        secureTextEntry={!showPwd}
-                        placeholder="Re-enter password"
-                        placeholderTextColor={THEME.colors.textMuted}
-                        value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                      />
-                    </View>
-                  </View>
-                </View>
-
-                <View style={styles.pwdActionRow}>
-                  <Pressable
-                    onPress={() => setShowPwd(!showPwd)}
-                    style={styles.showPwdToggle}
-                  >
-                    <Ionicons name={showPwd ? 'eye-off-outline' : 'eye-outline'} size={15} color={THEME.colors.textSecondary} style={{ marginRight: 6 }} />
-                    <Text style={styles.showPwdText}>{showPwd ? 'Hide' : 'Show'} Password</Text>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={handleSavePassword}
-                    disabled={pwdLoading}
-                    style={({ pressed }) => [
-                      styles.savePwdBtn,
-                      pressed && { opacity: 0.85 },
-                      pwdLoading && { opacity: 0.6 },
-                    ]}
-                  >
-                    {pwdLoading ? (
-                      <ActivityIndicator size="small" color="#FFFFFF" />
-                    ) : (
-                      <Text style={styles.savePwdBtnText}>
-                        {user?.hasCustomPassword ? 'Update Password' : 'Save Workspace Password'}
-                      </Text>
+                    {pwdMessage && (
+                      <View style={[styles.pwdAlertBox, pwdMessage.type === 'success' ? styles.pwdAlertSuccess : styles.pwdAlertError]}>
+                        <Ionicons
+                          name={pwdMessage.type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'}
+                          size={16}
+                          color={pwdMessage.type === 'success' ? THEME.colors.textPrimary : THEME.colors.error}
+                          style={{ marginRight: 6 }}
+                        />
+                        <Text style={[styles.pwdAlertText, pwdMessage.type === 'success' ? styles.pwdAlertTextSuccess : styles.pwdAlertTextError]}>
+                          {pwdMessage.text}
+                        </Text>
+                      </View>
                     )}
-                  </Pressable>
-                </View>
-              </View>
 
-              {/* BOTTOM GRID: WORKPLACE MODULES (From Figma Screen 2) */}
-              <View style={styles.modulesSection}>
-                <Text style={styles.sectionHeader}>Workspace quick access</Text>
+                    <View style={[styles.pwdFormGrid, !isDesktop && styles.pwdFormGridMobile]}>
+                      <View style={styles.pwdFieldCol}>
+                        <Text style={styles.pwdInputLabel}>New Password</Text>
+                        <View style={styles.pwdInputWrapper}>
+                          <Ionicons name="key-outline" size={16} color={THEME.colors.textMuted} style={styles.pwdInputIcon} />
+                          <TextInput
+                            style={styles.pwdTextInput}
+                            secureTextEntry={!showPwd}
+                            placeholder="At least 6 characters"
+                            placeholderTextColor={THEME.colors.textMuted}
+                            value={newPassword}
+                            onChangeText={setNewPassword}
+                          />
+                        </View>
+                      </View>
 
-                <View style={[styles.modulesGrid, !isDesktop && styles.modulesGridMobile]}>
-                  {/* Module 1: Team Directory */}
-                  <Pressable
-                    onPress={() => user?.role === 'admin' ? navigateTo('admin') : alert('Directory contains authorized @hbplus.fit members.')}
-                    style={styles.moduleCard}
-                  >
-                    <View style={styles.moduleIconWrapper}>
-                      <Ionicons name="people-outline" size={18} color={THEME.colors.onyx} />
+                      <View style={styles.pwdFieldCol}>
+                        <Text style={styles.pwdInputLabel}>Confirm Password</Text>
+                        <View style={styles.pwdInputWrapper}>
+                          <Ionicons name="lock-closed-outline" size={16} color={THEME.colors.textMuted} style={styles.pwdInputIcon} />
+                          <TextInput
+                            style={styles.pwdTextInput}
+                            secureTextEntry={!showPwd}
+                            placeholder="Re-enter password"
+                            placeholderTextColor={THEME.colors.textMuted}
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
+                          />
+                        </View>
+                      </View>
                     </View>
-                    <Text style={styles.moduleTitle}>Team Directory</Text>
-                    <Text style={styles.moduleDesc}>
-                      View members and administrators verified on @{APP_CONFIG.allowedDomain}.
-                    </Text>
-                  </Pressable>
 
-                  {/* Module 2: Resource Library */}
-                  <Pressable
-                    onPress={() => {
-                      setActiveTab('resources');
-                      navigateTo('resources');
-                    }}
-                    style={styles.moduleCard}
-                  >
-                    <View style={styles.moduleIconWrapper}>
-                      <Ionicons name="folder-outline" size={18} color={THEME.colors.terracotta} />
+                    <View style={styles.pwdActionRow}>
+                      <Pressable
+                        onPress={() => setShowPwd(!showPwd)}
+                        style={styles.showPwdToggle}
+                      >
+                        <Ionicons name={showPwd ? 'eye-off-outline' : 'eye-outline'} size={15} color={THEME.colors.textSecondary} style={{ marginRight: 6 }} />
+                        <Text style={styles.showPwdText}>{showPwd ? 'Hide' : 'Show'} Password</Text>
+                      </Pressable>
+
+                      <Pressable
+                        onPress={handleSavePassword}
+                        disabled={pwdLoading}
+                        style={({ pressed }) => [
+                          styles.savePwdBtn,
+                          pressed && { opacity: 0.85 },
+                          pwdLoading && { opacity: 0.6 },
+                        ]}
+                      >
+                        {pwdLoading ? (
+                          <ActivityIndicator size="small" color="#FFFFFF" />
+                        ) : (
+                          <Text style={styles.savePwdBtnText}>
+                            {user?.hasCustomPassword ? 'Update Password' : 'Save Workspace Password'}
+                          </Text>
+                        )}
+                      </Pressable>
                     </View>
-                    <Text style={styles.moduleTitle}>Resource Library</Text>
-                    <Text style={styles.moduleDesc}>
-                      Access 14 official clinical protocols, brand kits, and security compliance handbooks.
-                    </Text>
-                  </Pressable>
-
-                  {/* Module 3: Session State */}
-                  <Pressable
-                    onPress={signOut}
-                    style={styles.moduleCard}
-                  >
-                    <View style={[styles.moduleIconWrapper, { backgroundColor: '#FEF2F2' }]}>
-                      <Ionicons name="log-out-outline" size={18} color={THEME.colors.error} />
-                    </View>
-                    <Text style={styles.moduleTitle}>Terminate Session</Text>
-                    <Text style={styles.moduleDesc}>
-                      Securely sign out and clear active authentication tokens.
-                    </Text>
-                  </Pressable>
-                </View>
-              </View>
-
-              {/* SECTION: OUR PATHWAYS (Direct from example.html) */}
-              <View style={styles.pathwaysSection}>
-                <View style={styles.pathwayHeaderRow}>
-                  <View>
-                    <Text style={styles.pathwaySubheader}>THE HOLY TRIANGLE OF HEALTH</Text>
-                    <Text style={styles.sectionHeader}>Our Pathways</Text>
-                  </View>
-                  <Text style={styles.pathwayKicker}>Integrative Wellness</Text>
-                </View>
-
-                <View style={[styles.pathwaysGrid, !isDesktop && styles.modulesGridMobile]}>
-                  {/* Pathway 1 */}
-                  <View style={styles.pathwayCard}>
-                    <View style={styles.pathwayIconBox}>
-                      <Ionicons name="barbell-outline" size={18} color={THEME.colors.terracotta} />
-                    </View>
-                    <Text style={styles.moduleTitle}>Pain Management</Text>
-                    <Text style={styles.moduleDesc}>
-                      Targeted physical therapy, postural correction, and chronic joint relief.
-                    </Text>
                   </View>
 
-                  {/* Pathway 2 */}
-                  <View style={styles.pathwayCard}>
-                    <View style={styles.pathwayIconBox}>
-                      <Ionicons name="restaurant-outline" size={18} color={THEME.colors.terracotta} />
+                  {/* BOTTOM GRID: WORKPLACE MODULES (From Figma Screen 2) */}
+                  <View style={styles.modulesSection}>
+                    <Text style={styles.sectionHeader}>Workspace quick access</Text>
+
+                    <View style={[styles.modulesGrid, !isDesktop && styles.modulesGridMobile]}>
+                      {/* Module 1: Team Directory */}
+                      <Pressable
+                        onPress={() => user?.role === 'admin' ? navigateTo('admin') : alert('Directory contains authorized @hbplus.fit members.')}
+                        style={styles.moduleCard}
+                      >
+                        <View style={styles.moduleIconWrapper}>
+                          <Ionicons name="people-outline" size={18} color={THEME.colors.onyx} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Team Directory</Text>
+                        <Text style={styles.moduleDesc}>
+                          View members and administrators verified on @{APP_CONFIG.allowedDomain}.
+                        </Text>
+                      </Pressable>
+
+                      {/* Module 2: Resource Library */}
+                      <Pressable
+                        onPress={() => {
+                          setActiveTab('resources');
+                          navigateTo('resources');
+                        }}
+                        style={styles.moduleCard}
+                      >
+                        <View style={styles.moduleIconWrapper}>
+                          <Ionicons name="folder-outline" size={18} color={THEME.colors.terracotta} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Resource Library</Text>
+                        <Text style={styles.moduleDesc}>
+                          Access 14 official clinical protocols, brand kits, and security compliance handbooks.
+                        </Text>
+                      </Pressable>
+
+                      {/* Module 3: Session State */}
+                      <Pressable
+                        onPress={signOut}
+                        style={styles.moduleCard}
+                      >
+                        <View style={[styles.moduleIconWrapper, { backgroundColor: '#FEF2F2' }]}>
+                          <Ionicons name="log-out-outline" size={18} color={THEME.colors.error} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Terminate Session</Text>
+                        <Text style={styles.moduleDesc}>
+                          Securely sign out and clear active authentication tokens.
+                        </Text>
+                      </Pressable>
                     </View>
-                    <Text style={styles.moduleTitle}>Weight Management</Text>
-                    <Text style={styles.moduleDesc}>
-                      Metabolic testing, sustainable nutrition, and body recomposition.
-                    </Text>
                   </View>
 
-                  {/* Pathway 3 */}
-                  <View style={styles.pathwayCard}>
-                    <View style={styles.pathwayIconBox}>
-                      <Ionicons name="heart-outline" size={18} color={THEME.colors.terracotta} />
+                  {/* SECTION: OUR PATHWAYS (Direct from example.html) */}
+                  <View style={styles.pathwaysSection}>
+                    <View style={styles.pathwayHeaderRow}>
+                      <View>
+                        <Text style={styles.pathwaySubheader}>THE HOLY TRIANGLE OF HEALTH</Text>
+                        <Text style={styles.sectionHeader}>Our Pathways</Text>
+                      </View>
+                      <Text style={styles.pathwayKicker}>Integrative Wellness</Text>
                     </View>
-                    <Text style={styles.moduleTitle}>Pre & Post Natal</Text>
-                    <Text style={styles.moduleDesc}>
-                      Specialized maternal wellness, core rehab, and guided postpartum strength.
-                    </Text>
-                  </View>
 
-                  {/* Pathway 4 */}
-                  <View style={styles.pathwayCard}>
-                    <View style={styles.pathwayIconBox}>
-                      <Ionicons name="pulse-outline" size={18} color={THEME.colors.terracotta} />
+                    <View style={[styles.pathwaysGrid, !isDesktop && styles.modulesGridMobile]}>
+                      {/* Pathway 1 */}
+                      <View style={styles.pathwayCard}>
+                        <View style={styles.pathwayIconBox}>
+                          <Ionicons name="barbell-outline" size={18} color={THEME.colors.terracotta} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Pain Management</Text>
+                        <Text style={styles.moduleDesc}>
+                          Targeted physical therapy, postural correction, and chronic joint relief.
+                        </Text>
+                      </View>
+
+                      {/* Pathway 2 */}
+                      <View style={styles.pathwayCard}>
+                        <View style={styles.pathwayIconBox}>
+                          <Ionicons name="restaurant-outline" size={18} color={THEME.colors.terracotta} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Weight Management</Text>
+                        <Text style={styles.moduleDesc}>
+                          Metabolic testing, sustainable nutrition, and body recomposition.
+                        </Text>
+                      </View>
+
+                      {/* Pathway 3 */}
+                      <View style={styles.pathwayCard}>
+                        <View style={styles.pathwayIconBox}>
+                          <Ionicons name="heart-outline" size={18} color={THEME.colors.terracotta} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Pre & Post Natal</Text>
+                        <Text style={styles.moduleDesc}>
+                          Specialized maternal wellness, core rehab, and guided postpartum strength.
+                        </Text>
+                      </View>
+
+                      {/* Pathway 4 */}
+                      <View style={styles.pathwayCard}>
+                        <View style={styles.pathwayIconBox}>
+                          <Ionicons name="pulse-outline" size={18} color={THEME.colors.terracotta} />
+                        </View>
+                        <Text style={styles.moduleTitle}>Lifestyle Management</Text>
+                        <Text style={styles.moduleDesc}>
+                          Circadian rhythm alignment, stress resilience, and deep restorative sleep.
+                        </Text>
+                      </View>
                     </View>
-                    <Text style={styles.moduleTitle}>Lifestyle Management</Text>
-                    <Text style={styles.moduleDesc}>
-                      Circadian rhythm alignment, stress resilience, and deep restorative sleep.
-                    </Text>
                   </View>
-                </View>
-              </View>
-            </>
-          )}
+                </>
+              )}
 
             </View>
           </ScrollView>

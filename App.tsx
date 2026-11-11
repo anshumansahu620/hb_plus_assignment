@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   BackHandler,
   Platform,
+  Image,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
@@ -16,6 +17,8 @@ import { AdminScreen } from './src/screens/AdminScreen';
 import { THEME } from './src/constants/theme';
 import { APP_CONFIG } from './src/constants/config';
 import { injectHBPlusFonts } from './src/utils/loadFonts';
+
+const hbplusLogo = require('./assets/hbplus-logo.png');
 
 // Activate official fonts immediately
 injectHBPlusFonts();
@@ -46,9 +49,11 @@ const AppNavigator: React.FC = () => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <View style={styles.loadingLogoBadge}>
-          <Text style={styles.loadingLogoText}>HB+</Text>
-        </View>
+        <Image
+          source={hbplusLogo}
+          style={styles.loadingLogo}
+          resizeMode="contain"
+        />
         <ActivityIndicator
           size="large"
           color={THEME.colors.primary}
@@ -99,21 +104,10 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.background,
     padding: 24,
   },
-  loadingLogoBadge: {
+  loadingLogo: {
     width: 64,
     height: 64,
-    borderRadius: THEME.borderRadius.lg,
-    backgroundColor: THEME.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 20,
-    ...THEME.shadows.md,
-  },
-  loadingLogoText: {
-    color: '#FFFFFF',
-    fontWeight: '900',
-    fontSize: 26,
-    letterSpacing: 0.5,
   },
   loadingSpinner: {
     marginVertical: 12,
