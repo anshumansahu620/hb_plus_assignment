@@ -181,9 +181,7 @@ export const LoginScreen: React.FC = () => {
                   />
                 </View>
 
-                <Text style={styles.authMethodHint}>
-                  Instant 1-click single sign-on with your official @{ALLOWED_DOMAIN} Google Workspace account.
-                </Text>
+                
 
                 <Pressable
                   onPress={() => {

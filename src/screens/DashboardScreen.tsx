@@ -294,63 +294,64 @@ export const DashboardScreen: React.FC = () => {
                   {/* Admin Announcement Callout (If user is Admin) */}
 
 
-                  {/* CARD: QUICK GRANT ADMIN ACCESS (Directly on Dashboard if Admin) */}
-                  {user?.role === 'admin' && (
-                    <View style={styles.cardContainer}>
-                      <View style={styles.cardHeaderRow}>
-                        <View>
-                          <Text style={styles.cardTitle}>Grant Admin Access & Permissions</Text>
-                          <Text style={styles.cardSubtitle}>
-                            Assign administrator permissions to any verified @{APP_CONFIG.allowedDomain} team member.
-                          </Text>
-                        </View>
+                  {/* CARD: GRANT ADMIN ACCESS & PERMISSIONS (Always inside the view) */}
+                  <View style={styles.cardContainer}>
+                    <View style={styles.cardHeaderRow}>
+                      <View>
+                        <Text style={styles.cardTitle}>Grant Admin Access & Permissions</Text>
+                      </View>
+                      {user?.role === 'admin' ? (
                         <Badge label="ADMIN PRIVILEGES" variant="admin" />
-                      </View>
-
-                      {quickAdminMsg && (
-                        <View style={[styles.pwdAlertBox, quickAdminMsg.type === 'success' ? styles.quickAdminAlertSuccess : styles.pwdAlertError]}>
-                          <Ionicons
-                            name={quickAdminMsg.type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'}
-                            size={16}
-                            color={quickAdminMsg.type === 'success' ? THEME.colors.textPrimary : THEME.colors.error}
-                            style={{ marginRight: 6 }}
-                          />
-                          <Text style={[styles.pwdAlertText, quickAdminMsg.type === 'success' ? styles.quickAdminAlertTextSuccess : styles.pwdAlertTextError]}>
-                            {quickAdminMsg.text}
-                          </Text>
-                        </View>
-                      )}
-
-                      <View style={[styles.grantAdminRow, !isDesktop && styles.grantAdminRowMobile]}>
-                        <View style={styles.grantAdminInputWrapper}>
-                          <Ionicons name="mail-outline" size={16} color={THEME.colors.textMuted} style={styles.pwdInputIcon} />
-                          <TextInput
-                            style={styles.pwdTextInput}
-                            placeholder={`colleague@${APP_CONFIG.allowedDomain}`}
-                            placeholderTextColor={THEME.colors.textMuted}
-                            value={quickAdminEmail}
-                            onChangeText={setQuickAdminEmail}
-                            autoCapitalize="none"
-                            keyboardType="email-address"
-                          />
-                        </View>
-                        <Pressable
-                          onPress={handleQuickGrantAdmin}
-                          disabled={isQuickGranting}
-                          style={({ pressed }) => [
-                            styles.quickGrantBtn,
-                            pressed && { opacity: 0.8 },
-                            isQuickGranting && { opacity: 0.6 },
-                          ]}
-                        >
-                          <Ionicons name="lock-closed-outline" size={15} color="#FFFFFF" style={{ marginRight: 6 }} />
-                          <Text style={styles.quickGrantBtnText}>
-                            {isQuickGranting ? 'Granting...' : 'Grant Admin Access'}
-                          </Text>
+                      ) : (
+                        <Pressable onPress={elevateToAdmin} style={styles.claimAdminPill}>
+                          <Text style={styles.claimAdminPillText}>Elevate to Admin</Text>
                         </Pressable>
-                      </View>
+                      )}
                     </View>
-                  )}
+
+                    {quickAdminMsg && (
+                      <View style={[styles.pwdAlertBox, quickAdminMsg.type === 'success' ? styles.quickAdminAlertSuccess : styles.pwdAlertError]}>
+                        <Ionicons
+                          name={quickAdminMsg.type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'}
+                          size={16}
+                          color={quickAdminMsg.type === 'success' ? THEME.colors.textPrimary : THEME.colors.error}
+                          style={{ marginRight: 6 }}
+                        />
+                        <Text style={[styles.pwdAlertText, quickAdminMsg.type === 'success' ? styles.quickAdminAlertTextSuccess : styles.pwdAlertTextError]}>
+                          {quickAdminMsg.text}
+                        </Text>
+                      </View>
+                    )}
+
+                    <View style={[styles.grantAdminRow, !isDesktop && styles.grantAdminRowMobile]}>
+                      <View style={styles.grantAdminInputWrapper}>
+                        <Ionicons name="mail-outline" size={16} color={THEME.colors.textMuted} style={styles.pwdInputIcon} />
+                        <TextInput
+                          style={styles.pwdTextInput}
+                          placeholder={`colleague@${APP_CONFIG.allowedDomain}`}
+                          placeholderTextColor={THEME.colors.textMuted}
+                          value={quickAdminEmail}
+                          onChangeText={setQuickAdminEmail}
+                          autoCapitalize="none"
+                          keyboardType="email-address"
+                        />
+                      </View>
+                      <Pressable
+                        onPress={handleQuickGrantAdmin}
+                        disabled={isQuickGranting}
+                        style={({ pressed }) => [
+                          styles.quickGrantBtn,
+                          pressed && { opacity: 0.8 },
+                          isQuickGranting && { opacity: 0.6 },
+                        ]}
+                      >
+                        <Ionicons name="lock-closed-outline" size={15} color="#FFFFFF" style={{ marginRight: 6 }} />
+                        <Text style={styles.quickGrantBtnText}>
+                          {isQuickGranting ? 'Granting...' : 'Grant Admin Access'}
+                        </Text>
+                      </Pressable>
+                    </View>
+                  </View>
 
                   {/* CARD: YOUR ACCOUNT (From Figma Screen 2 & 4) */}
                   <View style={styles.cardContainer}>
