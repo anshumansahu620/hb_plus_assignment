@@ -51,31 +51,34 @@ export const LoginScreen: React.FC = () => {
                 style={styles.heroBrandLogo}
                 resizeMode="contain"
               />
-
+              <View style={styles.brandTextCol}>
+                <Text style={styles.brandSubtitleText}>Hop with HB</Text>
+              </View>
             </View>
-
+            <View style={styles.officialPill}>
+              <Text style={styles.officialPillText}>Corporate SSO</Text>
+            </View>
           </View>
 
           <View style={styles.heroMiddle}>
             <Text style={styles.heroTaglineKicker}>HOP WITH HB</Text>
             <Text style={styles.heroTitle}>Wellness That Understands Your Lifestyle.</Text>
             <Text style={styles.heroDescription}>
-              Real health goes beyond fitness. It lives at the intersection of body, mind, and gut. Welcome to the official HB+ team portal.
+              Real health goes beyond fitness. It lives at the intersection of body, mind, and gut. Welcome to the official HB+ team portal trusted by{' '}
+              <Text style={styles.heroHighlightText}>1550+ Members</Text>.
             </Text>
 
-
-
-            {/* Numbers strip from example.html */}
-            <View style={styles.numbersStrip}>
-              <View style={styles.numberItem}>
-                <Text style={styles.numberValue}>1550<Text style={{ color: THEME.colors.terracotta }}>+</Text></Text>
-                <Text style={styles.numberLabel}>Active Members</Text>
+            {/* Official Workspace Badge Card */}
+            <View style={styles.domainHighlightCard}>
+              <View style={styles.domainCardTop}>
+                <Text style={styles.domainCardDomain}>@{ALLOWED_DOMAIN}</Text>
+                <View style={styles.domainCardBadge}>
+                  <Text style={styles.domainCardBadgeText}>Official Workspace</Text>
+                </View>
               </View>
-              <View style={styles.numberDivider} />
-              <View style={styles.numberItem}>
-                <Text style={styles.numberValue}>100<Text style={{ color: THEME.colors.terracotta }}>%</Text></Text>
-                <Text style={styles.numberLabel}>Verified SSO</Text>
-              </View>
+              <Text style={styles.domainCardDesc}>
+                Access is strictly restricted to verified corporate team members.
+              </Text>
             </View>
           </View>
 
@@ -355,11 +358,17 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   heroDescription: {
+    fontFamily: THEME.typography.fontFamily.sans,
     fontSize: THEME.typography.fontSize.base,
     color: THEME.colors.textSecondary,
     marginTop: 12,
-    lineHeight: 22,
-    maxWidth: 340,
+    lineHeight: 24,
+    maxWidth: 360,
+  },
+  heroHighlightText: {
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontWeight: '700',
+    color: THEME.colors.terracotta,
   },
   domainHighlightCard: {
     backgroundColor: '#FFFFFF',

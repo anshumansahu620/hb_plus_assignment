@@ -122,3 +122,4 @@ export const injectHBPlusFonts = (): void => {
   `;
   document.head.appendChild(style);
 };
+
