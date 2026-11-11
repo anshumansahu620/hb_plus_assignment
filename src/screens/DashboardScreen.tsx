@@ -419,14 +419,16 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   brandName: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontSize: 22,
+    fontWeight: '700',
     color: THEME.colors.onyx,
     letterSpacing: -0.5,
   },
   brandNameDark: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontSize: 22,
+    fontWeight: '700',
     color: THEME.colors.onyx,
   },
   menuList: {
@@ -550,8 +552,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   greetingTitle: {
-    fontSize: THEME.typography.fontSize.xxl,
-    fontWeight: '800',
+    fontFamily: THEME.typography.fontFamily.serif,
+    fontSize: 32,
+    fontWeight: '700',
     color: THEME.colors.textPrimary,
     letterSpacing: -0.5,
   },
@@ -608,8 +611,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
   forestHeroTitle: {
-    fontSize: 26,
-    fontWeight: '800',
+    fontFamily: THEME.typography.fontFamily.serif,
+    fontSize: 28,
+    fontWeight: '700',
     color: THEME.colors.onyx,
     letterSpacing: -0.5,
   },
@@ -696,9 +700,11 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.md,
   },
   cardTitle: {
-    fontSize: THEME.typography.fontSize.base,
+    fontFamily: THEME.typography.fontFamily.serif,
+    fontSize: 20,
     fontWeight: '700',
     color: THEME.colors.textPrimary,
+    letterSpacing: -0.3,
   },
   accountTable: {
     borderTopWidth: 1,
@@ -738,11 +744,11 @@ const styles = StyleSheet.create({
     marginTop: THEME.spacing.sm,
   },
   sectionHeader: {
-    fontSize: 13,
+    fontFamily: THEME.typography.fontFamily.serif,
+    fontSize: 20,
     fontWeight: '700',
-    color: THEME.colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
+    color: THEME.colors.textPrimary,
+    letterSpacing: -0.3,
     marginBottom: 12,
   },
   modulesGrid: {

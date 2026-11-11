@@ -41,7 +41,7 @@ export const LoginScreen: React.FC = () => {
       keyboardShouldPersistTaps="handled"
     >
       <View style={[styles.mainLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
-        
+
         {/* LEFT / TOP HERO PANEL (Official HB+ Branding from example.html) */}
         <View style={[styles.heroPanel, isDesktop ? styles.heroPanelDesktop : styles.heroPanelMobile]}>
           <View style={styles.heroTop}>
@@ -51,13 +51,9 @@ export const LoginScreen: React.FC = () => {
                 style={styles.heroBrandLogo}
                 resizeMode="contain"
               />
-              <View style={styles.brandTextCol}>
-                <Text style={styles.brandSubtitleText}>Hop with HB</Text>
-              </View>
+
             </View>
-            <View style={styles.officialPill}>
-              <Text style={styles.officialPillText}>Corporate SSO</Text>
-            </View>
+
           </View>
 
           <View style={styles.heroMiddle}>
@@ -67,18 +63,7 @@ export const LoginScreen: React.FC = () => {
               Real health goes beyond fitness. It lives at the intersection of body, mind, and gut. Welcome to the official HB+ team portal.
             </Text>
 
-            {/* Official Workspace Badge Card */}
-            <View style={styles.domainHighlightCard}>
-              <View style={styles.domainCardTop}>
-                <Text style={styles.domainCardDomain}>@{ALLOWED_DOMAIN}</Text>
-                <View style={styles.domainCardBadge}>
-                  <Text style={styles.domainCardBadgeText}>Official Workspace</Text>
-                </View>
-              </View>
-              <Text style={styles.domainCardDesc}>
-                Access is strictly restricted to verified corporate team members.
-              </Text>
-            </View>
+
 
             {/* Numbers strip from example.html */}
             <View style={styles.numbersStrip}>
@@ -330,7 +315,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   brandSubtitleText: {
-    fontSize: 14,
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontSize: 15,
     fontWeight: '700',
     color: THEME.colors.onyx,
     letterSpacing: -0.3,
@@ -344,6 +330,7 @@ const styles = StyleSheet.create({
     borderColor: THEME.colors.cardBorder,
   },
   officialPillText: {
+    fontFamily: THEME.typography.fontFamily.sans,
     fontSize: 11,
     fontWeight: '700',
     color: THEME.colors.terracotta,
@@ -352,6 +339,7 @@ const styles = StyleSheet.create({
     marginVertical: THEME.spacing.lg,
   },
   heroTaglineKicker: {
+    fontFamily: THEME.typography.fontFamily.sans,
     fontSize: 11,
     fontWeight: '800',
     color: THEME.colors.terracotta,
@@ -359,11 +347,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   heroTitle: {
-    fontSize: 32,
-    fontWeight: '800',
+    fontFamily: THEME.typography.fontFamily.serif,
+    fontSize: 34,
+    fontWeight: '700',
     color: THEME.colors.onyx,
-    lineHeight: 40,
-    letterSpacing: -0.6,
+    lineHeight: 42,
+    letterSpacing: -0.5,
   },
   heroDescription: {
     fontSize: THEME.typography.fontSize.base,
@@ -388,7 +377,8 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   domainCardDomain: {
-    fontSize: 15,
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontSize: 16,
     fontWeight: '700',
     color: THEME.colors.onyx,
   },
@@ -427,8 +417,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   numberValue: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontSize: 22,
+    fontWeight: '700',
     color: THEME.colors.onyx,
   },
   numberLabel: {
@@ -491,8 +482,9 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   authTitle: {
-    fontSize: THEME.typography.fontSize.xxl,
-    fontWeight: '800',
+    fontFamily: THEME.typography.fontFamily.serif,
+    fontSize: 28,
+    fontWeight: '700',
     color: THEME.colors.textPrimary,
     letterSpacing: -0.5,
   },

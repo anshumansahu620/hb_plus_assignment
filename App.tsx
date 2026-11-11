@@ -15,6 +15,10 @@ import { DashboardScreen } from './src/screens/DashboardScreen';
 import { AdminScreen } from './src/screens/AdminScreen';
 import { THEME } from './src/constants/theme';
 import { APP_CONFIG } from './src/constants/config';
+import { injectHBPlusFonts } from './src/utils/loadFonts';
+
+// Activate official fonts immediately
+injectHBPlusFonts();
 
 const AppNavigator: React.FC = () => {
   const { isAuthenticated, isLoading, activeRoute, navigateTo } = useAuth();

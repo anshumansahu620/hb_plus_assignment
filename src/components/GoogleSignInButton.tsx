@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
     height: 20,
   },
   buttonText: {
+    fontFamily: THEME.typography.fontFamily.sans,
     fontSize: THEME.typography.fontSize.base,
     fontWeight: THEME.typography.fontWeight.semibold,
     color: THEME.colors.googleBtnText,

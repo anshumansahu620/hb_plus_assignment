@@ -139,6 +139,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   text: {
+    fontFamily: THEME.typography.fontFamily.sans,
     fontSize: THEME.typography.fontSize.base,
     fontWeight: THEME.typography.fontWeight.semibold,
   },

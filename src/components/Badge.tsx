@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   badgeText: {
+    fontFamily: THEME.typography.fontFamily.sans,
     fontSize: 11,
     fontWeight: '600',
     letterSpacing: 0.3,

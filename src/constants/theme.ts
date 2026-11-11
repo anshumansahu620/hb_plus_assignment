@@ -90,7 +90,8 @@ export const THEME = {
   typography: {
     fontFamily: {
       sans: "'DM Sans', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-      serif: "'The Seasons', 'Georgia', 'Times New Roman', serif",
+      serif: "'The Seasons', 'The Seasons Bold', 'The Seasons Regular', 'Georgia', 'Times New Roman', serif",
+      gilroy: "'Gilroy', 'Gilroy-Bold', 'Gilroy-Medium', 'DM Sans', sans-serif",
       mono: "'Fragment Mono', 'DM Mono', monospace",
     },
     fontSize: {

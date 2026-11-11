@@ -255,8 +255,9 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   brandName: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontSize: 22,
+    fontWeight: '700',
     color: THEME.colors.onyx,
   },
   headerActions: {
@@ -279,8 +280,9 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.lg,
   },
   pageTitle: {
-    fontSize: THEME.typography.fontSize.xxl,
-    fontWeight: '800',
+    fontFamily: THEME.typography.fontFamily.serif,
+    fontSize: 32,
+    fontWeight: '700',
     color: THEME.colors.textPrimary,
     letterSpacing: -0.5,
   },
@@ -308,9 +310,11 @@ const styles = StyleSheet.create({
     borderBottomColor: THEME.colors.divider,
   },
   cardTitle: {
-    fontSize: THEME.typography.fontSize.base,
+    fontFamily: THEME.typography.fontFamily.serif,
+    fontSize: 18,
     fontWeight: '700',
     color: THEME.colors.textPrimary,
+    letterSpacing: -0.3,
   },
   cardSubtitle: {
     fontSize: 12,
