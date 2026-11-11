@@ -117,8 +117,12 @@ sequenceDiagram
 
 ### Core Requirements
 - [x] **Cross-Platform**: Exact same codebase runs seamlessly on Web (Netlify) and Mobile (Expo/Android/iOS).
-- [x] **Official Google Sign-In**: Branded Google button with real OAuth 2.0 integration via Supabase.
+- [x] **Official Google Sign-In**: Branded Google button (`assets/google-logo.svg`) with real OAuth 2.0 integration via Supabase.
+- [x] **Email & Password Authentication**: Work email/password option with the exact same domain whitelist validation.
 - [x] **Domain Validation**: Robust algorithm enforcing `@hbplus.fit` whitelist.
+- [x] **Exact Error Messaging**: Strictly returns `"Access restricted. Please login using your official domain email."` on any non-whitelisted domain (e.g. `@gmail.com`).
+- [x] **Official Hop with HB Branding**: Colors, typography, and logo (`assets/hbplus-logo.png`) extracted directly from `hbplus.fit` (`example.html`) and Figma prototype.
+- [x] **Permanent Uncollapsible Sidebar**: 250px fixed navigation sidebar on Desktop matching Figma layout with zero emojis (clean Ionicons vector icons throughout).
 - [x] **Protected Routes**: Direct URL visits (e.g., typing `/#dashboard` or `/#admin` in browser) without authentication are intercepted and redirected to `/`.
 - [x] **Logout Flow**: Safely terminates the session and resets auth state.
 - [x] **Loading States**: Animated indicator while authenticating and validating session tokens.
