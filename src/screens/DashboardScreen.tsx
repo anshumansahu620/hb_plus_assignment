@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,11 @@ import {
   Image,
   useWindowDimensions,
   Pressable,
-  Animated,
-  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { Badge } from '../components/Badge';
+import { Button } from '../components/Button';
 import { THEME } from '../constants/theme';
 import { APP_CONFIG } from '../constants/config';
 
@@ -22,286 +21,98 @@ export const DashboardScreen: React.FC = () => {
   const isDesktop = width >= THEME.breakpoints.tablet;
 
   const [activeTab, setActiveTab] = useState<'overview' | 'resources'>('overview');
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-
-  // Desktop smooth width & opacity animation
-  const sidebarWidthAnim = useRef(new Animated.Value(240)).current;
-  const labelOpacityAnim = useRef(new Animated.Value(1)).current;
-
-  // Mobile drawer slide & backdrop animation
-  const drawerTranslateX = useRef(new Animated.Value(-280)).current;
-  const backdropOpacity = useRef(new Animated.Value(0)).current;
 
   const firstName = user?.fullName
     ? user.fullName.split(' ')[0]
     : user?.email.split('@')[0] || 'Member';
 
-  // Toggle desktop sidebar with smooth parallel animations
-  const handleToggleCollapse = () => {
-    const nextState = !isCollapsed;
-    setIsCollapsed(nextState);
-
-    Animated.parallel([
-      Animated.timing(sidebarWidthAnim, {
-        toValue: nextState ? 72 : 240,
-        duration: 250,
-        useNativeDriver: false,
-      }),
-      Animated.timing(labelOpacityAnim, {
-        toValue: nextState ? 0 : 1,
-        duration: nextState ? 120 : 250,
-        useNativeDriver: false,
-      }),
-    ]).start();
-  };
-
-  // Open mobile drawer with slide animation
-  const openMobileDrawer = () => {
-    setIsMobileDrawerOpen(true);
-    Animated.parallel([
-      Animated.timing(drawerTranslateX, {
-        toValue: 0,
-        duration: 240,
-        useNativeDriver: false,
-      }),
-      Animated.timing(backdropOpacity, {
-        toValue: 1,
-        duration: 240,
-        useNativeDriver: false,
-      }),
-    ]).start();
-  };
-
-  // Close mobile drawer with slide animation
-  const closeMobileDrawer = () => {
-    Animated.parallel([
-      Animated.timing(drawerTranslateX, {
-        toValue: -280,
-        duration: 200,
-        useNativeDriver: false,
-      }),
-      Animated.timing(backdropOpacity, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: false,
-      }),
-    ]).start(() => {
-      setIsMobileDrawerOpen(false);
-    });
-  };
-
-  // Render Sidebar Content
-  const renderSidebarContent = (collapsed: boolean, isDrawer = false) => (
-    <View style={[styles.sidebarInner, collapsed && styles.sidebarInnerCollapsed]}>
-      <View style={styles.sidebarTop}>
-        {/* Brand Row & Toggle Button */}
-        <View style={[styles.brandRow, collapsed && styles.brandRowCollapsed]}>
-          {!collapsed ? (
-            <Animated.View style={[styles.brandRowLeft, { opacity: isDrawer ? 1 : labelOpacityAnim }]}>
-              <View style={styles.brandDot} />
-              <Text style={styles.brandName}>hbplus</Text>
-            </Animated.View>
-          ) : (
-            <View style={styles.brandLogoIconBadge}>
-              <View style={styles.brandDot} />
-              <Text style={styles.brandMiniText}>HB</Text>
-            </View>
-          )}
-
-          {/* Toggle Button */}
-          <Pressable
-            onPress={isDrawer ? closeMobileDrawer : handleToggleCollapse}
-            style={({ pressed }) => [styles.collapseToggleBtn, pressed && { opacity: 0.7 }]}
-            accessibilityLabel={isDrawer ? "Close drawer" : collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <Ionicons
-              name={isDrawer ? "close-outline" : collapsed ? "chevron-forward-outline" : "chevron-back-outline"}
-              size={18}
-              color={THEME.colors.textSecondary}
-            />
-          </Pressable>
-        </View>
-
-        {/* Menu Items */}
-        <View style={[styles.menuList, collapsed && styles.menuListCollapsed]}>
-          {/* Overview */}
-          <Pressable
-            onPress={() => {
-              setActiveTab('overview');
-              if (isDrawer) closeMobileDrawer();
-            }}
-            style={[
-              styles.menuItem,
-              activeTab === 'overview' && styles.menuItemActive,
-              collapsed && styles.menuItemCollapsed,
-            ]}
-          >
-            <Ionicons
-              name="grid-outline"
-              size={18}
-              color={activeTab === 'overview' ? THEME.colors.forestGreen : THEME.colors.textSecondary}
-              style={!collapsed ? styles.menuIcon : undefined}
-            />
-            {!collapsed && (
-              <Animated.View style={[styles.labelWrapper, { opacity: isDrawer ? 1 : labelOpacityAnim }]}>
-                <Text style={[styles.menuItemText, activeTab === 'overview' && styles.menuItemTextActive]}>
-                  Overview
-                </Text>
-              </Animated.View>
-            )}
-          </Pressable>
-
-          {/* Admin Panel (if admin) */}
-          {user?.role === 'admin' && (
-            <Pressable
-              onPress={() => {
-                navigateTo('admin');
-                if (isDrawer) closeMobileDrawer();
-              }}
-              style={[
-                styles.menuItem,
-                collapsed && styles.menuItemCollapsed,
-              ]}
-            >
-              <Ionicons
-                name="shield-checkmark-outline"
-                size={18}
-                color={THEME.colors.textSecondary}
-                style={!collapsed ? styles.menuIcon : undefined}
-              />
-              {!collapsed && (
-                <Animated.View style={[styles.labelWrapperRow, { opacity: isDrawer ? 1 : labelOpacityAnim }]}>
-                  <Text style={styles.menuItemText}>Admin Panel</Text>
-                  <Badge label="RBAC" variant="admin" />
-                </Animated.View>
-              )}
-            </Pressable>
-          )}
-
-          {/* Resources */}
-          <Pressable
-            onPress={() => {
-              setActiveTab('resources');
-              if (isDrawer) closeMobileDrawer();
-            }}
-            style={[
-              styles.menuItem,
-              activeTab === 'resources' && styles.menuItemActive,
-              collapsed && styles.menuItemCollapsed,
-            ]}
-          >
-            <Ionicons
-              name="folder-outline"
-              size={18}
-              color={activeTab === 'resources' ? THEME.colors.forestGreen : THEME.colors.textSecondary}
-              style={!collapsed ? styles.menuIcon : undefined}
-            />
-            {!collapsed && (
-              <Animated.View style={[styles.labelWrapper, { opacity: isDrawer ? 1 : labelOpacityAnim }]}>
-                <Text style={[styles.menuItemText, activeTab === 'resources' && styles.menuItemTextActive]}>
-                  Resources
-                </Text>
-              </Animated.View>
-            )}
-          </Pressable>
-        </View>
-      </View>
-
-      {/* User Profile Footer */}
-      <View style={[styles.sidebarFooter, collapsed && styles.sidebarFooterCollapsed]}>
-        {!collapsed ? (
-          <Animated.View style={{ opacity: isDrawer ? 1 : labelOpacityAnim, width: '100%' }}>
-            <View style={styles.userProfileRow}>
-              {user?.avatarUrl ? (
-                <Image source={{ uri: user.avatarUrl }} style={styles.userAvatar} />
-              ) : (
-                <View style={styles.avatarFallback}>
-                  <Text style={styles.avatarInitial}>{firstName[0].toUpperCase()}</Text>
-                </View>
-              )}
-              <View style={styles.userMetaCol}>
-                <Text style={styles.userName} numberOfLines={1}>{user?.fullName || firstName}</Text>
-                <Text style={styles.userRoleText}>{user?.role === 'admin' ? 'Administrator' : 'Team Member'}</Text>
-              </View>
-            </View>
-
-            <Pressable
-              onPress={signOut}
-              style={({ pressed }) => [styles.signOutLink, pressed && { opacity: 0.6 }]}
-            >
-              <Ionicons name="log-out-outline" size={14} color={THEME.colors.error} style={{ marginRight: 6 }} />
-              <Text style={styles.signOutText}>Sign out</Text>
-            </Pressable>
-          </Animated.View>
-        ) : (
-          <View style={styles.userProfileCollapsed}>
-            {user?.avatarUrl ? (
-              <Image source={{ uri: user.avatarUrl }} style={styles.userAvatarCollapsed} />
-            ) : (
-              <View style={styles.avatarFallbackCollapsed}>
-                <Text style={styles.avatarInitial}>{firstName[0].toUpperCase()}</Text>
-              </View>
-            )}
-            <Pressable
-              onPress={signOut}
-              style={({ pressed }) => [styles.signOutIconBtn, pressed && { opacity: 0.6 }]}
-              accessibilityLabel="Sign out"
-            >
-              <Ionicons name="log-out-outline" size={18} color={THEME.colors.error} />
-            </Pressable>
-          </View>
-        )}
-      </View>
-    </View>
-  );
-
   return (
     <View style={styles.rootWrapper}>
       <View style={[styles.dashboardLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
         
-        {/* DESKTOP SIDEBAR (Animated Smooth Width Transition) */}
+        {/* SIDEBAR (Desktop only - matches Figma middle screen) */}
         {isDesktop && (
-          <Animated.View
-            style={[
-              styles.sidebar,
-              { width: sidebarWidthAnim },
-              isCollapsed ? styles.sidebarCollapsedPadding : styles.sidebarExpandedPadding,
-              Platform.OS === 'web' && ({
-                transition: 'width 250ms cubic-bezier(0.4, 0, 0.2, 1), padding 250ms ease',
-              } as any),
-            ]}
-          >
-            {renderSidebarContent(isCollapsed, false)}
-          </Animated.View>
-        )}
+          <View style={styles.sidebar}>
+            <View style={styles.sidebarTop}>
+              {/* Brand Logo */}
+              <View style={styles.brandRow}>
+                <View style={styles.brandDot} />
+                <Text style={styles.brandName}>hbplus</Text>
+              </View>
 
-        {/* MOBILE SLIDING DRAWER (Animated smoothly) */}
-        {!isDesktop && isMobileDrawerOpen && (
-          <View style={styles.mobileDrawerWrapper}>
-            <Animated.View
-              style={[
-                styles.modalBackdrop,
-                { opacity: backdropOpacity },
-              ]}
-            >
+              {/* Sidebar Menu Items */}
+              <View style={styles.menuList}>
+                <Pressable
+                  onPress={() => setActiveTab('overview')}
+                  style={[styles.menuItem, activeTab === 'overview' && styles.menuItemActive]}
+                >
+                  <Ionicons
+                    name="grid-outline"
+                    size={17}
+                    color={activeTab === 'overview' ? THEME.colors.forestGreen : THEME.colors.textSecondary}
+                    style={styles.menuIcon}
+                  />
+                  <Text style={[styles.menuItemText, activeTab === 'overview' && styles.menuItemTextActive]}>
+                    Overview
+                  </Text>
+                </Pressable>
+
+                {user?.role === 'admin' && (
+                  <Pressable
+                    onPress={() => navigateTo('admin')}
+                    style={styles.menuItem}
+                  >
+                    <Ionicons
+                      name="shield-checkmark-outline"
+                      size={17}
+                      color={THEME.colors.textSecondary}
+                      style={styles.menuIcon}
+                    />
+                    <Text style={styles.menuItemText}>Admin Panel</Text>
+                    <Badge label="RBAC" variant="admin" />
+                  </Pressable>
+                )}
+
+                <Pressable
+                  onPress={() => setActiveTab('resources')}
+                  style={[styles.menuItem, activeTab === 'resources' && styles.menuItemActive]}
+                >
+                  <Ionicons
+                    name="folder-outline"
+                    size={17}
+                    color={activeTab === 'resources' ? THEME.colors.forestGreen : THEME.colors.textSecondary}
+                    style={styles.menuIcon}
+                  />
+                  <Text style={[styles.menuItemText, activeTab === 'resources' && styles.menuItemTextActive]}>
+                    Resources
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+
+            {/* Sidebar User Footer */}
+            <View style={styles.sidebarFooter}>
+              <View style={styles.userProfileRow}>
+                {user?.avatarUrl ? (
+                  <Image source={{ uri: user.avatarUrl }} style={styles.userAvatar} />
+                ) : (
+                  <View style={styles.avatarFallback}>
+                    <Text style={styles.avatarInitial}>{firstName[0].toUpperCase()}</Text>
+                  </View>
+                )}
+                <View style={styles.userMetaCol}>
+                  <Text style={styles.userName} numberOfLines={1}>{user?.fullName || firstName}</Text>
+                  <Text style={styles.userRoleText}>{user?.role === 'admin' ? 'Administrator' : 'Team Member'}</Text>
+                </View>
+              </View>
+
               <Pressable
-                style={StyleSheet.absoluteFill}
-                onPress={closeMobileDrawer}
-              />
-            </Animated.View>
-
-            <Animated.View
-              style={[
-                styles.modalDrawerContent,
-                { transform: [{ translateX: drawerTranslateX }] },
-                Platform.OS === 'web' && ({
-                  transition: 'transform 240ms cubic-bezier(0.4, 0, 0.2, 1)',
-                } as any),
-              ]}
-            >
-              {renderSidebarContent(false, true)}
-            </Animated.View>
+                onPress={signOut}
+                style={({ pressed }) => [styles.signOutLink, pressed && { opacity: 0.6 }]}
+              >
+                <Text style={styles.signOutText}>Sign out</Text>
+              </Pressable>
+            </View>
           </View>
         )}
 
@@ -310,18 +121,9 @@ export const DashboardScreen: React.FC = () => {
           {/* Top Mobile Bar if mobile */}
           {!isDesktop && (
             <View style={styles.mobileTopBar}>
-              <View style={styles.mobileLeftGroup}>
-                <Pressable
-                  onPress={openMobileDrawer}
-                  style={({ pressed }) => [styles.mobileMenuButton, pressed && { opacity: 0.6 }]}
-                  accessibilityLabel="Open navigation menu"
-                >
-                  <Ionicons name="menu-outline" size={24} color={THEME.colors.forestGreen} />
-                </Pressable>
-                <View style={styles.brandRowSimple}>
-                  <View style={styles.brandDot} />
-                  <Text style={styles.brandNameDark}>hbplus</Text>
-                </View>
+              <View style={styles.brandRow}>
+                <View style={styles.brandDot} />
+                <Text style={styles.brandNameDark}>hbplus</Text>
               </View>
               <Pressable onPress={signOut} style={styles.mobileSignOut}>
                 <Text style={styles.mobileSignOutText}>Sign out</Text>
@@ -504,73 +306,27 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
 
-  // Sidebar Styles (Smooth Transition)
+  // Sidebar Styles (Figma Screen 2)
   sidebar: {
+    width: 250,
     backgroundColor: '#FFFFFF',
     borderRightWidth: 1,
     borderRightColor: THEME.colors.cardBorder,
-    overflow: 'hidden',
-  },
-  sidebarExpandedPadding: {
     padding: THEME.spacing.lg,
-  },
-  sidebarCollapsedPadding: {
-    paddingVertical: THEME.spacing.lg,
-    paddingHorizontal: 8,
-    alignItems: 'center',
-  },
-  sidebarInner: {
-    flex: 1,
     justifyContent: 'space-between',
-    width: '100%',
   },
-  sidebarInnerCollapsed: {
-    alignItems: 'center',
-    width: '100%',
-  },
-  sidebarTop: {
-    width: '100%',
-  },
+  sidebarTop: {},
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     marginBottom: THEME.spacing.xl,
-    width: '100%',
-  },
-  brandRowCollapsed: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: THEME.spacing.xl,
-  },
-  brandRowLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  brandRowSimple: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  brandLogoIconBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: THEME.colors.sageBg,
-    paddingHorizontal: 6,
-    paddingVertical: 4,
-    borderRadius: THEME.borderRadius.sm,
-  },
-  brandMiniText: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: THEME.colors.forestGreen,
   },
   brandDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: THEME.colors.forestGreenHighlight,
-    marginRight: 6,
+    marginRight: 8,
   },
   brandName: {
     fontSize: 20,
@@ -583,20 +339,8 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: THEME.colors.forestGreen,
   },
-  collapseToggleBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   menuList: {
     gap: 6,
-    width: '100%',
-  },
-  menuListCollapsed: {
-    alignItems: 'center',
   },
   menuItem: {
     flexDirection: 'row',
@@ -605,32 +349,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: THEME.borderRadius.md,
   },
-  menuItemCollapsed: {
-    justifyContent: 'center',
-    paddingHorizontal: 0,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-  },
   menuItemActive: {
     backgroundColor: THEME.colors.sageBg,
   },
   menuIcon: {
     marginRight: 10,
   },
-  labelWrapper: {
-    flex: 1,
-  },
-  labelWrapperRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
   menuItemText: {
     fontSize: 14,
     color: THEME.colors.textSecondary,
     fontWeight: '500',
+    flex: 1,
   },
   menuItemTextActive: {
     color: THEME.colors.forestGreen,
@@ -639,11 +368,6 @@ const styles = StyleSheet.create({
   sidebarFooter: {
     borderTopWidth: 1,
     borderTopColor: THEME.colors.divider,
-    paddingTop: THEME.spacing.md,
-    width: '100%',
-  },
-  sidebarFooterCollapsed: {
-    alignItems: 'center',
     paddingTop: THEME.spacing.md,
   },
   userProfileRow: {
@@ -666,27 +390,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 10,
   },
-  userProfileCollapsed: {
-    alignItems: 'center',
-    gap: 12,
-  },
-  userAvatarCollapsed: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-  },
-  avatarFallbackCollapsed: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: THEME.colors.forestGreen,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   avatarInitial: {
     color: '#FFFFFF',
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: 15,
   },
   userMetaCol: {
     flex: 1,
@@ -701,49 +408,12 @@ const styles = StyleSheet.create({
     color: THEME.colors.textMuted,
   },
   signOutLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingVertical: 4,
   },
   signOutText: {
     fontSize: 12,
     color: THEME.colors.error,
     fontWeight: '600',
-  },
-  signOutIconBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FEF2F2',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // Mobile Sliding Drawer
-  mobileDrawerWrapper: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 999,
-    flexDirection: 'row',
-  },
-  modalBackdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
-  },
-  modalDrawerContent: {
-    width: 270,
-    backgroundColor: '#FFFFFF',
-    height: '100%',
-    padding: THEME.spacing.lg,
-    ...THEME.shadows.lg,
-    zIndex: 1000,
   },
 
   // Main Content Area
@@ -759,15 +429,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: THEME.spacing.md,
-  },
-  mobileLeftGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  mobileMenuButton: {
-    padding: 6,
-    borderRadius: THEME.borderRadius.sm,
   },
   mobileSignOut: {
     paddingVertical: 6,
@@ -873,6 +534,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  lockBadgeIcon: {
+    fontSize: 22,
   },
 
   // Admin Announcement
@@ -1009,6 +673,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
+  },
+  moduleIcon: {
+    fontSize: 18,
   },
   moduleTitle: {
     fontSize: 14,
