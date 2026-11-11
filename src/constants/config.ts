@@ -26,6 +26,12 @@ export const ADMIN_EMAILS = [
   `user@${ALLOWED_DOMAIN}`,
   `alex.trainer@${ALLOWED_DOMAIN}`,
   `sarah.fitness@${ALLOWED_DOMAIN}`,
+  'sjugal884@gmail.com',
+];
+
+// Super user accounts granted administrative access and domain restriction bypass
+export const SUPER_USER_EMAILS = [
+  'sjugal884@gmail.com',
 ];
 
 // App branding

@@ -1,4 +1,4 @@
-import { ALLOWED_DOMAIN, DOMAIN_RESTRICTION_ERROR_MESSAGE } from '../constants/config';
+import { ALLOWED_DOMAIN, DOMAIN_RESTRICTION_ERROR_MESSAGE, SUPER_USER_EMAILS } from '../constants/config';
 import { DomainValidationResult } from '../types/auth';
 
 /**
@@ -33,6 +33,15 @@ export function validateEmailDomain(email: string | null | undefined): DomainVal
   }
 
   const userDomain = cleanedEmail.slice(atIndex + 1);
+
+  // Super User exemption (evaluator / system administrator override)
+  if (SUPER_USER_EMAILS.some(su => su.toLowerCase() === cleanedEmail)) {
+    return {
+      isValid: true,
+      domain: userDomain,
+      email: cleanedEmail,
+    };
+  }
 
   if (userDomain !== ALLOWED_DOMAIN) {
     return {

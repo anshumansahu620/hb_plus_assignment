@@ -37,6 +37,7 @@ export const AdminScreen: React.FC = () => {
   const [grantEmail, setGrantEmail] = useState('');
   const [grantMessage, setGrantMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [isGranting, setIsGranting] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -126,6 +127,18 @@ export const AdminScreen: React.FC = () => {
       {/* Top Header */}
       <View style={styles.adminHeader}>
         <View style={styles.headerBrandRow}>
+          <Pressable
+            onPress={() => setIsMenuOpen(prev => !prev)}
+            style={({ pressed }) => [styles.hamburgerButton, pressed && { opacity: 0.7 }]}
+            accessibilityLabel="Toggle navigation menu"
+          >
+            <Ionicons
+              name={isMenuOpen ? "close-outline" : "menu-outline"}
+              size={24}
+              color={THEME.colors.onyx}
+            />
+          </Pressable>
+
           <Image
             source={hbplusLogo}
             style={styles.brandLogo}
@@ -145,6 +158,126 @@ export const AdminScreen: React.FC = () => {
           />
         </View>
       </View>
+
+      {/* Collapsible Hamburger Drawer Menu */}
+      {isMenuOpen && (
+        <View style={styles.drawerOverlayContainer}>
+          <Pressable
+            style={styles.drawerBackdrop}
+            onPress={() => setIsMenuOpen(false)}
+            accessibilityLabel="Close navigation menu"
+          />
+
+          <View style={styles.collapsibleDrawer}>
+            <View style={styles.drawerHeader}>
+              <View style={styles.drawerBrandRow}>
+                <Image
+                  source={hbplusLogo}
+                  style={styles.drawerBrandLogo}
+                  resizeMode="contain"
+                />
+                <View>
+                  <Text style={styles.drawerBrandName}>hbplus</Text>
+                  <Text style={styles.drawerBrandSubtitle}>Hop with HB</Text>
+                </View>
+              </View>
+
+              <Pressable
+                onPress={() => setIsMenuOpen(false)}
+                style={({ pressed }) => [styles.drawerCloseBtn, pressed && { opacity: 0.7 }]}
+                accessibilityLabel="Close menu"
+              >
+                <Ionicons name="close" size={20} color={THEME.colors.onyx} />
+              </Pressable>
+            </View>
+
+            <View style={styles.drawerSection}>
+              <Text style={styles.drawerSectionLabel}>WORKSPACE NAVIGATION</Text>
+
+              <View style={styles.drawerMenuList}>
+                <Pressable
+                  onPress={() => {
+                    setIsMenuOpen(false);
+                    navigateTo('dashboard');
+                  }}
+                  style={styles.drawerMenuItem}
+                >
+                  <Ionicons
+                    name="grid-outline"
+                    size={18}
+                    color={THEME.colors.textSecondary}
+                    style={styles.drawerMenuIcon}
+                  />
+                  <Text style={styles.drawerMenuItemText}>Overview Dashboard</Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => {
+                    setIsMenuOpen(false);
+                    navigateTo('resources');
+                  }}
+                  style={styles.drawerMenuItem}
+                >
+                  <Ionicons
+                    name="folder-outline"
+                    size={18}
+                    color={THEME.colors.textSecondary}
+                    style={styles.drawerMenuIcon}
+                  />
+                  <Text style={styles.drawerMenuItemText}>Resource Library</Text>
+                  <Badge label="14 items" variant="sage" />
+                </Pressable>
+
+                <Pressable
+                  onPress={() => setIsMenuOpen(false)}
+                  style={[styles.drawerMenuItem, styles.drawerMenuItemActive]}
+                >
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={18}
+                    color={THEME.colors.terracotta}
+                    style={styles.drawerMenuIcon}
+                  />
+                  <Text style={[styles.drawerMenuItemText, styles.drawerMenuItemTextActive]}>
+                    Admin Control Center
+                  </Text>
+                  <Badge label="RBAC" variant="admin" />
+                </Pressable>
+              </View>
+            </View>
+
+            <View style={styles.drawerFooter}>
+              <View style={styles.drawerUserProfileRow}>
+                {user?.avatarUrl ? (
+                  <Image source={{ uri: user.avatarUrl }} style={styles.drawerUserAvatar} />
+                ) : (
+                  <View style={styles.drawerAvatarFallback}>
+                    <Text style={styles.drawerAvatarInitial}>
+                      {(user?.fullName || user?.email || 'A')[0].toUpperCase()}
+                    </Text>
+                  </View>
+                )}
+                <View style={styles.drawerUserMetaCol}>
+                  <Text style={styles.drawerUserName} numberOfLines={1}>{user?.fullName || user?.email}</Text>
+                  <Text style={styles.drawerUserRoleText}>Administrator</Text>
+                  <Text style={styles.drawerUserEmail} numberOfLines={1}>{user?.email}</Text>
+                </View>
+              </View>
+
+              <Pressable
+                onPress={() => {
+                  setIsMenuOpen(false);
+                  signOut();
+                }}
+                style={({ pressed }) => [styles.drawerSignOutBtn, pressed && { opacity: 0.7 }]}
+              >
+                <Ionicons name="log-out-outline" size={16} color={THEME.colors.error} style={{ marginRight: 8 }} />
+                <Text style={styles.drawerSignOutText}>Sign out of workspace</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      )}
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.innerContainer}>
@@ -368,6 +501,186 @@ const styles = StyleSheet.create({
   headerBrandRow: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  hamburgerButton: {
+    width: 38,
+    height: 38,
+    borderRadius: THEME.borderRadius.md,
+    backgroundColor: THEME.colors.creamDark,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  drawerOverlayContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
+    flexDirection: 'row',
+  },
+  drawerBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(26, 26, 26, 0.45)',
+  },
+  collapsibleDrawer: {
+    width: 290,
+    maxWidth: '85%',
+    height: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRightWidth: 1,
+    borderRightColor: THEME.colors.cardBorder,
+    padding: THEME.spacing.lg,
+    justifyContent: 'space-between',
+    zIndex: 1000,
+    ...THEME.shadows.lg,
+  },
+  drawerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: THEME.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.colors.divider,
+  },
+  drawerBrandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  drawerBrandLogo: {
+    width: 28,
+    height: 28,
+    marginRight: 10,
+  },
+  drawerBrandName: {
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontSize: 22,
+    fontWeight: '700',
+    color: THEME.colors.onyx,
+    letterSpacing: -0.5,
+  },
+  drawerBrandSubtitle: {
+    fontSize: 10,
+    color: THEME.colors.textMuted,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  drawerCloseBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: THEME.colors.creamDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  drawerSection: {
+    flex: 1,
+    paddingTop: THEME.spacing.lg,
+  },
+  drawerSectionLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: THEME.colors.terracotta,
+    letterSpacing: 1.2,
+    marginBottom: 12,
+  },
+  drawerMenuList: {
+    gap: 6,
+  },
+  drawerMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: THEME.borderRadius.md,
+    backgroundColor: 'transparent',
+  },
+  drawerMenuItemActive: {
+    backgroundColor: THEME.colors.creamDark,
+  },
+  drawerMenuIcon: {
+    marginRight: 12,
+  },
+  drawerMenuItemText: {
+    fontSize: 14,
+    color: THEME.colors.textSecondary,
+    fontWeight: '500',
+    flex: 1,
+  },
+  drawerMenuItemTextActive: {
+    color: THEME.colors.onyx,
+    fontWeight: '700',
+  },
+  drawerFooter: {
+    borderTopWidth: 1,
+    borderTopColor: THEME.colors.divider,
+    paddingTop: THEME.spacing.md,
+  },
+  drawerUserProfileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  drawerUserAvatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    marginRight: 10,
+  },
+  drawerAvatarFallback: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: THEME.colors.onyx,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  drawerAvatarInitial: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  drawerUserMetaCol: {
+    flex: 1,
+  },
+  drawerUserName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+  },
+  drawerUserRoleText: {
+    fontSize: 11,
+    color: THEME.colors.terracotta,
+    fontWeight: '600',
+  },
+  drawerUserEmail: {
+    fontSize: 11,
+    color: THEME.colors.textMuted,
+  },
+  drawerSignOutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: THEME.borderRadius.md,
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  drawerSignOutText: {
+    fontSize: 12,
+    color: THEME.colors.error,
+    fontWeight: '600',
   },
   brandLogo: {
     width: 26,

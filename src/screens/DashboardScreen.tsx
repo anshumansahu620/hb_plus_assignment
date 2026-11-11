@@ -27,6 +27,7 @@ export const DashboardScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'resources'>(
     activeRoute === 'resources' ? 'resources' : 'overview'
   );
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     if (activeRoute === 'resources') {
@@ -112,154 +113,271 @@ export const DashboardScreen: React.FC = () => {
 
   return (
     <View style={styles.rootWrapper}>
-      <View style={[styles.dashboardLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
+      <View style={styles.dashboardLayout}>
 
-        {/* PERMANENT UNCOLLAPSIBLE DESKTOP SIDEBAR (Figma Prototype Standard) */}
-        {isDesktop && (
-          <View style={styles.sidebar}>
-            <View style={styles.sidebarTop}>
-              {/* Brand Header */}
-              <View style={styles.brandRow}>
-                <Image
-                  source={hbplusLogo}
-                  style={styles.brandLogo}
-                  resizeMode="contain"
+        {/* TOP HEADER BAR WITH HAMBURGER BUTTON */}
+        <View style={styles.topHeaderBar}>
+          <View style={styles.topHeaderLeft}>
+            <Pressable
+              onPress={() => setIsMenuOpen(prev => !prev)}
+              style={({ pressed }) => [styles.hamburgerButton, pressed && { opacity: 0.7 }]}
+              accessibilityLabel="Toggle navigation menu"
+            >
+              <Ionicons
+                name={isMenuOpen ? "close-outline" : "menu-outline"}
+                size={24}
+                color={THEME.colors.onyx}
+              />
+            </Pressable>
+
+            <Pressable
+              onPress={() => {
+                setActiveTab('overview');
+                navigateTo('dashboard');
+              }}
+              style={styles.brandRowTop}
+            >
+              <Image
+                source={hbplusLogo}
+                style={styles.brandLogoTop}
+                resizeMode="contain"
+              />
+              <View style={styles.brandTextCol}>
+                <Text style={styles.brandNameTop}>hbplus</Text>
+                <Text style={styles.brandSubtitleTop}>Hop with HB</Text>
+              </View>
+            </Pressable>
+          </View>
+
+          {/* Desktop Navigation Tabs */}
+          {isDesktop && (
+            <View style={styles.desktopNavPills}>
+              <Pressable
+                onPress={() => {
+                  setActiveTab('overview');
+                  navigateTo('dashboard');
+                }}
+                style={[styles.desktopNavPill, activeTab === 'overview' && styles.desktopNavPillActive]}
+              >
+                <Ionicons
+                  name="grid-outline"
+                  size={14}
+                  color={activeTab === 'overview' ? '#FFFFFF' : THEME.colors.textSecondary}
+                  style={{ marginRight: 6 }}
                 />
-                <View style={styles.brandTextCol}>
-                  <Text style={styles.brandName}>hbplus</Text>
-                  <Text style={styles.brandSubtitle}>Hop with HB</Text>
-                </View>
-              </View>
-
-              {/* Sidebar Menu Items */}
-              <View style={styles.menuList}>
-                <Pressable
-                  onPress={() => {
-                    setActiveTab('overview');
-                    navigateTo('dashboard');
-                  }}
-                  style={[styles.menuItem, activeTab === 'overview' && styles.menuItemActive]}
-                >
-                  <Ionicons
-                    name="grid-outline"
-                    size={17}
-                    color={activeTab === 'overview' ? THEME.colors.terracotta : THEME.colors.textSecondary}
-                    style={styles.menuIcon}
-                  />
-                  <Text style={[styles.menuItemText, activeTab === 'overview' && styles.menuItemTextActive]}>
-                    Overview
-                  </Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => {
-                    setActiveTab('resources');
-                    navigateTo('resources');
-                  }}
-                  style={[styles.menuItem, activeTab === 'resources' && styles.menuItemActive]}
-                >
-                  <Ionicons
-                    name="folder-outline"
-                    size={17}
-                    color={activeTab === 'resources' ? THEME.colors.terracotta : THEME.colors.textSecondary}
-                    style={styles.menuIcon}
-                  />
-                  <Text style={[styles.menuItemText, activeTab === 'resources' && styles.menuItemTextActive]}>
-                    Resources
-                  </Text>
-                  <Badge label="14" variant="sage" />
-                </Pressable>
-
-                {user?.role === 'admin' && (
-                  <Pressable
-                    onPress={() => navigateTo('admin')}
-                    style={styles.menuItem}
-                  >
-                    <Ionicons
-                      name="lock-closed-outline"
-                      size={17}
-                      color={THEME.colors.textSecondary}
-                      style={styles.menuIcon}
-                    />
-                    <Text style={styles.menuItemText}>Admin Panel</Text>
-                    <Badge label="RBAC" variant="admin" />
-                  </Pressable>
-                )}
-              </View>
-            </View>
-
-            {/* Sidebar User Footer */}
-            <View style={styles.sidebarFooter}>
-              <View style={styles.userProfileRow}>
-                {user?.avatarUrl ? (
-                  <Image source={{ uri: user.avatarUrl }} style={styles.userAvatar} />
-                ) : (
-                  <View style={styles.avatarFallback}>
-                    <Text style={styles.avatarInitial}>{firstName[0].toUpperCase()}</Text>
-                  </View>
-                )}
-                <View style={styles.userMetaCol}>
-                  <Text style={styles.userName} numberOfLines={1}>{user?.fullName || firstName}</Text>
-                  <Text style={styles.userRoleText}>{user?.role === 'admin' ? 'Administrator' : 'Team Member'}</Text>
-                </View>
-              </View>
+                <Text style={[styles.desktopNavPillText, activeTab === 'overview' && styles.desktopNavPillTextActive]}>
+                  Overview
+                </Text>
+              </Pressable>
 
               <Pressable
-                onPress={signOut}
-                style={({ pressed }) => [styles.signOutLink, pressed && { opacity: 0.6 }]}
+                onPress={() => {
+                  setActiveTab('resources');
+                  navigateTo('resources');
+                }}
+                style={[styles.desktopNavPill, activeTab === 'resources' && styles.desktopNavPillActive]}
               >
-                <Ionicons name="log-out-outline" size={14} color={THEME.colors.error} style={{ marginRight: 6 }} />
-                <Text style={styles.signOutText}>Sign out</Text>
+                <Ionicons
+                  name="folder-outline"
+                  size={14}
+                  color={activeTab === 'resources' ? '#FFFFFF' : THEME.colors.textSecondary}
+                  style={{ marginRight: 6 }}
+                />
+                <Text style={[styles.desktopNavPillText, activeTab === 'resources' && styles.desktopNavPillTextActive]}>
+                  Resources
+                </Text>
+                <View style={styles.pillBadge}>
+                  <Text style={styles.pillBadgeText}>14</Text>
+                </View>
               </Pressable>
+
+              {user?.role === 'admin' && (
+                <Pressable
+                  onPress={() => navigateTo('admin')}
+                  style={styles.desktopNavPill}
+                >
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={14}
+                    color={THEME.colors.textSecondary}
+                    style={{ marginRight: 6 }}
+                  />
+                  <Text style={styles.desktopNavPillText}>Admin Panel</Text>
+                  <View style={styles.pillBadgeAdmin}>
+                    <Text style={styles.pillBadgeAdminText}>RBAC</Text>
+                  </View>
+                </Pressable>
+              )}
+            </View>
+          )}
+
+          {/* Right Section: Role Badge, Profile & Sign Out */}
+          <View style={styles.topHeaderRight}>
+            <View style={styles.userBadgeWrapper}>
+              <Badge
+                label={user?.role === 'admin' ? 'ADMIN' : `@${user?.domain || APP_CONFIG.allowedDomain}`}
+                variant={user?.role === 'admin' ? 'admin' : 'sage'}
+              />
+            </View>
+
+            <View style={styles.topUserAvatarRow}>
+              {user?.avatarUrl ? (
+                <Image source={{ uri: user.avatarUrl }} style={styles.topUserAvatar} />
+              ) : (
+                <View style={styles.topAvatarFallback}>
+                  <Text style={styles.topAvatarInitial}>{firstName[0].toUpperCase()}</Text>
+                </View>
+              )}
+              {isDesktop && (
+                <Text style={styles.topUserName} numberOfLines={1}>{user?.fullName || firstName}</Text>
+              )}
+            </View>
+
+            <Pressable
+              onPress={signOut}
+              style={({ pressed }) => [styles.topSignOutBtn, pressed && { opacity: 0.7 }]}
+              accessibilityLabel="Sign out"
+            >
+              <Ionicons name="log-out-outline" size={16} color={THEME.colors.error} />
+              {isDesktop && <Text style={styles.topSignOutText}>Sign out</Text>}
+            </Pressable>
+          </View>
+        </View>
+
+        {/* COLLAPSIBLE HAMBURGER DRAWER MENU */}
+        {isMenuOpen && (
+          <View style={styles.drawerOverlayContainer}>
+            <Pressable
+              style={styles.drawerBackdrop}
+              onPress={() => setIsMenuOpen(false)}
+              accessibilityLabel="Close navigation menu"
+            />
+
+            <View style={styles.collapsibleDrawer}>
+              {/* Drawer Top Header with Brand & Close Button */}
+              <View style={styles.drawerHeader}>
+                <View style={styles.drawerBrandRow}>
+                  <Image
+                    source={hbplusLogo}
+                    style={styles.drawerBrandLogo}
+                    resizeMode="contain"
+                  />
+                  <View>
+                    <Text style={styles.drawerBrandName}>hbplus</Text>
+                    <Text style={styles.drawerBrandSubtitle}>Hop with HB</Text>
+                  </View>
+                </View>
+
+                <Pressable
+                  onPress={() => setIsMenuOpen(false)}
+                  style={({ pressed }) => [styles.drawerCloseBtn, pressed && { opacity: 0.7 }]}
+                  accessibilityLabel="Close menu"
+                >
+                  <Ionicons name="close" size={20} color={THEME.colors.onyx} />
+                </Pressable>
+              </View>
+
+              {/* Drawer Navigation Section */}
+              <View style={styles.drawerSection}>
+                <Text style={styles.drawerSectionLabel}>WORKSPACE NAVIGATION</Text>
+
+                <View style={styles.drawerMenuList}>
+                  <Pressable
+                    onPress={() => {
+                      setActiveTab('overview');
+                      navigateTo('dashboard');
+                      setIsMenuOpen(false);
+                    }}
+                    style={[styles.drawerMenuItem, activeTab === 'overview' && styles.drawerMenuItemActive]}
+                  >
+                    <Ionicons
+                      name="grid-outline"
+                      size={18}
+                      color={activeTab === 'overview' ? THEME.colors.terracotta : THEME.colors.textSecondary}
+                      style={styles.drawerMenuIcon}
+                    />
+                    <Text style={[styles.drawerMenuItemText, activeTab === 'overview' && styles.drawerMenuItemTextActive]}>
+                      Overview Dashboard
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => {
+                      setActiveTab('resources');
+                      navigateTo('resources');
+                      setIsMenuOpen(false);
+                    }}
+                    style={[styles.drawerMenuItem, activeTab === 'resources' && styles.drawerMenuItemActive]}
+                  >
+                    <Ionicons
+                      name="folder-outline"
+                      size={18}
+                      color={activeTab === 'resources' ? THEME.colors.terracotta : THEME.colors.textSecondary}
+                      style={styles.drawerMenuIcon}
+                    />
+                    <Text style={[styles.drawerMenuItemText, activeTab === 'resources' && styles.drawerMenuItemTextActive]}>
+                      Resource Library
+                    </Text>
+                    <Badge label="14 items" variant="sage" />
+                  </Pressable>
+
+                  {user?.role === 'admin' && (
+                    <Pressable
+                      onPress={() => {
+                        navigateTo('admin');
+                        setIsMenuOpen(false);
+                      }}
+                      style={styles.drawerMenuItem}
+                    >
+                      <Ionicons
+                        name="lock-closed-outline"
+                        size={18}
+                        color={THEME.colors.terracotta}
+                        style={styles.drawerMenuIcon}
+                      />
+                      <Text style={[styles.drawerMenuItemText, { fontWeight: '700', color: THEME.colors.onyx }]}>
+                        Admin Control Center
+                      </Text>
+                      <Badge label="RBAC" variant="admin" />
+                    </Pressable>
+                  )}
+                </View>
+              </View>
+
+              {/* Drawer User Footer */}
+              <View style={styles.drawerFooter}>
+                <View style={styles.drawerUserProfileRow}>
+                  {user?.avatarUrl ? (
+                    <Image source={{ uri: user.avatarUrl }} style={styles.drawerUserAvatar} />
+                  ) : (
+                    <View style={styles.drawerAvatarFallback}>
+                      <Text style={styles.drawerAvatarInitial}>{firstName[0].toUpperCase()}</Text>
+                    </View>
+                  )}
+                  <View style={styles.drawerUserMetaCol}>
+                    <Text style={styles.drawerUserName} numberOfLines={1}>{user?.fullName || firstName}</Text>
+                    <Text style={styles.drawerUserRoleText}>{user?.role === 'admin' ? 'Administrator' : 'Team Member'}</Text>
+                    <Text style={styles.drawerUserEmail} numberOfLines={1}>{user?.email}</Text>
+                  </View>
+                </View>
+
+                <Pressable
+                  onPress={() => {
+                    setIsMenuOpen(false);
+                    signOut();
+                  }}
+                  style={({ pressed }) => [styles.drawerSignOutBtn, pressed && { opacity: 0.7 }]}
+                >
+                  <Ionicons name="log-out-outline" size={16} color={THEME.colors.error} style={{ marginRight: 8 }} />
+                  <Text style={styles.drawerSignOutText}>Sign out of workspace</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
         )}
 
         {/* MAIN DASHBOARD CONTENT AREA */}
         <View style={styles.contentArea}>
-          {/* Top Mobile Bar if mobile */}
-          {!isDesktop && (
-            <View style={styles.mobileTopBar}>
-              <View style={styles.brandRowMobile}>
-                <Image
-                  source={hbplusLogo}
-                  style={styles.brandLogoMobile}
-                  resizeMode="contain"
-                />
-                <Text style={styles.brandNameDark}>hbplus</Text>
-              </View>
-
-              <View style={styles.mobileNavPills}>
-                <Pressable
-                  onPress={() => {
-                    setActiveTab('overview');
-                    navigateTo('dashboard');
-                  }}
-                  style={[styles.mobileNavPill, activeTab === 'overview' && styles.mobileNavPillActive]}
-                >
-                  <Text style={[styles.mobileNavPillText, activeTab === 'overview' && styles.mobileNavPillTextActive]}>
-                    Overview
-                  </Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => {
-                    setActiveTab('resources');
-                    navigateTo('resources');
-                  }}
-                  style={[styles.mobileNavPill, activeTab === 'resources' && styles.mobileNavPillActive]}
-                >
-                  <Text style={[styles.mobileNavPillText, activeTab === 'resources' && styles.mobileNavPillTextActive]}>
-                    Resources
-                  </Text>
-                </Pressable>
-              </View>
-
-              <Pressable onPress={signOut} style={styles.mobileSignOut}>
-                <Ionicons name="log-out-outline" size={16} color={THEME.colors.error} />
-              </Pressable>
-            </View>
-          )}
 
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.innerContainer}>
@@ -618,118 +736,301 @@ const styles = StyleSheet.create({
   },
   dashboardLayout: {
     flex: 1,
-  },
-  layoutDesktop: {
-    flexDirection: 'row',
-  },
-  layoutMobile: {
     flexDirection: 'column',
   },
 
-  // Permanent Uncollapsible Sidebar (250px)
-  sidebar: {
-    width: 250,
+  // Top Header Bar with Hamburger Button
+  topHeaderBar: {
+    height: 64,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.colors.cardBorder,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: THEME.spacing.md,
+    zIndex: 10,
+    ...THEME.shadows.sm,
+  },
+  topHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  hamburgerButton: {
+    width: 38,
+    height: 38,
+    borderRadius: THEME.borderRadius.md,
+    backgroundColor: THEME.colors.creamDark,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  brandRowTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  brandLogoTop: {
+    width: 26,
+    height: 26,
+    marginRight: 8,
+  },
+  brandTextCol: {
+    flexDirection: 'column',
+  },
+  brandNameTop: {
+    fontFamily: THEME.typography.fontFamily.gilroy,
+    fontSize: 20,
+    fontWeight: '700',
+    color: THEME.colors.onyx,
+    letterSpacing: -0.5,
+    lineHeight: 22,
+  },
+  brandSubtitleTop: {
+    fontSize: 9,
+    color: THEME.colors.textMuted,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    lineHeight: 11,
+  },
+
+  // Center Desktop Navigation Pills
+  desktopNavPills: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  desktopNavPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: THEME.borderRadius.full,
+    backgroundColor: THEME.colors.creamDark,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+  },
+  desktopNavPillActive: {
+    backgroundColor: THEME.colors.onyx,
+    borderColor: THEME.colors.onyx,
+  },
+  desktopNavPillText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: THEME.colors.textSecondary,
+  },
+  desktopNavPillTextActive: {
+    color: '#FFFFFF',
+  },
+  pillBadge: {
+    backgroundColor: 'rgba(92, 107, 74, 0.15)',
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: THEME.borderRadius.full,
+    marginLeft: 6,
+  },
+  pillBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: THEME.colors.tealAccent,
+  },
+  pillBadgeAdmin: {
+    backgroundColor: 'rgba(159, 64, 34, 0.15)',
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: THEME.borderRadius.full,
+    marginLeft: 6,
+  },
+  pillBadgeAdminText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: THEME.colors.terracotta,
+  },
+
+  // Right Header Controls
+  topHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  userBadgeWrapper: {
+    display: 'flex',
+  },
+  topUserAvatarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  topUserAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+  },
+  topAvatarFallback: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: THEME.colors.onyx,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  topAvatarInitial: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  topUserName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: THEME.colors.textPrimary,
+    maxWidth: 120,
+  },
+  topSignOutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: THEME.borderRadius.md,
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    gap: 4,
+  },
+  topSignOutText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: THEME.colors.error,
+  },
+
+  // Collapsible Hamburger Drawer
+  drawerOverlayContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
+    flexDirection: 'row',
+  },
+  drawerBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(26, 26, 26, 0.45)',
+  },
+  collapsibleDrawer: {
+    width: 290,
+    maxWidth: '85%',
+    height: '100%',
     backgroundColor: '#FFFFFF',
     borderRightWidth: 1,
     borderRightColor: THEME.colors.cardBorder,
     padding: THEME.spacing.lg,
     justifyContent: 'space-between',
+    zIndex: 1000,
+    ...THEME.shadows.lg,
   },
-  sidebarTop: {
-    width: '100%',
-  },
-  brandRow: {
+  drawerHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: THEME.spacing.xl,
+    justifyContent: 'space-between',
+    paddingBottom: THEME.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.colors.divider,
   },
-  brandLogo: {
+  drawerBrandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  drawerBrandLogo: {
     width: 28,
     height: 28,
     marginRight: 10,
   },
-  brandTextCol: {
-    flexDirection: 'column',
-  },
-  brandSubtitle: {
-    fontSize: 10,
-    color: THEME.colors.textMuted,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-  },
-  brandRowMobile: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  brandLogoMobile: {
-    width: 24,
-    height: 24,
-    marginRight: 8,
-  },
-  brandDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: THEME.colors.terracotta,
-    marginRight: 8,
-  },
-  brandName: {
+  drawerBrandName: {
     fontFamily: THEME.typography.fontFamily.gilroy,
     fontSize: 22,
     fontWeight: '700',
     color: THEME.colors.onyx,
     letterSpacing: -0.5,
   },
-  brandNameDark: {
-    fontFamily: THEME.typography.fontFamily.gilroy,
-    fontSize: 22,
-    fontWeight: '700',
-    color: THEME.colors.onyx,
+  drawerBrandSubtitle: {
+    fontSize: 10,
+    color: THEME.colors.textMuted,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
-  menuList: {
+  drawerCloseBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: THEME.colors.creamDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  drawerSection: {
+    flex: 1,
+    paddingTop: THEME.spacing.lg,
+  },
+  drawerSectionLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: THEME.colors.terracotta,
+    letterSpacing: 1.2,
+    marginBottom: 12,
+  },
+  drawerMenuList: {
     gap: 6,
   },
-  menuItem: {
+  drawerMenuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 12,
     borderRadius: THEME.borderRadius.md,
+    backgroundColor: 'transparent',
   },
-  menuItemActive: {
+  drawerMenuItemActive: {
     backgroundColor: THEME.colors.creamDark,
   },
-  menuIcon: {
-    marginRight: 10,
+  drawerMenuIcon: {
+    marginRight: 12,
   },
-  menuItemText: {
+  drawerMenuItemText: {
     fontSize: 14,
     color: THEME.colors.textSecondary,
     fontWeight: '500',
     flex: 1,
   },
-  menuItemTextActive: {
+  drawerMenuItemTextActive: {
     color: THEME.colors.onyx,
     fontWeight: '700',
   },
-  sidebarFooter: {
+  drawerFooter: {
     borderTopWidth: 1,
     borderTopColor: THEME.colors.divider,
     paddingTop: THEME.spacing.md,
   },
-  userProfileRow: {
+  drawerUserProfileRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
-  userAvatar: {
+  drawerUserAvatar: {
     width: 38,
     height: 38,
     borderRadius: 19,
     marginRight: 10,
   },
-  avatarFallback: {
+  drawerAvatarFallback: {
     width: 38,
     height: 38,
     borderRadius: 19,
@@ -738,29 +1039,40 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 10,
   },
-  avatarInitial: {
+  drawerAvatarInitial: {
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 15,
   },
-  userMetaCol: {
+  drawerUserMetaCol: {
     flex: 1,
   },
-  userName: {
+  drawerUserName: {
     fontSize: 13,
     fontWeight: '700',
     color: THEME.colors.textPrimary,
   },
-  userRoleText: {
+  drawerUserRoleText: {
+    fontSize: 11,
+    color: THEME.colors.terracotta,
+    fontWeight: '600',
+  },
+  drawerUserEmail: {
     fontSize: 11,
     color: THEME.colors.textMuted,
   },
-  signOutLink: {
+  drawerSignOutBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 4,
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: THEME.borderRadius.md,
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FECACA',
   },
-  signOutText: {
+  drawerSignOutText: {
     fontSize: 12,
     color: THEME.colors.error,
     fontWeight: '600',
@@ -769,52 +1081,6 @@ const styles = StyleSheet.create({
   // Main Content Area
   contentArea: {
     flex: 1,
-  },
-  mobileTopBar: {
-    height: 60,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: THEME.colors.cardBorder,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: THEME.spacing.md,
-  },
-  mobileNavPills: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  mobileNavPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: THEME.borderRadius.full,
-    backgroundColor: THEME.colors.creamDark,
-    borderWidth: 1,
-    borderColor: THEME.colors.cardBorder,
-  },
-  mobileNavPillActive: {
-    backgroundColor: THEME.colors.onyx,
-    borderColor: THEME.colors.onyx,
-  },
-  mobileNavPillText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: THEME.colors.textSecondary,
-  },
-  mobileNavPillTextActive: {
-    color: '#FFFFFF',
-  },
-  mobileSignOut: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: THEME.borderRadius.sm,
-    backgroundColor: '#FEF2F2',
-  },
-  mobileSignOutText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: THEME.colors.error,
   },
   scrollContent: {
     padding: THEME.spacing.xl,

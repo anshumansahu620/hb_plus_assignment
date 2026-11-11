@@ -109,6 +109,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     async function initializeAuth() {
       try {
+        // 0. Check for OAuth errors in web URL query parameters
+        if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location.search) {
+          const urlParams = new URLSearchParams(window.location.search);
+          const oauthError = urlParams.get('error_description') || urlParams.get('error');
+          if (oauthError && isMounted) {
+            const cleanError = decodeURIComponent(oauthError.replace(/\+/g, ' '));
+            console.warn('OAuth redirect error detected in URL query params:', cleanError);
+            // Clean URL query string without reloading page
+            window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+            setAuthState({
+              user: null,
+              isLoading: false,
+              error: cleanError,
+              isAuthenticated: false,
+            });
+            setActiveRoute('login');
+            return;
+          }
+        }
+
         // 1. Check local session cache first
         const cachedUserRaw = await appStorage.getItem(CURRENT_USER_KEY);
         if (cachedUserRaw) {

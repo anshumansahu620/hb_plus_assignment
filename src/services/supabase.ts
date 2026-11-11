@@ -23,7 +23,8 @@ export async function startGoogleOAuth(redirectTo?: string) {
   
   if (!redirectUrl) {
     if (Platform.OS === 'web' && typeof window !== 'undefined') {
-      redirectUrl = window.location.origin;
+      // Ensure clean URL without hash or stale search params
+      redirectUrl = window.location.origin + (window.location.pathname === '/' ? '' : window.location.pathname);
     } else {
       redirectUrl = 'hbplus://auth/callback';
     }

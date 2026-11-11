@@ -8,7 +8,6 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Badge } from './Badge';
 import { THEME } from '../constants/theme';
 import { APP_CONFIG } from '../constants/config';
 
@@ -202,7 +201,6 @@ export const ResourcesView: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
   const [actionToast, setActionToast] = useState<{ message: string; type: 'view' | 'download' } | null>(null);
 
-  // Filtered resources based on search and category
   const filteredResources = useMemo(() => {
     return RESOURCES_DATA.filter(item => {
       const matchesCategory =
@@ -234,26 +232,30 @@ export const ResourcesView: React.FC = () => {
     }, 4000);
   };
 
+  const categories = [
+    { id: 'all', label: `All (${RESOURCES_DATA.length})` },
+    { id: 'clinical', label: 'Clinical Protocols (4)' },
+    { id: 'brand', label: 'Brand & Design (3)' },
+    { id: 'security', label: 'Security & Access (4)' },
+    { id: 'operations', label: 'Operations (3)' },
+  ];
+
   return (
     <View style={styles.container}>
-      {/* Page Header */}
+      {/* Header */}
       <View style={styles.headerBlock}>
-        <View style={styles.kickerRow}>
-          <View style={styles.kickerDot} />
-          <Text style={styles.kickerText}>HB+ CORPORATE RESOURCE CENTER</Text>
-        </View>
         <Text style={styles.pageTitle}>Knowledge & Operational Library</Text>
         <Text style={styles.pageSubtitle}>
           Official clinical protocols, brand toolkits, security compliance handbooks, and onboarding documentation for verified @{APP_CONFIG.allowedDomain} team members.
         </Text>
       </View>
 
-      {/* Action Toast Alert */}
+      {/* Toast */}
       {actionToast && (
         <View style={[styles.toastBanner, actionToast.type === 'download' ? styles.toastDownload : styles.toastView]}>
           <Ionicons
             name={actionToast.type === 'download' ? 'cloud-download-outline' : 'eye-outline'}
-            size={18}
+            size={16}
             color={THEME.colors.textPrimary}
             style={{ marginRight: 8 }}
           />
@@ -264,11 +266,10 @@ export const ResourcesView: React.FC = () => {
         </View>
       )}
 
-      {/* Search and Category Filters */}
-      <View style={styles.controlsCard}>
-        {/* Search Bar */}
+      {/* Search & Filters */}
+      <View style={styles.controls}>
         <View style={styles.searchWrapper}>
-          <Ionicons name="search-outline" size={18} color={THEME.colors.textMuted} style={{ marginRight: 8 }} />
+          <Ionicons name="search-outline" size={16} color={THEME.colors.textMuted} style={{ marginRight: 8 }} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search protocols, brand guidelines, security SOPs..."
@@ -283,15 +284,8 @@ export const ResourcesView: React.FC = () => {
           )}
         </View>
 
-        {/* Category Filter Pills */}
         <View style={styles.filterPillsRow}>
-          {[
-            { id: 'all', label: `All (${RESOURCES_DATA.length})` },
-            { id: 'clinical', label: 'Clinical Protocols (4)' },
-            { id: 'brand', label: 'Brand & Design (3)' },
-            { id: 'security', label: 'Security & Access (4)' },
-            { id: 'operations', label: 'Operations (3)' },
-          ].map(cat => {
+          {categories.map(cat => {
             const isSelected = selectedCategory === cat.id;
             return (
               <Pressable
@@ -308,45 +302,25 @@ export const ResourcesView: React.FC = () => {
         </View>
       </View>
 
-      {/* Resources Grid */}
+      {/* Grid */}
       <View style={[styles.resourcesGrid, !isDesktop && styles.resourcesGridMobile]}>
         {filteredResources.map(item => (
           <View key={item.id} style={styles.resourceCard}>
-            {/* Card Header: Icon & Badges */}
-            <View style={styles.cardTopRow}>
-              <View style={styles.resourceIconBox}>
-                <Ionicons name={item.iconName} size={20} color={THEME.colors.terracotta} />
-              </View>
-              <View style={styles.badgeGroup}>
-                <Badge
-                  label={item.format}
-                  variant={item.format === 'PDF' ? 'primary' : 'sage'}
-                />
-                <Badge
-                  label={item.category.toUpperCase()}
-                  variant={item.category === 'security' ? 'admin' : 'neutral'}
-                />
-              </View>
-            </View>
-
-            {/* Card Body */}
+            <Text style={styles.categoryText}>{item.categoryLabel}</Text>
             <Text style={styles.resourceTitle}>{item.title}</Text>
             <Text style={styles.resourceDesc}>{item.description}</Text>
 
-            {/* Card Footer: Metadata & Action Buttons */}
             <View style={styles.cardFooter}>
-              <View style={styles.metaRow}>
-                <Text style={styles.metaSize}>{item.size}</Text>
-                <Text style={styles.metaDot}>•</Text>
-                <Text style={styles.metaUpdated}>{item.updatedAt}</Text>
-              </View>
+              <Text style={styles.metaText}>
+                {item.format} · {item.size} · {item.updatedAt}
+              </Text>
 
               <View style={styles.actionButtonsRow}>
                 <Pressable
                   onPress={() => handleAction(item, 'view')}
                   style={({ pressed }) => [styles.actionBtn, styles.actionBtnOutline, pressed && { opacity: 0.7 }]}
                 >
-                  <Ionicons name="eye-outline" size={13} color={THEME.colors.textPrimary} style={{ marginRight: 4 }} />
+                  <Ionicons name="eye-outline" size={14} color={THEME.colors.textPrimary} style={{ marginRight: 6 }} />
                   <Text style={styles.actionBtnTextOutline}>Preview</Text>
                 </Pressable>
 
@@ -354,7 +328,7 @@ export const ResourcesView: React.FC = () => {
                   onPress={() => handleAction(item, 'download')}
                   style={({ pressed }) => [styles.actionBtn, styles.actionBtnPrimary, pressed && { opacity: 0.85 }]}
                 >
-                  <Ionicons name="download-outline" size={13} color="#FFFFFF" style={{ marginRight: 4 }} />
+                  <Ionicons name="download-outline" size={14} color="#FFFFFF" style={{ marginRight: 6 }} />
                   <Text style={styles.actionBtnTextPrimary}>Download</Text>
                 </Pressable>
               </View>
@@ -364,25 +338,15 @@ export const ResourcesView: React.FC = () => {
 
         {filteredResources.length === 0 && (
           <View style={styles.emptyCard}>
-            <Ionicons name="folder-open-outline" size={36} color={THEME.colors.textMuted} style={{ marginBottom: 8 }} />
+            <Ionicons name="folder-open-outline" size={32} color={THEME.colors.textMuted} style={{ marginBottom: 12 }} />
             <Text style={styles.emptyTitle}>No matching resources found</Text>
-            <Text style={styles.emptySubtitle}>Try searching for a different keyword or select another category filter.</Text>
+            <Text style={styles.emptySubtitle}>Try a different keyword or select another category.</Text>
           </View>
         )}
       </View>
 
-      {/* Compliance & Verification Hub Banner */}
-      <View style={styles.complianceCard}>
-        <View style={styles.complianceContent}>
-          <Ionicons name="lock-closed" size={24} color={THEME.colors.terracotta} style={{ marginRight: 12 }} />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.complianceTitle}>Official Corporate Knowledge Repository</Text>
-            <Text style={styles.complianceDesc}>
-              All materials hosted in this portal are proprietary assets of Hop with HB (`hbplus.fit`). Distribution outside the corporate domain without administrator approval is strictly prohibited.
-            </Text>
-          </View>
-        </View>
-      </View>
+      {/* Footer Notice */}
+
     </View>
   );
 };
@@ -391,31 +355,14 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
   },
+
+  // Header
   headerBlock: {
-    marginBottom: THEME.spacing.lg,
-  },
-  kickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  kickerDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: THEME.colors.terracotta,
-    marginRight: 6,
-  },
-  kickerText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: THEME.colors.terracotta,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
+    marginBottom: THEME.spacing.xl,
   },
   pageTitle: {
     fontFamily: THEME.typography.fontFamily.serif,
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: '700',
     color: THEME.colors.textPrimary,
     letterSpacing: -0.5,
@@ -423,21 +370,20 @@ const styles = StyleSheet.create({
   pageSubtitle: {
     fontSize: 14,
     color: THEME.colors.textSecondary,
-    marginTop: 6,
-    lineHeight: 21,
-    maxWidth: 720,
+    marginTop: 8,
+    lineHeight: 22,
+    maxWidth: 640,
   },
 
-  // Toast Banner
+  // Toast
   toastBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderRadius: THEME.borderRadius.md,
-    marginBottom: THEME.spacing.md,
+    marginBottom: THEME.spacing.lg,
     borderWidth: 1,
-    ...THEME.shadows.sm,
   },
   toastView: {
     backgroundColor: '#FAF8F5',
@@ -450,34 +396,28 @@ const styles = StyleSheet.create({
   toastText: {
     flex: 1,
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '500',
     color: THEME.colors.textPrimary,
   },
 
-  // Controls Card
-  controlsCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: THEME.borderRadius.card,
-    borderWidth: 1,
-    borderColor: THEME.colors.cardBorder,
-    padding: THEME.spacing.md,
-    marginBottom: THEME.spacing.lg,
-    ...THEME.shadows.sm,
+  // Controls
+  controls: {
+    marginBottom: THEME.spacing.xl,
   },
   searchWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FAF8F5',
-    borderWidth: 1.5,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
     borderColor: THEME.colors.cardBorder,
     borderRadius: THEME.borderRadius.md,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     height: 44,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   searchInput: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 14,
     color: THEME.colors.textPrimary,
     outlineWidth: 0,
     height: '100%',
@@ -488,12 +428,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   filterPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
     borderRadius: THEME.borderRadius.full,
-    backgroundColor: THEME.colors.creamDark,
     borderWidth: 1,
     borderColor: THEME.colors.cardBorder,
+    backgroundColor: 'transparent',
   },
   filterPillActive: {
     backgroundColor: THEME.colors.onyx,
@@ -501,7 +441,7 @@ const styles = StyleSheet.create({
   },
   filterPillText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '500',
     color: THEME.colors.textSecondary,
   },
   filterPillTextActive: {
@@ -525,29 +465,16 @@ const styles = StyleSheet.create({
     borderRadius: THEME.borderRadius.card,
     borderWidth: 1,
     borderColor: THEME.colors.cardBorder,
-    padding: THEME.spacing.md,
+    padding: 20,
     justifyContent: 'space-between',
-    ...THEME.shadows.sm,
   },
-  cardTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  resourceIconBox: {
-    width: 38,
-    height: 38,
-    borderRadius: 8,
-    backgroundColor: '#FAF8F5',
-    borderWidth: 1,
-    borderColor: THEME.colors.cardBorder,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeGroup: {
-    flexDirection: 'row',
-    gap: 6,
+  categoryText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: THEME.colors.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 8,
   },
   resourceTitle: {
     fontFamily: THEME.typography.fontFamily.serif,
@@ -555,36 +482,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: THEME.colors.textPrimary,
     letterSpacing: -0.3,
-    marginBottom: 6,
+    lineHeight: 23,
+    marginBottom: 8,
   },
   resourceDesc: {
-    fontSize: 12,
+    fontSize: 13,
     color: THEME.colors.textSecondary,
-    lineHeight: 18,
-    marginBottom: 14,
+    lineHeight: 20,
+    marginBottom: 20,
   },
   cardFooter: {
-    borderTopWidth: 1,
-    borderTopColor: THEME.colors.divider,
-    paddingTop: 10,
-    gap: 10,
+    gap: 14,
   },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  metaSize: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: THEME.colors.textPrimary,
-  },
-  metaDot: {
-    marginHorizontal: 5,
-    fontSize: 11,
-    color: THEME.colors.textMuted,
-  },
-  metaUpdated: {
-    fontSize: 11,
+  metaText: {
+    fontSize: 12,
     color: THEME.colors.textMuted,
   },
   actionButtonsRow: {
@@ -593,14 +504,14 @@ const styles = StyleSheet.create({
   },
   actionBtn: {
     flex: 1,
-    height: 34,
+    height: 38,
     borderRadius: THEME.borderRadius.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
   actionBtnOutline: {
-    backgroundColor: '#FAF8F5',
+    backgroundColor: 'transparent',
     borderWidth: 1,
     borderColor: THEME.colors.cardBorder,
   },
@@ -608,20 +519,20 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.terracotta,
   },
   actionBtnTextOutline: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: THEME.colors.textPrimary,
   },
   actionBtnTextPrimary: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: '#FFFFFF',
   },
 
   // Empty state
   emptyCard: {
     width: '100%',
-    padding: 36,
+    padding: 40,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
@@ -630,8 +541,8 @@ const styles = StyleSheet.create({
     borderColor: THEME.colors.cardBorder,
   },
   emptyTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '600',
     color: THEME.colors.textPrimary,
   },
   emptySubtitle: {
@@ -640,29 +551,24 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  // Compliance Hub
-  complianceCard: {
-    backgroundColor: THEME.colors.creamDark,
-    borderRadius: THEME.borderRadius.card,
-    borderWidth: 1,
-    borderColor: THEME.colors.cardBorder,
-    padding: THEME.spacing.lg,
-    ...THEME.shadows.sm,
-  },
-  complianceContent: {
+  // Footer notice
+  notice: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: THEME.borderRadius.card,
+    backgroundColor: THEME.colors.creamDark,
   },
-  complianceTitle: {
-    fontSize: 14,
-    fontWeight: '700',
+  noticeTitle: {
+    fontSize: 13,
+    fontWeight: '600',
     color: THEME.colors.onyx,
     marginBottom: 4,
   },
-  complianceDesc: {
+  noticeDesc: {
     fontSize: 12,
     color: THEME.colors.textSecondary,
     lineHeight: 18,
   },
 });
-
