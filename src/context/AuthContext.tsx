@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const navigateTo = useCallback((targetRoute: AppRoute) => {
     setAuthState(current => {
       // Route Protection: Prevent accessing protected routes when unauthenticated
-      if (!current.isAuthenticated && (targetRoute === 'dashboard' || targetRoute === 'admin' || targetRoute === 'profile')) {
+      if (!current.isAuthenticated && (targetRoute === 'dashboard' || targetRoute === 'admin' || targetRoute === 'profile' || targetRoute === 'resources')) {
         setActiveRoute('login');
         updateUrlHash('login');
         return {
@@ -131,6 +131,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               const hash = window.location.hash.replace('#', '') as AppRoute;
               if (hash === 'admin' && cachedUser.role === 'admin') {
                 setActiveRoute('admin');
+              } else if (hash === 'resources') {
+                setActiveRoute('resources');
               } else {
                 setActiveRoute('dashboard');
                 updateUrlHash('dashboard');

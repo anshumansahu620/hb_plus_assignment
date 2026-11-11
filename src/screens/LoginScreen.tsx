@@ -187,45 +187,6 @@ export const LoginScreen: React.FC = () => {
             </View>
 
             {/* Evaluator & Recruiter Sandbox Suite */}
-            <View style={styles.evaluatorSection}>
-              <View style={styles.evaluatorDividerRow}>
-                <View style={styles.evaluatorLine} />
-                <Text style={styles.evaluatorLabel}>EVALUATOR TEST SCENARIOS</Text>
-                <View style={styles.evaluatorLine} />
-              </View>
-
-              <View style={styles.testButtonsGrid}>
-                {/* 1. Allowed User */}
-                <Button
-                  label="Allow: user@hbplus.fit (Team Member)"
-                  variant="outline"
-                  onPress={() => simulateLogin(`alex.trainer@${ALLOWED_DOMAIN}`, 'user')}
-                  isLoading={isLoading}
-                  style={styles.testBtnSuccess}
-                  textStyle={styles.testBtnTextSuccess}
-                />
-
-                {/* 2. Allowed Admin */}
-                <Button
-                  label="Allow: admin@hbplus.fit (Admin Role)"
-                  variant="outline"
-                  onPress={() => simulateLogin(`admin@${ALLOWED_DOMAIN}`, 'admin')}
-                  isLoading={isLoading}
-                  style={styles.testBtnAdmin}
-                  textStyle={styles.testBtnTextAdmin}
-                />
-
-                {/* 3. Blocked Gmail */}
-                <Button
-                  label="Block: example@gmail.com (Restricted)"
-                  variant="outline"
-                  onPress={() => simulateLogin('example@gmail.com')}
-                  isLoading={isLoading}
-                  style={styles.testBtnDanger}
-                  textStyle={styles.testBtnTextDanger}
-                />
-              </View>
-            </View>
 
             {/* Terms and Privacy Footer */}
             <View style={styles.termsFooter}>

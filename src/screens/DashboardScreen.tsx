@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,17 +13,28 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { Badge } from '../components/Badge';
+import { ResourcesView } from '../components/ResourcesView';
 import { THEME } from '../constants/theme';
 import { APP_CONFIG } from '../constants/config';
 
 const hbplusLogo = require('../../assets/hbplus-logo.png');
 
 export const DashboardScreen: React.FC = () => {
-  const { user, signOut, navigateTo, setPassword, grantAdminAccess, elevateToAdmin } = useAuth();
+  const { user, signOut, navigateTo, setPassword, grantAdminAccess, elevateToAdmin, activeRoute } = useAuth();
   const { width } = useWindowDimensions();
   const isDesktop = width >= THEME.breakpoints.tablet;
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'resources'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'resources'>(
+    activeRoute === 'resources' ? 'resources' : 'overview'
+  );
+
+  useEffect(() => {
+    if (activeRoute === 'resources') {
+      setActiveTab('resources');
+    } else if (activeRoute === 'dashboard') {
+      setActiveTab('overview');
+    }
+  }, [activeRoute]);
 
   // Quick Grant Admin State on Dashboard
   const [quickAdminEmail, setQuickAdminEmail] = useState('');
@@ -123,7 +134,10 @@ export const DashboardScreen: React.FC = () => {
               {/* Sidebar Menu Items */}
               <View style={styles.menuList}>
                 <Pressable
-                  onPress={() => setActiveTab('overview')}
+                  onPress={() => {
+                    setActiveTab('overview');
+                    navigateTo('dashboard');
+                  }}
                   style={[styles.menuItem, activeTab === 'overview' && styles.menuItemActive]}
                 >
                   <Ionicons
@@ -135,6 +149,25 @@ export const DashboardScreen: React.FC = () => {
                   <Text style={[styles.menuItemText, activeTab === 'overview' && styles.menuItemTextActive]}>
                     Overview
                   </Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => {
+                    setActiveTab('resources');
+                    navigateTo('resources');
+                  }}
+                  style={[styles.menuItem, activeTab === 'resources' && styles.menuItemActive]}
+                >
+                  <Ionicons
+                    name="folder-outline"
+                    size={17}
+                    color={activeTab === 'resources' ? THEME.colors.terracotta : THEME.colors.textSecondary}
+                    style={styles.menuIcon}
+                  />
+                  <Text style={[styles.menuItemText, activeTab === 'resources' && styles.menuItemTextActive]}>
+                    Resources
+                  </Text>
+                  <Badge label="14" variant="sage" />
                 </Pressable>
 
                 {user?.role === 'admin' && (
@@ -152,21 +185,6 @@ export const DashboardScreen: React.FC = () => {
                     <Badge label="RBAC" variant="admin" />
                   </Pressable>
                 )}
-
-                <Pressable
-                  onPress={() => setActiveTab('resources')}
-                  style={[styles.menuItem, activeTab === 'resources' && styles.menuItemActive]}
-                >
-                  <Ionicons
-                    name="folder-outline"
-                    size={17}
-                    color={activeTab === 'resources' ? THEME.colors.terracotta : THEME.colors.textSecondary}
-                    style={styles.menuIcon}
-                  />
-                  <Text style={[styles.menuItemText, activeTab === 'resources' && styles.menuItemTextActive]}>
-                    Resources
-                  </Text>
-                </Pressable>
               </View>
             </View>
 
@@ -210,26 +228,55 @@ export const DashboardScreen: React.FC = () => {
                 />
                 <Text style={styles.brandNameDark}>hbplus</Text>
               </View>
+
+              <View style={styles.mobileNavPills}>
+                <Pressable
+                  onPress={() => {
+                    setActiveTab('overview');
+                    navigateTo('dashboard');
+                  }}
+                  style={[styles.mobileNavPill, activeTab === 'overview' && styles.mobileNavPillActive]}
+                >
+                  <Text style={[styles.mobileNavPillText, activeTab === 'overview' && styles.mobileNavPillTextActive]}>
+                    Overview
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => {
+                    setActiveTab('resources');
+                    navigateTo('resources');
+                  }}
+                  style={[styles.mobileNavPill, activeTab === 'resources' && styles.mobileNavPillActive]}
+                >
+                  <Text style={[styles.mobileNavPillText, activeTab === 'resources' && styles.mobileNavPillTextActive]}>
+                    Resources
+                  </Text>
+                </Pressable>
+              </View>
+
               <Pressable onPress={signOut} style={styles.mobileSignOut}>
-                <Text style={styles.mobileSignOutText}>Sign out</Text>
+                <Ionicons name="log-out-outline" size={16} color={THEME.colors.error} />
               </Pressable>
             </View>
           )}
 
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.innerContainer}>
+              {activeTab === 'resources' ? (
+                <ResourcesView />
+              ) : (
+                <>
+                  {/* Header Greeting */}
+                  <View style={styles.greetingHeader}>
+                    <View>
+                      <Text style={styles.greetingTitle}>Welcome back, {firstName}.</Text>
+                      <Text style={styles.greetingSubtitle}>
+                        Here is what's happening with your workspace today.
+                      </Text>
+                    </View>
 
-              {/* Header Greeting */}
-              <View style={styles.greetingHeader}>
-                <View>
-                  <Text style={styles.greetingTitle}>Welcome back, {firstName}.</Text>
-                  <Text style={styles.greetingSubtitle}>
-                    Here is what's happening with your workspace today.
-                  </Text>
-                </View>
-
-
-              </View>
+                  </View>
 
               {/* HB+ LUXURY HERO CARD (From example.html) */}
               <View style={styles.forestHeroBanner}>
@@ -507,17 +554,20 @@ export const DashboardScreen: React.FC = () => {
                     </Text>
                   </Pressable>
 
-                  {/* Module 2: Security Policy */}
+                  {/* Module 2: Resource Library */}
                   <Pressable
-                    onPress={() => alert(`Policy: Access restricted exclusively to @${APP_CONFIG.allowedDomain}. Non-official emails are rejected immediately.`)}
+                    onPress={() => {
+                      setActiveTab('resources');
+                      navigateTo('resources');
+                    }}
                     style={styles.moduleCard}
                   >
                     <View style={styles.moduleIconWrapper}>
-                      <Ionicons name="shield-checkmark-outline" size={18} color={THEME.colors.terracotta} />
+                      <Ionicons name="folder-outline" size={18} color={THEME.colors.terracotta} />
                     </View>
-                    <Text style={styles.moduleTitle}>Domain Security</Text>
+                    <Text style={styles.moduleTitle}>Resource Library</Text>
                     <Text style={styles.moduleDesc}>
-                      Strict Google OAuth domain validation active with automated session revocation.
+                      Access 14 official clinical protocols, brand kits, and security compliance handbooks.
                     </Text>
                   </Pressable>
 
@@ -593,6 +643,8 @@ export const DashboardScreen: React.FC = () => {
                   </View>
                 </View>
               </View>
+            </>
+          )}
 
             </View>
           </ScrollView>
@@ -771,6 +823,31 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: THEME.spacing.md,
+  },
+  mobileNavPills: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  mobileNavPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: THEME.borderRadius.full,
+    backgroundColor: THEME.colors.creamDark,
+    borderWidth: 1,
+    borderColor: THEME.colors.cardBorder,
+  },
+  mobileNavPillActive: {
+    backgroundColor: THEME.colors.onyx,
+    borderColor: THEME.colors.onyx,
+  },
+  mobileNavPillText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: THEME.colors.textSecondary,
+  },
+  mobileNavPillTextActive: {
+    color: '#FFFFFF',
   },
   mobileSignOut: {
     paddingVertical: 6,

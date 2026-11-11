@@ -55,6 +55,23 @@ export const Navbar: React.FC = () => {
             </Text>
           </Pressable>
 
+          <Pressable
+            onPress={() => navigateTo('resources')}
+            style={[
+              styles.navLink,
+              activeRoute === 'resources' && styles.navLinkActive,
+            ]}
+          >
+            <Text
+              style={[
+                styles.navLinkText,
+                activeRoute === 'resources' && styles.navLinkTextActive,
+              ]}
+            >
+              Resources
+            </Text>
+          </Pressable>
+
           {user?.role === 'admin' && (
             <Pressable
               onPress={() => navigateTo('admin')}

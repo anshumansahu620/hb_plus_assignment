@@ -41,5 +41,5 @@ export interface AuthContextType extends AuthState {
   navigateTo: (route: AppRoute) => void;
 }
 
-export type AppRoute = 'login' | 'dashboard' | 'admin' | 'profile';
+export type AppRoute = 'login' | 'dashboard' | 'admin' | 'profile' | 'resources';
 
