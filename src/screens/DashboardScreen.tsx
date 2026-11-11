@@ -292,48 +292,7 @@ export const DashboardScreen: React.FC = () => {
                   </View>
 
                   {/* Admin Announcement Callout (If user is Admin) */}
-                  {user?.role === 'admin' ? (
-                    <Pressable
-                      onPress={() => navigateTo('admin')}
-                      style={({ pressed }) => [styles.adminNotice, pressed && { opacity: 0.85 }]}
-                    >
-                      <View style={styles.adminNoticeContent}>
-                        <View style={styles.adminIconBox}>
-                          <Ionicons name="shield-outline" size={20} color="#d8931cff" />
-                        </View>
-                        <View style={{ flex: 1 }}>
-                          <Text style={styles.adminNoticeTitle}>Administrator Controls Active</Text>
-                          <Text style={styles.adminNoticeBody}>
-                            You have permission to manage team accounts, grant/revoke admin permissions, and review security audit logs.
-                          </Text>
-                        </View>
-                      </View>
-                      <View style={styles.adminNoticeBtn}>
-                        <Text style={styles.adminNoticeBtnText}>Open Panel →</Text>
-                      </View>
-                    </Pressable>
-                  ) : (
-                    /* Elevation Callout (If user is not yet Admin) */
-                    <View style={styles.elevateNotice}>
-                      <View style={styles.elevateNoticeContent}>
-                        <View style={styles.elevateIconBox}>
-                          <Ionicons name="shield-checkmark-outline" size={22} color={THEME.colors.terracotta} />
-                        </View>
-                        <View style={{ flex: 1 }}>
-                          <Text style={styles.elevateNoticeTitle}>Elevate to Administrator</Text>
-                          <Text style={styles.elevateNoticeBody}>
-                            Claim administrator privileges to grant admin access to colleagues, manage team roles, and inspect security audit logs.
-                          </Text>
-                        </View>
-                      </View>
-                      <Pressable
-                        onPress={elevateToAdmin}
-                        style={({ pressed }) => [styles.elevateBtn, pressed && { opacity: 0.85 }]}
-                      >
-                        <Text style={styles.elevateBtnText}>👑 Grant Myself Admin Access</Text>
-                      </Pressable>
-                    </View>
-                  )}
+
 
                   {/* CARD: QUICK GRANT ADMIN ACCESS (Directly on Dashboard if Admin) */}
                   {user?.role === 'admin' && (
@@ -353,7 +312,7 @@ export const DashboardScreen: React.FC = () => {
                           <Ionicons
                             name={quickAdminMsg.type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'}
                             size={16}
-                            color={quickAdminMsg.type === 'success' ? '#6D28D9' : THEME.colors.error}
+                            color={quickAdminMsg.type === 'success' ? THEME.colors.textPrimary : THEME.colors.error}
                             style={{ marginRight: 6 }}
                           />
                           <Text style={[styles.pwdAlertText, quickAdminMsg.type === 'success' ? styles.quickAdminAlertTextSuccess : styles.pwdAlertTextError]}>
@@ -966,8 +925,8 @@ const styles = StyleSheet.create({
 
   // Admin Announcement
   adminNotice: {
-    backgroundColor: '#FAF5FF',
-    borderColor: '#DDD6FE',
+    backgroundColor: THEME.colors.creamDark,
+    borderColor: THEME.colors.cardBorder,
     borderWidth: 1.5,
     borderRadius: THEME.borderRadius.card,
     padding: THEME.spacing.md,
@@ -988,15 +947,15 @@ const styles = StyleSheet.create({
   adminNoticeTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#6D28D9',
+    color: THEME.colors.onyx,
   },
   adminNoticeBody: {
     fontSize: 12,
-    color: '#7C3AED',
+    color: THEME.colors.textSecondary,
     marginTop: 2,
   },
   adminNoticeBtn: {
-    backgroundColor: '#7C3AED',
+    backgroundColor: THEME.colors.terracotta,
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: THEME.borderRadius.md,
@@ -1094,11 +1053,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   quickAdminAlertSuccess: {
-    backgroundColor: '#FAF5FF',
-    borderColor: '#DDD6FE',
+    backgroundColor: '#FAF8F5',
+    borderColor: THEME.colors.cardBorder,
   },
   quickAdminAlertTextSuccess: {
-    color: '#6D28D9',
+    color: THEME.colors.textPrimary,
     fontWeight: '600',
   },
   claimAdminPill: {

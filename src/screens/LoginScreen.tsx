@@ -563,14 +563,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   testBtnAdmin: {
-    borderColor: '#DDD6FE',
-    backgroundColor: '#F5F3FF',
+    borderColor: THEME.colors.cardBorder,
+    backgroundColor: THEME.colors.creamDark,
     paddingVertical: 9,
   },
   testBtnTextAdmin: {
-    color: '#6D28D9',
+    color: THEME.colors.onyx,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   testBtnDanger: {
     borderColor: '#FECACA',

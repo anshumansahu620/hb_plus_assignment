@@ -217,7 +217,7 @@ export const AdminScreen: React.FC = () => {
               <View style={styles.adminPillsWrap}>
                 {activeAdmins.map(admin => (
                   <View key={admin.id} style={styles.adminPill}>
-                    <Ionicons name="shield" size={12} color="#6D28D9" style={{ marginRight: 5 }} />
+                    <Ionicons name="shield" size={12} color={THEME.colors.terracotta} style={{ marginRight: 5 }} />
                     <Text style={styles.adminPillText}>{admin.email}</Text>
                   </View>
                 ))}
@@ -543,9 +543,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   feedbackSuccess: {
-    backgroundColor: '#FAF5FF',
+    backgroundColor: '#FAF8F5',
     borderWidth: 1,
-    borderColor: '#DDD6FE',
+    borderColor: THEME.colors.cardBorder,
   },
   feedbackError: {
     backgroundColor: '#FEF2F2',
@@ -558,7 +558,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   feedbackTextSuccess: {
-    color: '#6D28D9',
+    color: THEME.colors.textPrimary,
   },
   feedbackTextError: {
     color: THEME.colors.error,
@@ -626,9 +626,9 @@ const styles = StyleSheet.create({
   adminPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FAF5FF',
+    backgroundColor: '#FAF8F5',
     borderWidth: 1,
-    borderColor: '#DDD6FE',
+    borderColor: THEME.colors.cardBorder,
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
   adminPillText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#6D28D9',
+    color: THEME.colors.textPrimary,
   },
   logsList: {
     gap: 10,

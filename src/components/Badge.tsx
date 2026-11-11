@@ -31,9 +31,9 @@ export const Badge: React.FC<BadgeProps> = ({
         };
       case 'admin':
         return {
-          bg: '#F5F3FF',
-          text: '#6D28D9',
-          border: '#DDD6FE',
+          bg: '#1A1A1A',
+          text: '#F5F2E9',
+          border: '#1A1A1A',
         };
       case 'darkGreen':
         return {

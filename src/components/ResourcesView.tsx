@@ -440,8 +440,8 @@ const styles = StyleSheet.create({
     ...THEME.shadows.sm,
   },
   toastView: {
-    backgroundColor: '#FAF5FF',
-    borderColor: '#DDD6FE',
+    backgroundColor: '#FAF8F5',
+    borderColor: THEME.colors.cardBorder,
   },
   toastDownload: {
     backgroundColor: '#ECFDF5',
