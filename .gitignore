@@ -34,6 +34,8 @@ yarn-error.*
 .env
 .env*.local
 PASSWORD.txt
+.netlify/
+.netlify
 
 # typescript
 *.tsbuildinfo
