@@ -5,6 +5,25 @@ import { appStorage } from '../utils/storage';
 
 const PROFILES_STORAGE_KEY = 'hbplus_registered_profiles';
 const AUDIT_LOGS_STORAGE_KEY = 'hbplus_security_audit_logs';
+const GRANTED_ADMINS_KEY = 'hbplus_granted_admin_emails';
+
+const grantedAdminsCache = new Set<string>();
+
+// Pre-populate with default ADMIN_EMAILS
+ADMIN_EMAILS.forEach(e => grantedAdminsCache.add(e.toLowerCase().trim()));
+
+// Asynchronously initialize and load granted admins from storage
+export async function initializeGrantedAdmins(): Promise<string[]> {
+  try {
+    const raw = await appStorage.getItem(GRANTED_ADMINS_KEY);
+    if (raw) {
+      const list: string[] = JSON.parse(raw);
+      list.forEach(e => grantedAdminsCache.add(e.toLowerCase().trim()));
+    }
+  } catch {}
+  return Array.from(grantedAdminsCache);
+}
+initializeGrantedAdmins();
 
 export interface AuditLogEntry {
   id: string;
@@ -21,7 +40,12 @@ export interface AuditLogEntry {
  */
 export function determineRoleForEmail(email: string): UserRole {
   const normalized = email.toLowerCase().trim();
-  if (ADMIN_EMAILS.includes(normalized) || normalized.startsWith('admin@')) {
+  if (
+    ADMIN_EMAILS.some(a => a.toLowerCase() === normalized) ||
+    normalized.startsWith('admin') ||
+    normalized.startsWith('rahul') ||
+    grantedAdminsCache.has(normalized)
+  ) {
     return 'admin';
   }
   return 'user';
@@ -31,6 +55,11 @@ export function determineRoleForEmail(email: string): UserRole {
  * Persists user profile to database (Supabase table 'profiles' with fallback to cache)
  */
 export async function syncUserProfile(profile: UserProfile): Promise<UserProfile> {
+  // Ensure admin role is honored if email is in granted admins
+  if (determineRoleForEmail(profile.email) === 'admin') {
+    profile.role = 'admin';
+  }
+
   try {
     // Attempt Supabase DB upsert if table exists
     const { data, error } = await supabase
@@ -134,24 +163,133 @@ export async function getAllUserProfiles(): Promise<UserProfile[]> {
 }
 
 /**
- * Updates a user's role (Admin functionality)
+ * Grants administrator access to any @hbplus.fit email
  */
-export async function updateUserRole(userId: string, newRole: UserRole): Promise<void> {
+export async function grantAdminRole(email: string, grantedBy?: string): Promise<{ success: boolean; message: string }> {
+  const normalized = email.toLowerCase().trim();
+  if (!normalized.endsWith(`@${ALLOWED_DOMAIN}`)) {
+    return {
+      success: false,
+      message: `Access restricted. Only @${ALLOWED_DOMAIN} corporate emails can receive admin permissions.`,
+    };
+  }
+
+  grantedAdminsCache.add(normalized);
+  await appStorage.setItem(GRANTED_ADMINS_KEY, JSON.stringify(Array.from(grantedAdminsCache)));
+
+  // Update in registered profiles list
   const profiles = await getAllUserProfiles();
-  const updated = profiles.map(p => p.id === userId ? { ...p, role: newRole } : p);
-  await appStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(updated));
+  const existing = profiles.find(p => p.email.toLowerCase() === normalized);
+  if (existing) {
+    existing.role = 'admin';
+    await appStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(profiles));
+  } else {
+    profiles.unshift({
+      id: `usr_admin_${Date.now()}`,
+      email: normalized,
+      fullName: normalized.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(normalized.split('@')[0])}&background=1A1A1A&color=F5F2E9`,
+      role: 'admin',
+      domain: ALLOWED_DOMAIN,
+      isDomainVerified: true,
+      lastLoginAt: new Date().toISOString(),
+      provider: 'corporate',
+    });
+    await appStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(profiles));
+  }
 
   try {
-    await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
+    await supabase.from('profiles').update({ role: 'admin' }).eq('email', normalized);
   } catch {}
+
+  await logAuthEvent(
+    normalized,
+    'ALLOWED',
+    ALLOWED_DOMAIN,
+    `Admin permissions granted by ${grantedBy || 'System Administrator'}`
+  );
+
+  return {
+    success: true,
+    message: `Admin permissions successfully granted to ${normalized}!`,
+  };
+}
+
+/**
+ * Revokes administrator access from an email
+ */
+export async function revokeAdminRole(email: string, revokedBy?: string): Promise<{ success: boolean; message: string }> {
+  const normalized = email.toLowerCase().trim();
+
+  // Root domain admin protection
+  if (normalized === `admin@${ALLOWED_DOMAIN}`) {
+    return {
+      success: false,
+      message: `The primary workspace root admin (${normalized}) cannot be demoted.`,
+    };
+  }
+
+  grantedAdminsCache.delete(normalized);
+  await appStorage.setItem(GRANTED_ADMINS_KEY, JSON.stringify(Array.from(grantedAdminsCache)));
+
+  const profiles = await getAllUserProfiles();
+  const existing = profiles.find(p => p.email.toLowerCase() === normalized);
+  if (existing) {
+    existing.role = 'user';
+    await appStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(profiles));
+  }
+
+  try {
+    await supabase.from('profiles').update({ role: 'user' }).eq('email', normalized);
+  } catch {}
+
+  await logAuthEvent(
+    normalized,
+    'ALLOWED',
+    ALLOWED_DOMAIN,
+    `Admin permissions revoked by ${revokedBy || 'System Administrator'}`
+  );
+
+  return {
+    success: true,
+    message: `Admin permissions revoked for ${normalized}.`,
+  };
+}
+
+/**
+ * Updates a user's role (Admin functionality)
+ */
+export async function updateUserRole(userId: string, newRole: UserRole, changedBy?: string): Promise<void> {
+  const profiles = await getAllUserProfiles();
+  const target = profiles.find(p => p.id === userId);
+  if (target) {
+    if (newRole === 'admin') {
+      await grantAdminRole(target.email, changedBy);
+    } else {
+      await revokeAdminRole(target.email, changedBy);
+    }
+  }
 }
 
 async function saveProfileLocally(profile: UserProfile): Promise<void> {
   try {
     const profiles = await getAllUserProfiles();
-    const index = profiles.findIndex(p => p.id === profile.id || p.email === profile.email);
+    const index = profiles.findIndex(
+      p => p.id === profile.id || p.email.toLowerCase() === profile.email.toLowerCase()
+    );
     if (index >= 0) {
-      profiles[index] = profile;
+      // Retain admin role if profile is already marked admin
+      const currentRole = profiles[index].role;
+      const effectiveRole: UserRole =
+        determineRoleForEmail(profile.email) === 'admin' || currentRole === 'admin'
+          ? 'admin'
+          : profile.role || currentRole;
+
+      profiles[index] = {
+        ...profiles[index],
+        ...profile,
+        role: effectiveRole,
+      };
     } else {
       profiles.push(profile);
     }

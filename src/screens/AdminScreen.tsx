@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   Image,
   Pressable,
+  TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
@@ -16,7 +17,6 @@ import { THEME } from '../constants/theme';
 import { APP_CONFIG } from '../constants/config';
 import {
   getAllUserProfiles,
-  updateUserRole,
   getAuditLogs,
   AuditLogEntry,
 } from '../services/db';
@@ -25,13 +25,18 @@ import { UserProfile, UserRole } from '../types/auth';
 const hbplusLogo = require('../../assets/hbplus-logo.png');
 
 export const AdminScreen: React.FC = () => {
-  const { user, navigateTo, signOut } = useAuth();
+  const { user, navigateTo, signOut, grantAdminAccess, revokeAdminAccess, elevateToAdmin } = useAuth();
   const { width } = useWindowDimensions();
   const isDesktop = width >= THEME.breakpoints.tablet;
 
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
+
+  // Grant admin form state
+  const [grantEmail, setGrantEmail] = useState('');
+  const [grantMessage, setGrantMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [isGranting, setIsGranting] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -47,11 +52,43 @@ export const AdminScreen: React.FC = () => {
   };
 
   const handleRoleToggle = async (targetUser: UserProfile) => {
-    const nextRole: UserRole = targetUser.role === 'admin' ? 'user' : 'admin';
     setIsUpdating(targetUser.id);
-    await updateUserRole(targetUser.id, nextRole);
+    if (targetUser.role === 'admin') {
+      const res = await revokeAdminAccess(targetUser.email);
+      setGrantMessage({ text: res.message, type: res.success ? 'success' : 'error' });
+    } else {
+      const res = await grantAdminAccess(targetUser.email);
+      setGrantMessage({ text: res.message, type: res.success ? 'success' : 'error' });
+    }
     await loadData();
     setIsUpdating(null);
+  };
+
+  const handleGrantAdmin = async () => {
+    const trimmed = grantEmail.trim();
+    if (!trimmed) {
+      setGrantMessage({ text: 'Please enter a valid corporate email.', type: 'error' });
+      return;
+    }
+    if (!trimmed.toLowerCase().endsWith(`@${APP_CONFIG.allowedDomain}`)) {
+      setGrantMessage({
+        text: `Access restricted. Only @${APP_CONFIG.allowedDomain} corporate emails can receive admin permissions.`,
+        type: 'error',
+      });
+      return;
+    }
+
+    setIsGranting(true);
+    setGrantMessage(null);
+    const res = await grantAdminAccess(trimmed);
+    if (res.success) {
+      setGrantMessage({ text: res.message, type: 'success' });
+      setGrantEmail('');
+      await loadData();
+    } else {
+      setGrantMessage({ text: res.message, type: 'error' });
+    }
+    setIsGranting(false);
   };
 
   if (user?.role !== 'admin') {
@@ -64,14 +101,25 @@ export const AdminScreen: React.FC = () => {
             This control center is restricted to @{APP_CONFIG.allowedDomain} administrators.
           </Text>
           <Button
+            label="👑 Grant Myself Admin Access"
+            onPress={async () => {
+              await elevateToAdmin();
+              await loadData();
+            }}
+            style={{ marginTop: 16, backgroundColor: THEME.colors.terracotta }}
+          />
+          <Button
             label="Return to Dashboard"
+            variant="outline"
             onPress={() => navigateTo('dashboard')}
-            style={{ marginTop: 16 }}
+            style={{ marginTop: 10 }}
           />
         </View>
       </View>
     );
   }
+
+  const activeAdmins = profiles.filter(p => p.role === 'admin');
 
   return (
     <View style={styles.rootWrapper}>
@@ -104,8 +152,77 @@ export const AdminScreen: React.FC = () => {
           <View style={styles.pageTitleBlock}>
             <Text style={styles.pageTitle}>User Directory & Domain Auditing</Text>
             <Text style={styles.pageSubtitle}>
-              Manage corporate identities, role privileges, and inspect real-time domain security logs.
+              Manage corporate identities, grant admin permissions, and inspect real-time domain security logs.
             </Text>
+          </View>
+
+          {/* CARD: GRANT ADMIN PRIVILEGES (NEW FEATURE) */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View>
+                <Text style={styles.cardTitle}>Grant Admin Access & Permissions</Text>
+                <Text style={styles.cardSubtitle}>
+                  Authorize any @{APP_CONFIG.allowedDomain} team member with administrator privileges.
+                </Text>
+              </View>
+              <Badge label="RBAC Manager" variant="admin" />
+            </View>
+
+            {grantMessage && (
+              <View style={[styles.feedbackBanner, grantMessage.type === 'success' ? styles.feedbackSuccess : styles.feedbackError]}>
+                <Ionicons
+                  name={grantMessage.type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'}
+                  size={16}
+                  color={grantMessage.type === 'success' ? '#1A1A1A' : THEME.colors.error}
+                  style={{ marginRight: 8 }}
+                />
+                <Text style={[styles.feedbackText, grantMessage.type === 'success' ? styles.feedbackTextSuccess : styles.feedbackTextError]}>
+                  {grantMessage.text}
+                </Text>
+              </View>
+            )}
+
+            <View style={[styles.grantFormRow, !isDesktop && styles.grantFormRowMobile]}>
+              <View style={styles.grantInputWrapper}>
+                <Ionicons name="mail-outline" size={17} color={THEME.colors.textMuted} style={{ marginRight: 8 }} />
+                <TextInput
+                  style={styles.grantInput}
+                  placeholder={`member@${APP_CONFIG.allowedDomain}`}
+                  placeholderTextColor={THEME.colors.textMuted}
+                  value={grantEmail}
+                  onChangeText={setGrantEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              </View>
+              <Pressable
+                onPress={handleGrantAdmin}
+                disabled={isGranting}
+                style={({ pressed }) => [
+                  styles.grantBtn,
+                  pressed && { opacity: 0.8 },
+                  isGranting && { opacity: 0.6 },
+                ]}
+              >
+                <Ionicons name="shield-checkmark-outline" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+                <Text style={styles.grantBtnText}>
+                  {isGranting ? 'Granting...' : 'Grant Admin Access'}
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* Current Active Admins Pills */}
+            <View style={styles.adminPillsSection}>
+              <Text style={styles.adminPillsLabel}>Active Administrators ({activeAdmins.length}):</Text>
+              <View style={styles.adminPillsWrap}>
+                {activeAdmins.map(admin => (
+                  <View key={admin.id} style={styles.adminPill}>
+                    <Ionicons name="shield" size={12} color="#6D28D9" style={{ marginRight: 5 }} />
+                    <Text style={styles.adminPillText}>{admin.email}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
           </View>
 
           {/* User Directory Table Card */}
@@ -149,15 +266,25 @@ export const AdminScreen: React.FC = () => {
                         disabled={isUpdating === item.id}
                         style={({ pressed }) => [
                           styles.roleToggleBtn,
+                          item.role === 'admin' ? styles.roleToggleBtnRevoke : styles.roleToggleBtnPromote,
                           pressed && { opacity: 0.7 },
                         ]}
                       >
-                        <Text style={styles.roleToggleText}>
+                        <Ionicons
+                          name={item.role === 'admin' ? 'close-circle-outline' : 'shield-checkmark-outline'}
+                          size={14}
+                          color={item.role === 'admin' ? '#991B1B' : '#047857'}
+                          style={{ marginRight: 4 }}
+                        />
+                        <Text style={[
+                          styles.roleToggleText,
+                          item.role === 'admin' ? styles.roleToggleTextRevoke : styles.roleToggleTextPromote,
+                        ]}>
                           {isUpdating === item.id
                             ? 'Updating...'
                             : item.role === 'admin'
-                            ? 'Demote to User'
-                            : 'Promote to Admin'}
+                            ? 'Revoke Admin'
+                            : 'Grant Admin Access'}
                         </Text>
                       </Pressable>
                     )}
@@ -172,7 +299,7 @@ export const AdminScreen: React.FC = () => {
             <View style={styles.cardHeader}>
               <View>
                 <Text style={styles.cardTitle}>Security Audit & Domain Interceptions</Text>
-                <Text style={styles.cardSubtitle}>Real-time log of permitted @hbplus.fit logins and blocked attempts</Text>
+                <Text style={styles.cardSubtitle}>Real-time log of permitted @hbplus.fit logins, role updates, and blocked attempts</Text>
               </View>
               <Badge label="Live Audit" variant="darkGreen" />
             </View>
@@ -386,11 +513,130 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.creamDark,
     borderWidth: 1,
     borderColor: THEME.colors.cardBorder,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  roleToggleBtnPromote: {
+    backgroundColor: '#ECFDF5',
+    borderColor: '#A7F3D0',
+  },
+  roleToggleBtnRevoke: {
+    backgroundColor: '#FEF2F2',
+    borderColor: '#FECACA',
   },
   roleToggleText: {
     fontSize: 12,
     fontWeight: '600',
     color: THEME.colors.textSecondary,
+  },
+  roleToggleTextPromote: {
+    color: '#047857',
+  },
+  roleToggleTextRevoke: {
+    color: '#991B1B',
+  },
+  feedbackBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: THEME.borderRadius.md,
+    marginBottom: 12,
+  },
+  feedbackSuccess: {
+    backgroundColor: '#FAF5FF',
+    borderWidth: 1,
+    borderColor: '#DDD6FE',
+  },
+  feedbackError: {
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  feedbackText: {
+    fontSize: 12,
+    fontWeight: '600',
+    flex: 1,
+  },
+  feedbackTextSuccess: {
+    color: '#6D28D9',
+  },
+  feedbackTextError: {
+    color: THEME.colors.error,
+  },
+  grantFormRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  grantFormRowMobile: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
+  grantInputWrapper: {
+    flex: 1,
+    height: 44,
+    backgroundColor: '#FAF8F5',
+    borderWidth: 1.5,
+    borderColor: THEME.colors.cardBorder,
+    borderRadius: THEME.borderRadius.md,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  grantInput: {
+    flex: 1,
+    fontSize: 13,
+    color: THEME.colors.textPrimary,
+    outlineWidth: 0,
+    height: '100%',
+  },
+  grantBtn: {
+    backgroundColor: THEME.colors.terracotta,
+    height: 44,
+    paddingHorizontal: 18,
+    borderRadius: THEME.borderRadius.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  grantBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  adminPillsSection: {
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: THEME.colors.divider,
+  },
+  adminPillsLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: THEME.colors.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 8,
+  },
+  adminPillsWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  adminPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FAF5FF',
+    borderWidth: 1,
+    borderColor: '#DDD6FE',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  adminPillText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6D28D9',
   },
   logsList: {
     gap: 10,

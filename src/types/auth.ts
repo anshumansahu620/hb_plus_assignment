@@ -31,6 +31,9 @@ export interface AuthContextType extends AuthState {
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password?: string) => Promise<boolean>;
   setPassword: (newPassword: string) => Promise<{ success: boolean; message?: string }>;
+  grantAdminAccess: (email: string) => Promise<{ success: boolean; message: string }>;
+  revokeAdminAccess: (email: string) => Promise<{ success: boolean; message: string }>;
+  elevateToAdmin: () => Promise<void>;
   signOut: () => Promise<void>;
   clearError: () => void;
   simulateLogin: (email: string, role?: UserRole) => Promise<boolean>;

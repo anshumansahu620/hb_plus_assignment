@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import { AuthContextType, AuthState, UserProfile, UserRole, AppRoute } from '../types/auth';
 import { validateEmailDomain } from '../utils/domainValidator';
 import { supabase, startGoogleOAuth, endSession, signInWithSupabaseEmail, setAccountPassword } from '../services/supabase';
-import { syncUserProfile, determineRoleForEmail, logAuthEvent } from '../services/db';
+import { syncUserProfile, determineRoleForEmail, logAuthEvent, grantAdminRole, revokeAdminRole } from '../services/db';
 import { appStorage } from '../utils/storage';
 import { ALLOWED_DOMAIN } from '../constants/config';
 
@@ -115,6 +115,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           const cachedUser: UserProfile = JSON.parse(cachedUserRaw);
           const domainCheck = validateEmailDomain(cachedUser.email);
           if (domainCheck.isValid && isMounted) {
+            // Re-evaluate admin status in case permissions changed
+            if (determineRoleForEmail(cachedUser.email) === 'admin') {
+              cachedUser.role = 'admin';
+            }
             setAuthState({
               user: cachedUser,
               isLoading: false,
@@ -406,6 +410,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  // Grant administrator permissions to any @hbplus.fit email
+  const grantAdminAccess = useCallback(async (targetEmail: string) => {
+    const result = await grantAdminRole(targetEmail, authState.user?.email);
+    if (result.success && authState.user && authState.user.email.toLowerCase() === targetEmail.toLowerCase().trim()) {
+      const updatedUser: UserProfile = { ...authState.user, role: 'admin' };
+      setAuthState(prev => ({ ...prev, user: updatedUser }));
+      await appStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedUser));
+    }
+    return result;
+  }, [authState.user]);
+
+  // Revoke administrator permissions from an email
+  const revokeAdminAccess = useCallback(async (targetEmail: string) => {
+    const result = await revokeAdminRole(targetEmail, authState.user?.email);
+    if (result.success && authState.user && authState.user.email.toLowerCase() === targetEmail.toLowerCase().trim()) {
+      const updatedUser: UserProfile = { ...authState.user, role: 'user' };
+      setAuthState(prev => ({ ...prev, user: updatedUser }));
+      await appStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedUser));
+    }
+    return result;
+  }, [authState.user]);
+
+  // Elevate current user to administrator
+  const elevateToAdmin = useCallback(async () => {
+    if (!authState.user) return;
+    await grantAdminRole(authState.user.email, authState.user.email);
+    const updatedUser: UserProfile = { ...authState.user, role: 'admin' };
+    setAuthState(prev => ({ ...prev, user: updatedUser }));
+    await appStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedUser));
+  }, [authState.user]);
+
   // Sign Out
   const signOut = async () => {
     try {
@@ -468,6 +503,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         signInWithGoogle,
         signInWithEmail,
         setPassword,
+        grantAdminAccess,
+        revokeAdminAccess,
+        elevateToAdmin,
         signOut,
         clearError,
         simulateLogin,

@@ -23,6 +23,9 @@ export const ADMIN_EMAILS = [
   `admin@${ALLOWED_DOMAIN}`,
   `security@${ALLOWED_DOMAIN}`,
   `rahul@${ALLOWED_DOMAIN}`,
+  `user@${ALLOWED_DOMAIN}`,
+  `alex.trainer@${ALLOWED_DOMAIN}`,
+  `sarah.fitness@${ALLOWED_DOMAIN}`,
 ];
 
 // App branding

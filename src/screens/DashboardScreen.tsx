@@ -19,11 +19,40 @@ import { APP_CONFIG } from '../constants/config';
 const hbplusLogo = require('../../assets/hbplus-logo.png');
 
 export const DashboardScreen: React.FC = () => {
-  const { user, signOut, navigateTo, setPassword } = useAuth();
+  const { user, signOut, navigateTo, setPassword, grantAdminAccess, elevateToAdmin } = useAuth();
   const { width } = useWindowDimensions();
   const isDesktop = width >= THEME.breakpoints.tablet;
 
   const [activeTab, setActiveTab] = useState<'overview' | 'resources'>('overview');
+
+  // Quick Grant Admin State on Dashboard
+  const [quickAdminEmail, setQuickAdminEmail] = useState('');
+  const [quickAdminMsg, setQuickAdminMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [isQuickGranting, setIsQuickGranting] = useState(false);
+
+  const handleQuickGrantAdmin = async () => {
+    const trimmed = quickAdminEmail.trim();
+    if (!trimmed) {
+      setQuickAdminMsg({ text: 'Please enter a valid corporate email.', type: 'error' });
+      return;
+    }
+    if (!trimmed.toLowerCase().endsWith(`@${APP_CONFIG.allowedDomain}`)) {
+      setQuickAdminMsg({
+        text: `Access restricted. Only @${APP_CONFIG.allowedDomain} corporate emails can receive admin permissions.`,
+        type: 'error',
+      });
+      return;
+    }
+
+    setIsQuickGranting(true);
+    setQuickAdminMsg(null);
+    const res = await grantAdminAccess(trimmed);
+    setQuickAdminMsg({ text: res.message, type: res.success ? 'success' : 'error' });
+    if (res.success) {
+      setQuickAdminEmail('');
+    }
+    setIsQuickGranting(false);
+  };
 
   // Custom Password Setting State
   const [newPassword, setNewPassword] = useState('');
@@ -216,7 +245,7 @@ export const DashboardScreen: React.FC = () => {
               </View>
 
               {/* Admin Announcement Callout (If user is Admin) */}
-              {user?.role === 'admin' && (
+              {user?.role === 'admin' ? (
                 <Pressable
                   onPress={() => navigateTo('admin')}
                   style={({ pressed }) => [styles.adminNotice, pressed && { opacity: 0.85 }]}
@@ -228,7 +257,7 @@ export const DashboardScreen: React.FC = () => {
                     <View style={{ flex: 1 }}>
                       <Text style={styles.adminNoticeTitle}>Administrator Controls Active</Text>
                       <Text style={styles.adminNoticeBody}>
-                        You have permission to manage team accounts, toggle roles, and review security audit logs.
+                        You have permission to manage team accounts, grant/revoke admin permissions, and review security audit logs.
                       </Text>
                     </View>
                   </View>
@@ -236,6 +265,85 @@ export const DashboardScreen: React.FC = () => {
                     <Text style={styles.adminNoticeBtnText}>Open Panel →</Text>
                   </View>
                 </Pressable>
+              ) : (
+                /* Elevation Callout (If user is not yet Admin) */
+                <View style={styles.elevateNotice}>
+                  <View style={styles.elevateNoticeContent}>
+                    <View style={styles.elevateIconBox}>
+                      <Ionicons name="shield-checkmark-outline" size={22} color={THEME.colors.terracotta} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.elevateNoticeTitle}>Elevate to Administrator</Text>
+                      <Text style={styles.elevateNoticeBody}>
+                        Claim administrator privileges to grant admin access to colleagues, manage team roles, and inspect security audit logs.
+                      </Text>
+                    </View>
+                  </View>
+                  <Pressable
+                    onPress={elevateToAdmin}
+                    style={({ pressed }) => [styles.elevateBtn, pressed && { opacity: 0.85 }]}
+                  >
+                    <Text style={styles.elevateBtnText}>👑 Grant Myself Admin Access</Text>
+                  </Pressable>
+                </View>
+              )}
+
+              {/* CARD: QUICK GRANT ADMIN ACCESS (Directly on Dashboard if Admin) */}
+              {user?.role === 'admin' && (
+                <View style={styles.cardContainer}>
+                  <View style={styles.cardHeaderRow}>
+                    <View>
+                      <Text style={styles.cardTitle}>Grant Admin Access & Permissions</Text>
+                      <Text style={styles.cardSubtitle}>
+                        Assign administrator permissions to any verified @{APP_CONFIG.allowedDomain} team member.
+                      </Text>
+                    </View>
+                    <Badge label="ADMIN PRIVILEGES" variant="admin" />
+                  </View>
+
+                  {quickAdminMsg && (
+                    <View style={[styles.pwdAlertBox, quickAdminMsg.type === 'success' ? styles.quickAdminAlertSuccess : styles.pwdAlertError]}>
+                      <Ionicons
+                        name={quickAdminMsg.type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'}
+                        size={16}
+                        color={quickAdminMsg.type === 'success' ? '#6D28D9' : THEME.colors.error}
+                        style={{ marginRight: 6 }}
+                      />
+                      <Text style={[styles.pwdAlertText, quickAdminMsg.type === 'success' ? styles.quickAdminAlertTextSuccess : styles.pwdAlertTextError]}>
+                        {quickAdminMsg.text}
+                      </Text>
+                    </View>
+                  )}
+
+                  <View style={[styles.grantAdminRow, !isDesktop && styles.grantAdminRowMobile]}>
+                    <View style={styles.grantAdminInputWrapper}>
+                      <Ionicons name="mail-outline" size={16} color={THEME.colors.textMuted} style={styles.pwdInputIcon} />
+                      <TextInput
+                        style={styles.pwdTextInput}
+                        placeholder={`colleague@${APP_CONFIG.allowedDomain}`}
+                        placeholderTextColor={THEME.colors.textMuted}
+                        value={quickAdminEmail}
+                        onChangeText={setQuickAdminEmail}
+                        autoCapitalize="none"
+                        keyboardType="email-address"
+                      />
+                    </View>
+                    <Pressable
+                      onPress={handleQuickGrantAdmin}
+                      disabled={isQuickGranting}
+                      style={({ pressed }) => [
+                        styles.quickGrantBtn,
+                        pressed && { opacity: 0.8 },
+                        isQuickGranting && { opacity: 0.6 },
+                      ]}
+                    >
+                      <Ionicons name="shield-checkmark" size={15} color="#FFFFFF" style={{ marginRight: 6 }} />
+                      <Text style={styles.quickGrantBtnText}>
+                        {isQuickGranting ? 'Granting...' : 'Grant Admin Access'}
+                      </Text>
+                    </Pressable>
+                  </View>
+                </View>
               )}
 
               {/* CARD: YOUR ACCOUNT (From Figma Screen 2 & 4) */}
@@ -265,6 +373,20 @@ export const DashboardScreen: React.FC = () => {
                       label={user?.role === 'admin' ? 'Administrator' : 'Team Member'}
                       variant={user?.role === 'admin' ? 'admin' : 'sage'}
                     />
+                  </View>
+
+                  <View style={styles.tableRow}>
+                    <Text style={styles.tableLabel}>Admin privileges</Text>
+                    <View style={styles.domainValueRow}>
+                      <Text style={styles.tableValue}>
+                        {user?.role === 'admin' ? 'Full Access (Can Grant & Revoke Roles)' : 'Standard Access'}
+                      </Text>
+                      {user?.role !== 'admin' && (
+                        <Pressable onPress={elevateToAdmin} style={styles.claimAdminPill}>
+                          <Text style={styles.claimAdminPillText}>Claim Admin</Text>
+                        </Pressable>
+                      )}
+                    </View>
                   </View>
 
                   <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
@@ -807,6 +929,113 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 12,
+  },
+
+  // Elevate to Administrator Notice
+  elevateNotice: {
+    backgroundColor: '#FFF7ED',
+    borderColor: '#FED7AA',
+    borderWidth: 1.5,
+    borderRadius: THEME.borderRadius.card,
+    padding: THEME.spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: THEME.spacing.lg,
+    flexWrap: 'wrap',
+    gap: 12,
+    ...THEME.shadows.sm,
+  },
+  elevateNoticeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    minWidth: 260,
+  },
+  elevateIconBox: {
+    marginRight: 12,
+  },
+  elevateNoticeTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#9A3412',
+  },
+  elevateNoticeBody: {
+    fontSize: 12,
+    color: '#C2410C',
+    marginTop: 2,
+    lineHeight: 17,
+  },
+  elevateBtn: {
+    backgroundColor: THEME.colors.terracotta,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: THEME.borderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  elevateBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+
+  // Quick Grant Admin Row
+  grantAdminRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 4,
+  },
+  grantAdminRowMobile: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
+  grantAdminInputWrapper: {
+    flex: 1,
+    height: 44,
+    backgroundColor: '#FAF8F5',
+    borderWidth: 1.5,
+    borderColor: THEME.colors.cardBorder,
+    borderRadius: THEME.borderRadius.md,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  quickGrantBtn: {
+    backgroundColor: THEME.colors.onyx,
+    height: 44,
+    paddingHorizontal: 18,
+    borderRadius: THEME.borderRadius.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickGrantBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  quickAdminAlertSuccess: {
+    backgroundColor: '#FAF5FF',
+    borderColor: '#DDD6FE',
+  },
+  quickAdminAlertTextSuccess: {
+    color: '#6D28D9',
+    fontWeight: '600',
+  },
+  claimAdminPill: {
+    backgroundColor: '#FFF7ED',
+    borderWidth: 1,
+    borderColor: '#FED7AA',
+    borderRadius: THEME.borderRadius.full,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  claimAdminPillText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: THEME.colors.terracotta,
   },
 
   // Account Card
