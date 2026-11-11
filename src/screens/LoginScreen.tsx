@@ -40,17 +40,6 @@ export const LoginScreen: React.FC = () => {
       contentContainerStyle={styles.scrollRoot}
       keyboardShouldPersistTaps="handled"
     >
-      {/* DESKTOP TOP ANNOUNCEMENT BANNER */}
-      {isDesktop && (
-        <View style={styles.desktopAnnouncementBar}>
-          <View style={styles.desktopAnnouncementDot} />
-          <Text style={styles.desktopAnnouncementText}>
-            Real health goes beyond fitness. It lives at the intersection of body, mind, and gut. Welcome to the official HB+ team portal trusted by{' '}
-            <Text style={styles.desktopAnnouncementBold}>1550+ Members</Text>.
-          </Text>
-        </View>
-      )}
-
       <View style={[styles.mainLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
 
         {/* LEFT / TOP HERO PANEL (Official HB+ Branding from example.html) */}
@@ -70,34 +59,16 @@ export const LoginScreen: React.FC = () => {
           </View>
 
           <View style={styles.heroMiddle}>
-            <View style={styles.heroPill}>
-              <View style={styles.heroPillDot} />
-              <Text style={styles.heroPillText}>HOP WITH HB • OFFICIAL TEAM PORTAL</Text>
-            </View>
-
-            <Text style={styles.heroTitle}>
-              Real health goes beyond fitness. It lives at the intersection of body, mind, and gut.
-            </Text>
-
+            <Text style={styles.heroTaglineKicker}>HOP WITH HB</Text>
+            <Text style={styles.heroTitle}>Wellness That Understands Your Lifestyle.</Text>
             <Text style={styles.heroDescription}>
               Real health goes beyond fitness. It lives at the intersection of body, mind, and gut. Welcome to the official HB+ team portal trusted by{' '}
               <Text style={styles.heroHighlightText}>1550+ Members</Text>.
             </Text>
 
-            <View style={styles.memberTrustCard}>
-              <View style={styles.memberTrustTop}>
-                <View style={styles.memberTrustIconWrap}>
-                  <Ionicons name="lock-closed" size={16} color={THEME.colors.terracotta} />
-                </View>
-                <View>
-                  <Text style={styles.memberTrustNum}>1550+</Text>
-                  <Text style={styles.memberTrustLabel}>Active Team Members</Text>
-                </View>
-              </View>
-              <Text style={styles.memberTrustDomainTag}>
-                Restricted to verified @{ALLOWED_DOMAIN} accounts
-              </Text>
-            </View>
+
+
+
           </View>
 
           <View style={styles.heroFooter}>
@@ -120,12 +91,6 @@ export const LoginScreen: React.FC = () => {
           <View style={styles.authContentContainer}>
             {/* Header */}
             <View style={styles.authHeader}>
-              <View style={styles.authTrustBadge}>
-                <Ionicons name="lock-closed" size={12} color={THEME.colors.terracotta} style={{ marginRight: 6 }} />
-                <Text style={styles.authTrustBadgeText}>
-                  TRUSTED BY 1550+ MEMBERS • OFFICIAL PORTAL
-                </Text>
-              </View>
 
               <Text style={styles.authTitle}>Your workspace awaits.</Text>
               <Text style={styles.authSubtitle}>
@@ -246,40 +211,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: THEME.spacing.md,
   },
-  desktopAnnouncementBar: {
-    maxWidth: 1040,
-    width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: THEME.colors.cardBorder,
-    borderRadius: THEME.borderRadius.full,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    ...THEME.shadows.sm,
-  },
-  desktopAnnouncementDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: THEME.colors.terracotta,
-    marginRight: 10,
-  },
-  desktopAnnouncementText: {
-    fontFamily: THEME.typography.fontFamily.sans,
-    fontSize: 13,
-    color: THEME.colors.textPrimary,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  desktopAnnouncementBold: {
-    fontFamily: THEME.typography.fontFamily.gilroy,
-    fontWeight: '700',
-    color: THEME.colors.terracotta,
-  },
   mainLayout: {
     width: '100%',
     backgroundColor: THEME.colors.surface,
@@ -357,34 +288,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: THEME.colors.terracotta,
   },
-  heroPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: THEME.borderRadius.full,
-    borderWidth: 1,
-    borderColor: THEME.colors.cardBorder,
-    alignSelf: 'flex-start',
-    marginBottom: 14,
-  },
-  heroPillDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: THEME.colors.terracotta,
-    marginRight: 6,
-  },
-  heroPillText: {
-    fontFamily: THEME.typography.fontFamily.sans,
-    fontSize: 10,
-    fontWeight: '800',
-    color: THEME.colors.terracotta,
-    letterSpacing: 0.8,
-  },
   heroMiddle: {
-    marginVertical: THEME.spacing.md,
+    marginVertical: THEME.spacing.lg,
   },
   heroTaglineKicker: {
     fontFamily: THEME.typography.fontFamily.sans,
@@ -396,65 +301,24 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     fontFamily: THEME.typography.fontFamily.serif,
-    fontSize: 26,
+    fontSize: 34,
     fontWeight: '700',
     color: THEME.colors.onyx,
-    lineHeight: 34,
+    lineHeight: 42,
     letterSpacing: -0.5,
   },
   heroDescription: {
     fontFamily: THEME.typography.fontFamily.sans,
-    fontSize: 14,
+    fontSize: THEME.typography.fontSize.base,
     color: THEME.colors.textSecondary,
-    marginTop: 10,
-    lineHeight: 22,
-    maxWidth: 420,
+    marginTop: 12,
+    lineHeight: 24,
+    maxWidth: 360,
   },
   heroHighlightText: {
     fontFamily: THEME.typography.fontFamily.gilroy,
     fontWeight: '700',
     color: THEME.colors.terracotta,
-  },
-  memberTrustCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: THEME.borderRadius.card,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: THEME.colors.cardBorder,
-    marginTop: 16,
-    ...THEME.shadows.sm,
-  },
-  memberTrustTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  memberTrustIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: THEME.colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-  memberTrustNum: {
-    fontFamily: THEME.typography.fontFamily.gilroy,
-    fontSize: 18,
-    fontWeight: '800',
-    color: THEME.colors.terracotta,
-    letterSpacing: -0.3,
-  },
-  memberTrustLabel: {
-    fontFamily: THEME.typography.fontFamily.sans,
-    fontSize: 11,
-    color: THEME.colors.textSecondary,
-    fontWeight: '600',
-  },
-  memberTrustDomainTag: {
-    fontFamily: THEME.typography.fontFamily.sans,
-    fontSize: 11,
-    color: THEME.colors.textMuted,
-    marginTop: 6,
   },
   domainHighlightCard: {
     backgroundColor: '#FFFFFF',
@@ -565,23 +429,6 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     width: '100%',
     alignSelf: 'center',
-  },
-  authTrustBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: THEME.colors.primaryLight,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: THEME.borderRadius.full,
-    alignSelf: 'flex-start',
-    marginBottom: 10,
-  },
-  authTrustBadgeText: {
-    fontFamily: THEME.typography.fontFamily.sans,
-    fontSize: 10,
-    fontWeight: '800',
-    color: THEME.colors.terracotta,
-    letterSpacing: 0.5,
   },
   authHeader: {
     marginBottom: THEME.spacing.lg,
