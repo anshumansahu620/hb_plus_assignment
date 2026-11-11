@@ -11,7 +11,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { Badge } from '../components/Badge';
-import { Button } from '../components/Button';
 import { THEME } from '../constants/theme';
 import { APP_CONFIG } from '../constants/config';
 
@@ -30,11 +29,11 @@ export const DashboardScreen: React.FC = () => {
     <View style={styles.rootWrapper}>
       <View style={[styles.dashboardLayout, isDesktop ? styles.layoutDesktop : styles.layoutMobile]}>
         
-        {/* SIDEBAR (Desktop only - matches Figma middle screen) */}
+        {/* PERMANENT UNCOLLAPSIBLE DESKTOP SIDEBAR (Figma Prototype Standard) */}
         {isDesktop && (
           <View style={styles.sidebar}>
             <View style={styles.sidebarTop}>
-              {/* Brand Logo */}
+              {/* Brand Header */}
               <View style={styles.brandRow}>
                 <View style={styles.brandDot} />
                 <Text style={styles.brandName}>hbplus</Text>
@@ -110,6 +109,7 @@ export const DashboardScreen: React.FC = () => {
                 onPress={signOut}
                 style={({ pressed }) => [styles.signOutLink, pressed && { opacity: 0.6 }]}
               >
+                <Ionicons name="log-out-outline" size={14} color={THEME.colors.error} style={{ marginRight: 6 }} />
                 <Text style={styles.signOutText}>Sign out</Text>
               </Pressable>
             </View>
@@ -121,7 +121,7 @@ export const DashboardScreen: React.FC = () => {
           {/* Top Mobile Bar if mobile */}
           {!isDesktop && (
             <View style={styles.mobileTopBar}>
-              <View style={styles.brandRow}>
+              <View style={styles.brandRowMobile}>
                 <View style={styles.brandDot} />
                 <Text style={styles.brandNameDark}>hbplus</Text>
               </View>
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
 
-  // Sidebar Styles (Figma Screen 2)
+  // Permanent Uncollapsible Sidebar (250px)
   sidebar: {
     width: 250,
     backgroundColor: '#FFFFFF',
@@ -315,11 +315,17 @@ const styles = StyleSheet.create({
     padding: THEME.spacing.lg,
     justifyContent: 'space-between',
   },
-  sidebarTop: {},
+  sidebarTop: {
+    width: '100%',
+  },
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: THEME.spacing.xl,
+  },
+  brandRowMobile: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   brandDot: {
     width: 8,
@@ -408,6 +414,8 @@ const styles = StyleSheet.create({
     color: THEME.colors.textMuted,
   },
   signOutLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 4,
   },
   signOutText: {
@@ -534,9 +542,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  lockBadgeIcon: {
-    fontSize: 22,
   },
 
   // Admin Announcement
@@ -673,9 +678,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
-  },
-  moduleIcon: {
-    fontSize: 18,
   },
   moduleTitle: {
     fontSize: 14,
