@@ -1,6 +1,6 @@
 # HB+ Security & Team Portal
 
-A cross-platform React Native and React Native for Web application built for Hop with HB (`hbplus.fit`). The portal enforces corporate domain-restricted authentication supporting both Google OAuth 2.0 and Work Email credentials, granting access exclusively to accounts under `@hbplus.fit` while strictly blocking unauthorized domains.
+A cross-platform React Native and React Native for Web application built for Hop with HB (hbplus.fit). The portal enforces corporate domain-restricted authentication supporting both Google OAuth 2.0 and Work Email credentials, granting access exclusively to accounts under @hbplus.fit while strictly blocking unauthorized domains.
 
 ---
 
@@ -9,15 +9,15 @@ A cross-platform React Native and React Native for Web application built for Hop
 ### Objective
 Design and implement a cross-platform web and mobile security portal that satisfies the following core requirements:
 
-1. **Authentication Options**: Support single sign-on via Google OAuth 2.0 and direct Work Email authentication.
-2. **Strict Domain Validation**: Verify the user email domain against the authorized corporate domain (`@hbplus.fit`).
-3. **Domain Whitelisting**:
-   - Authorized Domain: Users with `@hbplus.fit` emails (for example, `employee@hbplus.fit`) are validated, their profile is synchronized, and access to the protected Dashboard and Resource Library is granted.
-   - Unauthorized Domain: Users authenticating with any non-whitelisted email (for example, `user@gmail.com` or `user@yahoo.com`) are immediately rejected, session tokens are revoked, and the exact error alert is displayed:
+1. Authentication Options: Support single sign-on via Google OAuth 2.0 and direct Work Email authentication.
+2. Strict Domain Validation: Verify the user email domain against the authorized corporate domain (@hbplus.fit).
+3. Domain Whitelisting:
+   - Authorized Domain: Users with @hbplus.fit emails (for example, employee@hbplus.fit) are validated, their profile is synchronized, and access to the protected Dashboard and Resource Library is granted.
+   - Unauthorized Domain: Users authenticating with any non-whitelisted email (for example, user@gmail.com or user@yahoo.com) are immediately rejected, session tokens are revoked, and the exact error alert is displayed:
      > "Access restricted. Please login using your official domain email."
-4. **Custom Password Setup**: Allow users who authenticate via Google OAuth to configure a personal workspace password directly from the dashboard, enabling direct work email sign-in.
-5. **Role-Based Access Control**: Standard users and Administrators are segregated with role-specific views, permission delegation capabilities, and security audit logging.
-6. **Brand Design Alignment**: Visual layout, color palette (Warm Sand, Terracotta, Onyx, Warm Cream), typography (The Seasons, Gilroy, DM Sans), and iconography (clean lock symbols) extracted directly from the Hop with HB production design.
+4. Custom Password Setup: Allow users who authenticate via Google OAuth to configure a personal workspace password directly from the dashboard, enabling direct work email sign-in.
+5. Role-Based Access Control: Standard users and Administrators are segregated with role-specific views, permission delegation capabilities, and security audit logging.
+6. Brand Design Alignment: Visual layout, color palette (Warm Sand, Terracotta, Onyx, Warm Cream), typography (The Seasons, Gilroy, DM Sans), and iconography (clean lock symbols) extracted directly from the Hop with HB production design.
 
 ---
 
@@ -57,25 +57,25 @@ The application operates as a single-page application on the web and as an Expo 
                                             6. User stays on Login Screen
 ```
 
-### 2.2 Global State Management (`src/context/AuthContext.tsx`)
-The `AuthProvider` context acts as the central state controller for the entire application lifecycle:
-- **Session Restoration**: On application mount, `initAuth()` checks for active Supabase sessions or persisted local sessions (`appStorage`). If a cached session belongs to an unauthorized domain, it is purged automatically.
-- **Switchable Authentication**: Handles OAuth redirect callbacks for Web and native URL schemes for Mobile (`supabase.auth.onAuthStateChange`).
-- **Domain Enforcement**: Both `signInWithGoogle` and `signInWithEmail` pass candidate emails through `validateEmailDomain()` before setting the authenticated user state.
-- **Password Management**: The `setPassword()` method allows authenticated domain users to store an encrypted credential in Supabase and local storage for direct email sign-in.
-- **Admin Delegation**: `grantAdminAccess()` and `revokeAdminAccess()` persist administrator rights across browser and device restarts using Supabase and `appStorage`.
-- **Client Route Guard**: Exposes `activeRoute` and `navigateTo()` functions that enforce view access controls.
+### 2.2 Global State Management (src/context/AuthContext.tsx)
+The AuthProvider context acts as the central state controller for the entire application lifecycle:
+- Session Restoration: On application mount, initAuth() checks for active Supabase sessions or persisted local sessions (appStorage). If a cached session belongs to an unauthorized domain, it is purged automatically.
+- Switchable Authentication: Handles OAuth redirect callbacks for Web and native URL schemes for Mobile (supabase.auth.onAuthStateChange).
+- Domain Enforcement: Both signInWithGoogle and signInWithEmail pass candidate emails through validateEmailDomain() before setting the authenticated user state.
+- Password Management: The setPassword() method allows authenticated domain users to store an encrypted credential in Supabase and local storage for direct email sign-in.
+- Admin Delegation: grantAdminAccess() and revokeAdminAccess() persist administrator rights across browser and device restarts using Supabase and appStorage.
+- Client Route Guard: Exposes activeRoute and navigateTo() functions that enforce view access controls.
 
-### 2.3 Route Protection (`App.tsx`)
+### 2.3 Route Protection (App.tsx)
 Route protection is enforced declaratively at the application root:
-- If `isLoading` is true, an animated loading screen displays while checking session credentials.
-- If `!isAuthenticated`, the application renders `LoginScreen`. Any direct route navigation to protected paths (such as `#dashboard` or `#admin`) is intercepted and redirected back to `login`.
-- If `isAuthenticated` and `activeRoute === 'admin'`, the app verifies that `user.role === 'admin'`. Non-admin attempts to open the admin view are intercepted and redirected to the dashboard.
-- If `isAuthenticated` and `activeRoute === 'dashboard'` or `activeRoute === 'resources'`, the protected `DashboardScreen` is rendered.
+- If isLoading is true, an animated loading screen displays while checking session credentials.
+- If !isAuthenticated, the application renders LoginScreen. Any direct route navigation to protected paths (such as #dashboard or #admin) is intercepted and redirected back to login.
+- If isAuthenticated and activeRoute === 'admin', the app verifies that user.role === 'admin'. Non-admin attempts to open the admin view are intercepted and redirected to the dashboard.
+- If isAuthenticated and activeRoute === 'dashboard' or activeRoute === 'resources', the protected DashboardScreen is rendered.
 
-### 2.4 Multi-Tier Storage Architecture (`src/utils/storage.ts`)
-React Native applications running on the web do not have native access to `AsyncStorage` without proper fallback handling. The `appStorage` utility implements a resilient storage adapter:
-1. Web Platform: Uses browser `localStorage`.
+### 2.4 Multi-Tier Storage Architecture (src/utils/storage.ts)
+React Native applications running on the web do not have native access to AsyncStorage without proper fallback handling. The appStorage utility implements a resilient storage adapter:
+1. Web Platform: Uses browser localStorage.
 2. Mobile Platform: Uses in-memory storage with fallbacks to avoid unhandled native bridge exceptions.
 3. Safe Parsing: Every read/write operation is wrapped in try-catch handlers to prevent application crashes during private browsing or restricted browser cookie modes.
 
@@ -85,91 +85,91 @@ React Native applications running on the web do not have native access to `Async
 
 ```
 hb_assignment/
-├── assets/                                 # Static image assets and application icons
-│   ├── favicon.png                         # Browser tab favicon (official HB+ mark)
-│   ├── google-logo.svg                     # Official multicolor Google G logo
-│   ├── hbplus-logo.png                     # Official Hop with HB brand logo
-│   ├── icon.png                            # Application launcher icon
-│   └── splash-icon.png                     # Splash screen icon
-├── public/                                 # Web root served by Metro bundler
-│   ├── favicon.ico                         # Root favicon
-│   ├── hbplus-logo.png                     # Static root asset for HTML headers
-│   └── index.html                          # HTML shell with Google Fonts and meta tags
-├── src/
-│   ├── components/                         # Modular, reusable UI components
-│   │   ├── Badge.tsx                       # Status and role indicator badges
-│   │   ├── Button.tsx                      # Primary and secondary tactile buttons
-│   │   ├── Card.tsx                        # Reusable dashboard card wrapper
-│   │   ├── ErrorAlert.tsx                  # Dismissible security alert banner
-│   │   ├── GoogleSignInButton.tsx          # Google-branded sign-in button
-│   │   ├── Navbar.tsx                      # Responsive navigation header & sidebar
-│   │   └── ResourcesView.tsx               # 14-protocol team resource library
-│   ├── constants/
-│   │   ├── config.ts                       # Configuration constants and domain settings
-│   │   └── theme.ts                        # Design system tokens (colors, typography, spacing)
-│   ├── context/
-│   │   └── AuthContext.tsx                 # Core authentication context and state machine
-│   ├── screens/
-│   │   ├── AdminScreen.tsx                 # Administrator management and audit trail
-│   │   ├── DashboardScreen.tsx             # Authenticated user dashboard and settings
-│   │   └── LoginScreen.tsx                 # Switchable Google/Email login screen
-│   ├── services/
-│   │   ├── db.ts                           # Database operations and audit logging
-│   │   └── supabase.ts                     # Supabase client and OAuth configuration
-│   ├── types/
-│   │   └── auth.ts                         # TypeScript data contracts and interfaces
-│   └── utils/
-│       ├── __tests__/                      # Automated unit test suites
-│       │   └── domainValidator.test.ts     # Domain validator unit tests
-│       ├── domainValidator.ts              # Strict domain validation logic
-│       ├── loadFonts.ts                    # Dynamic web font injector (The Seasons, Gilroy)
-│       └── storage.ts                      # Cross-platform persistent storage adapter
-├── App.tsx                                 # Application entrypoint and route dispatcher
-├── app.json                                # Expo project configuration manifest
-├── index.ts                                # Registration wrapper for Expo runtime
-├── netlify.toml                            # Netlify production build and redirect rules
-├── package.json                            # Package dependencies and execution scripts
-├── tsconfig.json                           # TypeScript compiler configuration
-└── README.md                               # Project documentation
+|-- assets/                                 # Static image assets and application icons
+|   |-- favicon.png                         # Browser tab favicon (official HB+ mark)
+|   |-- google-logo.svg                     # Official multicolor Google G logo
+|   |-- hbplus-logo.png                     # Official Hop with HB brand logo
+|   |-- icon.png                            # Application launcher icon
+|   \-- splash-icon.png                     # Splash screen icon
+|-- public/                                 # Web root served by Metro bundler
+|   |-- favicon.ico                         # Root favicon
+|   |-- hbplus-logo.png                     # Static root asset for HTML headers
+|   \-- index.html                          # HTML shell with Google Fonts and meta tags
+|-- src/
+|   |-- components/                         # Modular, reusable UI components
+|   |   |-- Badge.tsx                       # Status and role indicator badges
+|   |   |-- Button.tsx                      # Primary and secondary tactile buttons
+|   |   |-- Card.tsx                        # Reusable dashboard card wrapper
+|   |   |-- ErrorAlert.tsx                  # Dismissible security alert banner
+|   |   |-- GoogleSignInButton.tsx          # Google-branded sign-in button
+|   |   |-- Navbar.tsx                      # Responsive navigation header and sidebar
+|   |   \-- ResourcesView.tsx               # 14-protocol team resource library
+|   |-- constants/
+|   |   |-- config.ts                       # Configuration constants and domain settings
+|   |   \-- theme.ts                        # Design system tokens (colors, typography, spacing)
+|   |-- context/
+|   |   \-- AuthContext.tsx                 # Core authentication context and state machine
+|   |-- screens/
+|   |   |-- AdminScreen.tsx                 # Administrator management and audit trail
+|   |   |-- DashboardScreen.tsx             # Authenticated user dashboard and settings
+|   |   \-- LoginScreen.tsx                 # Switchable Google/Email login screen
+|   |-- services/
+|   |   |-- db.ts                           # Database operations and audit logging
+|   |   \-- supabase.ts                     # Supabase client and OAuth configuration
+|   |-- types/
+|   |   \-- auth.ts                         # TypeScript data contracts and interfaces
+|   \-- utils/
+|       |-- __tests__/                      # Automated unit test suites
+|       |   \-- domainValidator.test.ts     # Domain validator unit tests
+|       |-- domainValidator.ts              # Strict domain validation logic
+|       |-- loadFonts.ts                    # Dynamic web font injector (The Seasons, Gilroy)
+|       \-- storage.ts                      # Cross-platform persistent storage adapter
+|-- App.tsx                                 # Application entrypoint and route dispatcher
+|-- app.json                                # Expo project configuration manifest
+|-- index.ts                                # Registration wrapper for Expo runtime
+|-- netlify.toml                            # Netlify production build and redirect rules
+|-- package.json                            # Package dependencies and execution scripts
+|-- tsconfig.json                           # TypeScript compiler configuration
+\-- README.md                               # Project documentation
 ```
 
 ---
 
 ## 4. Key Screens & Component Descriptions
 
-### 4.1 Login Screen (`src/screens/LoginScreen.tsx`)
-- **Desktop Split View**: Left side features the Hop with HB editorial brand banner with responsive title typography and the verified member trust statement. The right side contains the authentication card.
-- **Switchable Authentication Tabs**: A segmented tab control allows users to cleanly toggle between **Google SSO** and **Work Email** without visual clutter.
-- **Google OAuth Button**: Initiates standard OAuth consent flow.
-- **Work Email Form**: Validates corporate work email and password inputs with field validation and toggleable password visibility.
-- **Error Presentation**: Displays the exact required domain restriction error whenever a non-domain account is rejected.
-- **Evaluator Sandbox**: Provides quick one-click evaluator credentials to easily test allowed domain access, admin privileges, and blocked domain scenarios.
+### 4.1 Login Screen (src/screens/LoginScreen.tsx)
+- Desktop Split View: Left side features the Hop with HB editorial brand banner with responsive title typography and the verified member trust statement. The right side contains the authentication card.
+- Switchable Authentication Tabs: A segmented tab control allows users to cleanly toggle between Google SSO and Work Email without visual clutter.
+- Google OAuth Button: Initiates standard OAuth consent flow.
+- Work Email Form: Validates corporate work email and password inputs with field validation and toggleable password visibility.
+- Error Presentation: Displays the exact required domain restriction error whenever a non-domain account is rejected.
+- Evaluator Sandbox: Provides quick one-click evaluator credentials to easily test allowed domain access, admin privileges, and blocked domain scenarios.
 
-### 4.2 Dashboard Screen (`src/screens/DashboardScreen.tsx`)
-- **Fixed Sidebar Navigation**: On desktop viewports (880px and wider), a permanent 250px uncollapsible sidebar provides fast navigation between Overview, Resources, and Admin views.
-- **Hero Welcome Banner**: Displays the active workspace greeting, personalized with the user name and the official Hop with HB lifestyle statement.
-- **Admin Access Management**: An embedded management card allowing verified team members to assign administrator privileges to any colleague under `@hbplus.fit`. Includes title auto-scaling and responsive container boundaries.
-- **Account Overview Table**: Displays authenticated email, domain status, assigned role, and last login timestamp.
-- **Set Workspace Password Card**: Allows Google-authenticated users to create or update their direct email password with confirmation matching and validation feedback.
-- **Quick Access Modules**: Shortcut cards for Team Directory, Resource Library, and Session Termination.
-- **Integrative Pathways Section**: Overview cards detailing Pain Management, Weight Management, Pre & Post Natal Care, and Lifestyle Management.
+### 4.2 Dashboard Screen (src/screens/DashboardScreen.tsx)
+- Fixed Sidebar Navigation: On desktop viewports (880px and wider), a permanent 250px uncollapsible sidebar provides fast navigation between Overview, Resources, and Admin views.
+- Hero Welcome Banner: Displays the active workspace greeting, personalized with the user name and the official Hop with HB lifestyle statement.
+- Admin Access Management: An embedded management card allowing verified team members to assign administrator privileges to any colleague under @hbplus.fit. Includes title auto-scaling and responsive container boundaries.
+- Account Overview Table: Displays authenticated email, domain status, assigned role, and last login timestamp.
+- Set Workspace Password Card: Allows Google-authenticated users to create or update their direct email password with confirmation matching and validation feedback.
+- Quick Access Modules: Shortcut cards for Team Directory, Resource Library, and Session Termination.
+- Integrative Pathways Section: Overview cards detailing Pain Management, Weight Management, Pre & Post Natal Care, and Lifestyle Management.
 
-### 4.3 Resource Library (`src/components/ResourcesView.tsx`)
+### 4.3 Resource Library (src/components/ResourcesView.tsx)
 - Interactive document repository containing 14 clinical protocols, brand kits, and security compliance handbooks.
 - Real-time search filtering by document title, code, and description.
 - Category pills: Clinical Protocols, Brand & Design, Security & Compliance, Operations.
 - Interactive download action with confirmation toast feedback.
 
-### 4.4 Admin Panel (`src/screens/AdminScreen.tsx`)
-- **Role Assignment**: Grant or revoke administrator privileges for any `@hbplus.fit` email.
-- **Team Directory Table**: Lists verified corporate members with active status indicators, role badges, and action buttons.
-- **Security Audit Log**: Displays chronological records of all authentication events, distinguishing allowed logins from blocked access attempts with timestamps and IP metadata.
+### 4.4 Admin Panel (src/screens/AdminScreen.tsx)
+- Role Assignment: Grant or revoke administrator privileges for any @hbplus.fit email.
+- Team Directory Table: Lists verified corporate members with active status indicators, role badges, and action buttons.
+- Security Audit Log: Displays chronological records of all authentication events, distinguishing allowed logins from blocked access attempts with timestamps and IP metadata.
 
 ---
 
 ## 5. Security & Domain Validation Logic
 
-### Validation Rules in `domainValidator.ts`
+### Validation Rules in domainValidator.ts
 
 ```typescript
 export const ALLOWED_DOMAIN = 'hbplus.fit';
@@ -190,14 +190,14 @@ export const validateEmailDomain = (email: string): boolean => {
 
 | Input Email | Validation Outcome | User Experience |
 | :--- | :--- | :--- |
-| `member@hbplus.fit` | Pass | Login granted, redirected to Dashboard |
-| `admin@hbplus.fit` | Pass | Login granted, Admin privileges activated |
-| `user.name@hbplus.fit` | Pass | Login granted, complex local-part supported |
-| `user@gmail.com` | Fail | Session rejected, exact error displayed |
-| `user@yahoo.com` | Fail | Session rejected, exact error displayed |
-| `user@hbplus.fit.attacker.com` | Fail | Subdomain spoofing rejected |
-| `user@fakehbplus.fit` | Fail | Prefix domain spoofing rejected |
-| `user@HBPLUS.FIT` | Pass | Case-insensitive matching accepted |
+| member@hbplus.fit | Pass | Login granted, redirected to Dashboard |
+| admin@hbplus.fit | Pass | Login granted, Admin privileges activated |
+| user.name@hbplus.fit | Pass | Login granted, complex local-part supported |
+| user@gmail.com | Fail | Session rejected, exact error displayed |
+| user@yahoo.com | Fail | Session rejected, exact error displayed |
+| user@hbplus.fit.attacker.com | Fail | Subdomain spoofing rejected |
+| user@fakehbplus.fit | Fail | Prefix domain spoofing rejected |
+| user@HBPLUS.FIT | Pass | Case-insensitive matching accepted |
 
 ---
 
@@ -216,7 +216,7 @@ npm install
 ```
 
 ### Step 2: Configure Environment Variables
-Create a `.env` file in the project root:
+Create a .env file in the project root:
 ```env
 EXPO_PUBLIC_ALLOWED_DOMAIN=hbplus.fit
 EXPO_PUBLIC_SUPABASE_URL=https://uwklwnsrgbzkhpqcbqqj.supabase.co
@@ -231,7 +231,7 @@ npm run web
 # Alternatively launch Expo interactive CLI
 npm run start
 ```
-The application will open at `http://localhost:8081`.
+The application will open at http://localhost:8081.
 
 ### Step 4: Run Typecheck and Unit Tests
 ```bash
@@ -251,10 +251,10 @@ The project uses Expo static web export to generate production-ready HTML, CSS, 
 ```bash
 npm run build:web
 ```
-The output files are compiled into the `dist/` directory.
+The output files are compiled into the dist/ directory.
 
 ### Netlify Deployment
-The repository includes a production-ready `netlify.toml` file:
+The repository includes a production-ready netlify.toml file:
 ```toml
 [build]
   command = "npm run build:web"
@@ -268,25 +268,25 @@ The repository includes a production-ready `netlify.toml` file:
 
 To deploy on Netlify:
 1. Connect the GitHub repository to your Netlify account.
-2. Ensure the build command is set to `npm run build:web` and the publish directory is `dist`.
-3. Add the environment variables (`EXPO_PUBLIC_ALLOWED_DOMAIN`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`) in the Netlify site settings.
+2. Ensure the build command is set to "npm run build:web" and the publish directory is "dist".
+3. Add the environment variables (EXPO_PUBLIC_ALLOWED_DOMAIN, EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY) in the Netlify site settings.
 4. Deploy the site.
 
 ---
 
 ## 8. Design System Tokens & Brand Standards
 
-All styles are governed by design tokens located in `src/constants/theme.ts`:
+All styles are governed by design tokens located in src/constants/theme.ts:
 
-- **Page Background Canvas**: `#F5F2E9` (Warm Linen Cream)
-- **Card & Surface Background**: `#FFFFFF` / `#EDEAE7` (Warm Stone Sand)
-- **Hairline Border Color**: `#DAD3CE` (Warm Sand Border)
-- **Primary Text & Accents**: `#1A1A1A` (Rich Onyx Charcoal)
-- **Primary CTA / Buttons**: `#9F4022` (Signature Terracotta)
-- **Button Pressed / Hover**: `#87341B` (Deep Terracotta)
-- **Secondary Muted Text**: `#636363` (Muted Slate)
-- **Font Families**:
-  - Serif Display: `The Seasons`, serif
-  - Brand Display: `Gilroy`, sans-serif
-  - Interface Body: `DM Sans`, sans-serif
-- **Iconography**: Clean vector icons from `@expo/vector-icons/Ionicons` utilizing lock symbols (`lock-closed-outline`, `lock-closed`) for security context.
+- Page Background Canvas: #F5F2E9 (Warm Linen Cream)
+- Card & Surface Background: #FFFFFF / #EDEAE7 (Warm Stone Sand)
+- Hairline Border Color: #DAD3CE (Warm Sand Border)
+- Primary Text & Accents: #1A1A1A (Rich Onyx Charcoal)
+- Primary CTA / Buttons: #9F4022 (Signature Terracotta)
+- Button Pressed / Hover: #87341B (Deep Terracotta)
+- Secondary Muted Text: #636363 (Muted Slate)
+- Font Families:
+  - Serif Display: The Seasons, serif
+  - Brand Display: Gilroy, sans-serif
+  - Interface Body: DM Sans, sans-serif
+- Iconography: Clean vector icons from @expo/vector-icons/Ionicons utilizing lock symbols (lock-closed-outline, lock-closed) for security context.
