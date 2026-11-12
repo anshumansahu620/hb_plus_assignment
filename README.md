@@ -224,8 +224,8 @@ The application provides a switchable login form supporting both Google OAuth an
 
 ### Step 1: Clone Repository & Install Dependencies
 ```bash
-git clone https://github.com/your-username/hb-security-portal.git
-cd hb_assignment
+git clone https://github.com/anshumansahu620/hb_plus_assignment.git
+cd hb_plus_assignment
 npm install
 ```
 
