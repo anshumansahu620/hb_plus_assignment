@@ -2,6 +2,10 @@
 
 A cross-platform React Native and React Native for Web application built for Hop with HB (hbplus.fit). The portal enforces corporate domain-restricted authentication supporting both Google OAuth 2.0 and Work Email credentials, granting access exclusively to accounts under @hbplus.fit while strictly blocking unauthorized domains.
 
+- Live URL: https://verdant-sable-417dc6.netlify.app
+- Access Password: My-Drop-Site
+- GitHub Repository: https://github.com/anshumansahu620/hb_plus_assignment.git
+
 ---
 
 ## 1. Executive Summary & Problem Statement
@@ -279,6 +283,9 @@ The repository includes a production-ready netlify.toml file:
   to = "/index.html"
   status = 200
 ```
+
+- Live Production URL: https://verdant-sable-417dc6.netlify.app
+- Access Password: My-Drop-Site
 
 To deploy on Netlify:
 1. Connect the GitHub repository to your Netlify account.
